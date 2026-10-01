@@ -127,7 +127,7 @@ Branch "UseTwice"
 
 A code is base64 of zstd-compressed JSON: an array of skills, each with its
 program as a JSON string in `DATA`. The easy way is the project's own tools,
-which also write JJS's quirks back correctly ([../ai/README.md](../ai/README.md)):
+which also write JJS's quirks back correctly ([MCP and CLI setup](../../README.md#connecting-an-mcp-client)):
 the MCP server's `decode` / `describe` / `encode`, or
 
 ```sh

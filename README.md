@@ -125,6 +125,35 @@ your frame rate; encoding uses the GPU and streams to disk.
   video export, keyframe animation, undo, save).
 - **A CLI**, `sbs`, with the same answers.
 
+#### Connecting an MCP client
+
+In the app, open search (<kbd>Ctrl+Space</kbd>) and choose **Connect an AI
+app**. The wizard configures supported clients, including Claude Desktop,
+Claude Code, Cursor, VS Code, Windsurf, Cline, Codex CLI, Gemini CLI and LM
+Studio.
+
+The installed Windows app can serve MCP over stdio without Node. Configure the
+client to run `arayashiki.exe` from the install folder with the `--mcp`
+argument; it starts the app if needed.
+
+For clients using this repository, `.mcp.json` registers the Node server for
+Claude Code. Other MCP clients can use:
+
+```json
+{
+  "mcpServers": {
+    "arayashiki": {
+      "command": "node",
+      "args": ["<path to this repo>/agent/mcp-server.js"]
+    }
+  }
+}
+```
+
+The repository MCP server and `sbs` CLI need Node 22.15 or later and `npm install`.
+Run CLI commands with `npm run sbs -- <command>`, for example
+`npm run sbs -- decode moveset.txt`.
+
 ## Building and running
 
 ```sh
@@ -147,8 +176,8 @@ npm run sbs -- lib grab slam
 npm run sbs -- docs LAST HIT
 ```
 
-In this repo, Claude Code picks up the MCP server from `.mcp.json` (Node) and
-the how-to from `.claude/skills/arayashiki/`.
+In this repo, Claude Code picks up the MCP server from `.mcp.json`; other
+clients can use the configuration above.
 
 ## How it was built: porting JJS
 
@@ -322,7 +351,6 @@ docs/
   jjs-skill-builder.md  the handbook
   jjs-library/          37 real moves, node by node (for AI and reference)
   jjs-game/             JJS's animations and sounds (generated)
-  ai/README.md          for AI agents
 lib/                    the generators (library, game data, effects)
 tests/                  node:test: engine, golden simulations, tools, MCP, search
 data/                   (git-ignored) real exports everything is checked against
