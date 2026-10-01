@@ -8,12 +8,16 @@
 //   * Taking a moveset from outside: `arayashiki --open <file>` (what
 //     the CLI's `sbs open` and the MCP server's `open_in_app` run). A second
 //     launch hands its file to the window already open.
+//   * Checking GitHub for a newer release and installing it (updates.rs).
+//   * Free AI models on this PC: llama.cpp's server and GGUF models (local.rs).
 
 mod account;
 mod ai;
 mod bridge;
 mod files;
+mod local;
 mod roblox;
+mod updates;
 
 use std::sync::{Arc, Mutex};
 
@@ -305,6 +309,7 @@ fn ui_log(app: tauri::AppHandle, line: String) {
 #[tauri::command]
 fn quit_app(app: tauri::AppHandle) {
     bridge::stop(&app);
+    local::shutdown(&app);
     app.exit(0);
 }
 
@@ -356,6 +361,7 @@ pub fn run() {
             let assets: SharedAssets = Arc::new(Assets::new(dir, account));
             app.manage(assets.clone());
             app.manage(files::Streams::default());
+            app.manage(local::SharedLocal::default());
             // The bridge AI tools reach the app by (bridge.rs).
             let shared_bridge: bridge::SharedBridge = Default::default();
             app.manage(shared_bridge.clone());
@@ -407,8 +413,25 @@ pub fn run() {
             ai::ai_fetch,
             ai::ai_clients,
             ai::connect_ai_client,
-            ai::app_exe_path
+            ai::app_exe_path,
+            updates::update_check,
+            updates::update_download,
+            updates::update_install,
+            updates::open_url,
+            local::local_status,
+            local::local_install_engine,
+            local::local_download_model,
+            local::local_cancel,
+            local::local_delete_model,
+            local::local_start,
+            local::local_stop
         ])
-        .run(tauri::generate_context!())
-        .expect("error while running Arayashiki");
+        .build(tauri::generate_context!())
+        .expect("error while running Arayashiki")
+        .run(|app, event| {
+            // However it closes, a local model's server goes with it.
+            if let tauri::RunEvent::Exit = event {
+                local::shutdown(app);
+            }
+        });
 }

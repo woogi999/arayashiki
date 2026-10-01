@@ -60,7 +60,7 @@ pub struct Bridge {
 
 pub type SharedBridge = Arc<Bridge>;
 
-fn random_token() -> String {
+pub(crate) fn random_token() -> String {
     // Good enough for a local secret: the clock, the process and a heap
     // address through a few rounds of mixing.
     let mut x = std::time::SystemTime::now()

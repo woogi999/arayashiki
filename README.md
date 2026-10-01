@@ -167,6 +167,16 @@ Needs Node 22.15 or later, Rust (stable, MSVC) and WebView2 (part of Windows
 11). The installer lands in `src-tauri/target/release/bundle/nsis/`, the app
 itself at `src-tauri/target/release/arayashiki.exe`.
 
+The installer's sidebar and header pictures (`src-tauri/installer/`) are
+drawn from the app's mark by `python lib/make-installer-art.py` (needs
+Pillow); run it again if the mark changes.
+
+**Releasing.** The app checks GitHub's latest release of
+`woogi999/arayashiki` for updates (`src-tauri/src/updates.rs`). Bump the
+version in `package.json`, `src-tauri/tauri.conf.json` and
+`src-tauri/Cargo.toml`, build, then publish a release tagged `vX.Y.Z` with
+the `…_x64-setup.exe` attached: installed copies offer it from then on.
+
 For agents working from the repo:
 
 ```sh

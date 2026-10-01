@@ -14,6 +14,9 @@ import {
 } from '../platform.js';
 import { ACTIONS, bindingOf, comboOf, custom, rebind, resetBinds } from '../keybinds.js';
 import { appearance, BACKGROUNDS, setAppearance } from '../prefs.js';
+import { openUpdates, setUpdatePrefs, updatePrefs } from '../updates.js';
+import { startTour } from '../onboarding.js';
+import { saveLayout, savedLayouts } from './dock.jsx';
 import { Icon } from '../icons.jsx';
 import { AccountDialog } from './account.jsx';
 import { TemplatesDialog } from './templates.jsx';
@@ -28,6 +31,9 @@ function Redirect({ to }) {
 }
 const ManualDialog = lazy(() => import('./manual.jsx'), 'ManualDialog');
 const ConnectDialog = lazy(() => import('../ai/connect.jsx'), 'ConnectDialog');
+const UpdatesDialog = lazy(() => import('./updates.jsx'), 'UpdatesDialog');
+const WelcomeDialog = lazy(() => import('./tour.jsx'), 'WelcomeDialog');
+const Tour = lazy(() => import('./tour.jsx'), 'Tour');
 import { Button, IconButton, Modal, Segmented, Switch } from './controls.jsx';
 
 const close = () => (S.dialog.value = null);
@@ -172,6 +178,7 @@ const SETTINGS_TABS = [
   { id: 'look', label: 'Appearance' },
   { id: 'ai', label: 'AI' },
   { id: 'roblox', label: 'Roblox' },
+  { id: 'updates', label: 'Updates' },
 ];
 
 function KeybindsSettings() {
@@ -280,7 +287,8 @@ function AiSettings() {
     <>
       <h3 class="section-title">The assistant inside Arayashiki</h3>
       <p class="hint">
-        Chat with your own AI (Claude, ChatGPT, Gemini, OpenRouter, or a free model on this PC with Ollama or LM Studio). It
+        Chat with your own AI (Claude, ChatGPT, Gemini, OpenRouter), or a free one that runs on this PC: choose “On this PC”
+        in the assistant’s settings and download a model (Qwen, Gemma, gpt-oss and more). It
         reads and edits the open moveset, simulates, takes screenshots, exports videos and animates cameras, and everything
         it changes can be undone.
       </p>
@@ -357,6 +365,70 @@ function RobloxSettings() {
   );
 }
 
+function UpdatesSettings() {
+  const p = updatePrefs.value;
+  return (
+    <>
+      <p class="hint">
+        This is Arayashiki <span class="num">{__APP_VERSION__}</span>. New versions come out on GitHub; the app can fetch
+        and install them for you, and your movesets and settings stay as they are.
+      </p>
+      <div class="prop-row">
+        <span>Check for updates at launch</span>
+        <Switch checked={p.auto} label="Check for updates at launch" onChange={(on) => setUpdatePrefs({ auto: on })} />
+      </div>
+      {p.skipped && (
+        <div class="prop-row">
+          <span>Skipped version</span>
+          <span class="settings-inline">
+            <span class="num">{p.skipped}</span>
+            <Button variant="ghost" onClick={() => setUpdatePrefs({ skipped: null })}>
+              Remind me again
+            </Button>
+          </span>
+        </div>
+      )}
+      <div class="modal-actions">
+        <Button icon="sparkles" variant="ghost" onClick={startTour}>
+          Take the quick tour again
+        </Button>
+        <span class="spacer" />
+        <Button icon="refresh" onClick={openUpdates}>
+          Check for updates now
+        </Button>
+      </div>
+    </>
+  );
+}
+
+function SaveLayoutDialog() {
+  const [name, setName] = useState('');
+  const taken = name.trim() && name.trim() in savedLayouts.value;
+  const go = () => saveLayout(name) && close();
+  return (
+    <Modal title="Save the panel layout" class="modal-small" onClose={close}>
+      <p class="hint">Keeps where the panels are and how big. Load it again from Layout in the top bar.</p>
+      <input
+        class="input"
+        maxLength={40}
+        placeholder="Layout name, e.g. Animating"
+        value={name}
+        autoFocus
+        onInput={(e) => setName(e.currentTarget.value)}
+        onKeyDown={(e) => e.key === 'Enter' && name.trim() && go()}
+      />
+      {taken && <p class="hint">That replaces the saved layout of the same name.</p>}
+      <div class="modal-actions">
+        <span class="spacer" />
+        <Button onClick={close}>Cancel</Button>
+        <Button variant="primary" icon="save" disabled={!name.trim()} onClick={go}>
+          Save
+        </Button>
+      </div>
+    </Modal>
+  );
+}
+
 function SettingsDialog() {
   const tab = S.settingsTab.value;
   const setTab = (t) => (S.settingsTab.value = t);
@@ -370,6 +442,8 @@ function SettingsDialog() {
           <AppearanceSettings />
         ) : tab === 'ai' ? (
           <AiSettings />
+        ) : tab === 'updates' ? (
+          <UpdatesSettings />
         ) : (
           <RobloxSettings />
         )}
@@ -399,6 +473,14 @@ export function Dialogs() {
       return <ManualDialog />;
     case 'connect-ai':
       return <ConnectDialog />;
+    case 'updates':
+      return <UpdatesDialog />;
+    case 'save-layout':
+      return <SaveLayoutDialog />;
+    case 'welcome':
+      return <WelcomeDialog />;
+    case 'tour':
+      return <Tour />;
     default:
       return null;
   }

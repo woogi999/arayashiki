@@ -13,12 +13,16 @@
 // the line.
 //
 // A camera block also ignores the screen shakes while it runs, so a shake
-// can be baked into the camera's own path: many short pieces jittering
-// about it.
+// is baked into the camera's own path: many short pieces jittering about it.
+// Each key has its own shake (studs) and turn (degrees), eased from key to
+// key like everything else, so a shake can build, hit and die away.
+//
+// A key can be a jump cut: the animation holds the key before it until the
+// cut's moment, then is at the cut key at once, rather than moving there.
 //
 // Keys are in the body part's frame at their own moment, in the builder's
 // terms: position (x left, y up, z forward, studs), rotation (degrees, as
-// ROTATION takes them). The math is BuilderFX's (src/fx/builderfx.js):
+// ROTATION takes them), size, opacity, shake, turn, cut. The math is BuilderFX's (src/fx/builderfx.js):
 //   a part effect starts at  part · pos · rot  and tweens to  start · pos · alt · altRot
 //   a camera is              part(t) · lerp(pos · rot, pos · alt · altRot)
 // where pos = CFrame.new(-x, y, -z).
@@ -43,7 +47,19 @@ const str = (v) => v.map((x) => String(r3(x) === 0 ? 0 : r3(x))).join(', ');
 /** Effects the animator can drive: the part effects (placed in the world) and the camera. */
 export const ANIMATABLE = ['Mesh', 'Block', 'Sphere', 'Cylinder', 'Wedge', 'Camera'];
 
-export const EASINGS = ['Linear', 'Sine', 'Quad', 'Cubic', 'Quart', 'Quint', 'Exponential', 'Circular', 'Back', 'Bounce', 'Elastic'];
+export const EASINGS = [
+  'Linear',
+  'Sine',
+  'Quad',
+  'Cubic',
+  'Quart',
+  'Quint',
+  'Exponential',
+  'Circular',
+  'Back',
+  'Bounce',
+  'Elastic',
+];
 
 // The animation being edited: { tag, effect, part, keys, ...options } or null.
 export const anim = signal(null);
@@ -76,14 +92,27 @@ export function fromNode(node, tag) {
   const size = Number(n.SIZE ?? 1) || 1;
   const time = Math.max(0.05, Number(n.TIME ?? 1) || 1);
   const ease = `${n['EASING STYLE'] || 'Linear'} ${n['EASING DIRECTION'] || 'In'}`;
-  const first = { t: 0, pos, rot, size, opacity: Number(n.OPACITY ?? 0) || 0, ease };
+  const first = { t: 0, pos, rot, size, opacity: Number(n.OPACITY ?? 0) || 0, ease, shake: 0, turn: 0 };
   const moving = alt.some((c) => Math.abs(c) > EPS);
-  let second = { ...first, t: time, size: size * (Number(n['ALT SIZE'] ?? 1) || 1), opacity: Number(n['ALT OPACITY'] ?? 0) || 0 };
+  let second = {
+    ...first,
+    t: time,
+    size: size * (Number(n['ALT SIZE'] ?? 1) || 1),
+    opacity: Number(n['ALT OPACITY'] ?? 0) || 0,
+  };
   if (moving) {
     const P = cfPos(-pos[0], pos[1], -pos[2]);
     const A = cfPos(-alt[0], alt[1], -alt[2]);
     // A camera ends at pos · alt · altRot; a part at pos · rot · pos · alt · altRot.
-    const end = n.EFFECT === 'Camera' ? P.clone().multiply(A).multiply(cfOrient(...altRot)) : keyMatrix(first).multiply(P).multiply(A).multiply(cfOrient(...altRot));
+    const end =
+      n.EFFECT === 'Camera'
+        ? P.clone()
+            .multiply(A)
+            .multiply(cfOrient(...altRot))
+        : keyMatrix(first)
+            .multiply(P)
+            .multiply(A)
+            .multiply(cfOrient(...altRot));
     second = { ...second, ...keyFrom(end) };
   }
   return {
@@ -97,8 +126,29 @@ export function fromNode(node, tag) {
     easing: n['EASING STYLE'] || 'Linear',
     direction: n['EASING DIRECTION'] || 'InOut',
     hold: 0,
-    shake: { amount: 0, turn: 0, freq: 14, from: 0, to: time, decay: true },
+    shakeFreq: 14, // shakes a second
   };
+}
+
+/**
+ * An animation in today's terms: animations kept from before shakes were
+ * keyed carry one shake ({ amount, turn, freq, from, to, decay }); it
+ * becomes each key's shake and turn (faded as it was).
+ */
+export function normalize(a) {
+  if (!a) return a;
+  const old = a.shake;
+  if (old === undefined && a.shakeFreq != null) return a;
+  const live = old && (old.amount > 0 || old.turn > 0) && old.to > old.from;
+  const keys = a.keys.map((k) => {
+    if (k.shake != null) return k;
+    if (!live) return { ...k, shake: 0, turn: 0 };
+    const inside = k.t >= old.from - EPS && k.t <= old.to + EPS;
+    const fade = old.decay !== false ? Math.max(0, 1 - (k.t - old.from) / (old.to - old.from)) : 1;
+    return { ...k, shake: inside ? r3((old.amount ?? 0) * fade) : 0, turn: inside ? r3((old.turn ?? 0) * fade) : 0 };
+  });
+  const { shake: _old, ...rest } = a;
+  return { ...rest, keys, shakeFreq: a.shakeFreq ?? old?.freq ?? 14 };
 }
 
 // ─── Sampling the keys ──────────────────────────────────────────────────
@@ -106,7 +156,14 @@ export function fromNode(node, tag) {
 function catmull(p0, p1, p2, p3, k) {
   const k2 = k * k;
   const k3 = k2 * k;
-  return p1.map((_, i) => 0.5 * (2 * p1[i] + (-p0[i] + p2[i]) * k + (2 * p0[i] - 5 * p1[i] + 4 * p2[i] - p3[i]) * k2 + (-p0[i] + 3 * p1[i] - 3 * p2[i] + p3[i]) * k3));
+  return p1.map(
+    (_, i) =>
+      0.5 *
+      (2 * p1[i] +
+        (-p0[i] + p2[i]) * k +
+        (2 * p0[i] - 5 * p1[i] + 4 * p2[i] - p3[i]) * k2 +
+        (-p0[i] + 3 * p1[i] - 3 * p2[i] + p3[i]) * k3),
+  );
 }
 
 function quatOf(rot) {
@@ -123,7 +180,12 @@ function eased(A, B, t) {
   return tweenAt(t - A.t, Math.max(EPS, B.t - A.t), style || 'Linear', direction || 'In');
 }
 
-/** The key pose at time t (smooth: through the keys; else straight between them), eased as each key says. */
+/**
+ * The key pose at time t (smooth: through the keys; else straight between
+ * them), eased as each key says. Before a jump cut it holds the key before.
+ * Shake and turn (how hard it shakes there) come along; the jitter itself
+ * is shakenAt's.
+ */
 export function poseAt(a, t) {
   const keys = a.keys;
   if (t <= keys[0].t) return { ...keys[0], t };
@@ -132,12 +194,24 @@ export function poseAt(a, t) {
   while (i < keys.length - 2 && keys[i + 1].t <= t) i++;
   const A = keys[i];
   const B = keys[i + 1];
+  if (B.cut) return { ...A, t, ease: 'Linear In' };
   const k = eased(A, B, t);
-  const P0 = keys[Math.max(0, i - 1)];
-  const P3 = keys[Math.min(keys.length - 1, i + 2)];
+  const u = (t - A.t) / Math.max(EPS, B.t - A.t);
+  // A curve doesn't reach across a cut: it starts again at the cut key.
+  const P0 = i > 0 && !A.cut ? keys[i - 1] : A;
+  const P3 = keys[i + 2] && !keys[i + 2].cut ? keys[i + 2] : B;
   const pos = a.smooth ? catmull(P0.pos, A.pos, B.pos, P3.pos, k) : A.pos.map((v, j) => v + (B.pos[j] - v) * k);
   const rot = rotOf(quatOf(A.rot).slerp(quatOf(B.rot), k));
-  return { t, pos, rot, size: A.size + (B.size - A.size) * k, opacity: A.opacity + (B.opacity - A.opacity) * k, ease: Math.abs(t - A.t) < EPS ? A.ease : 'Linear In' };
+  return {
+    t,
+    pos,
+    rot,
+    size: A.size + (B.size - A.size) * k,
+    opacity: A.opacity + (B.opacity - A.opacity) * k,
+    shake: (A.shake ?? 0) + ((B.shake ?? 0) - (A.shake ?? 0)) * u,
+    turn: (A.turn ?? 0) + ((B.turn ?? 0) - (A.turn ?? 0)) * u,
+    ease: Math.abs(t - A.t) < EPS ? A.ease : 'Linear In',
+  };
 }
 
 // Smooth noise in -1…1, seeded per axis.
@@ -152,44 +226,55 @@ function noise(x, seed) {
   return h(i) + (h(i + 1) - h(i)) * u;
 }
 
+/** A pose moved by its shake: smooth noise in the camera's own right/up axes, and a wobble in its turn. */
+function jitter(a, p) {
+  const amount = p.shake ?? 0;
+  const turn = p.turn ?? 0;
+  if (!(amount > 0 || turn > 0)) return p;
+  const x = p.t * (a.shakeFreq ?? 14);
+  const q = quatOf(p.rot);
+  const right = new Vector3(1, 0, 0).applyQuaternion(q);
+  const up = new Vector3(0, 1, 0).applyQuaternion(q);
+  const off = right.multiplyScalar(noise(x, 1) * amount).add(up.multiplyScalar(noise(x, 2) * amount));
+  // Roblox x is the builder's -x (and z its -z).
+  const pos = [p.pos[0] - off.x, p.pos[1] + off.y, p.pos[2] - off.z];
+  const rot = [p.rot[0] + noise(x, 3) * turn, p.rot[1] + noise(x, 4) * turn, p.rot[2] + noise(x, 5) * turn * 0.5];
+  return { ...p, pos, rot };
+}
+
+/** Where the animation is at t, shake and all (what the preview looks through). */
+export const shakenAt = (a, t) => jitter(a, poseAt(normalize(a), t));
+
+const shaky = (k) => (k.shake ?? 0) > 0 || (k.turn ?? 0) > 0;
+
 /**
  * The poses the chain goes through: the keys, plus points along a smoothed
- * path, plus the shake's jitter (in the camera's own right/up axes).
+ * path, plus the shake's jitter. A jump cut has two at its moment: the held
+ * pose arriving, then the cut key (`key` marks the poses that are keys).
  */
-export function samples(a) {
+export function samples(anim) {
+  const a = normalize(anim);
   const keys = a.keys;
-  const end = keys.at(-1).t;
-  const times = new Set(keys.map((k) => r3(k.t)));
-  if (a.smooth && keys.length > 2)
-    for (let i = 0; i < keys.length - 1; i++) {
-      const n = Math.max(1, Math.round((keys[i + 1].t - keys[i].t) * a.rate));
-      for (let j = 1; j < n; j++) times.add(r3(keys[i].t + ((keys[i + 1].t - keys[i].t) * j) / n));
+  const freq = a.shakeFreq ?? 14;
+  const out = [];
+  keys.forEach((K, i) => {
+    if (i > 0 && K.cut) out.push({ ...jitter(a, { ...keys[i - 1], t: K.t }), key: true });
+    out.push({ ...jitter(a, { ...K }), key: true });
+    const N = keys[i + 1];
+    if (!N || N.t - K.t < EPS) return;
+    const times = new Set();
+    if (a.smooth && keys.length > 2 && !N.cut) {
+      const n = Math.max(1, Math.round((N.t - K.t) * a.rate));
+      for (let j = 1; j < n; j++) times.add(r3(K.t + ((N.t - K.t) * j) / n));
     }
-  const sh = a.shake ?? {};
-  const shaking = (sh.amount > 0 || sh.turn > 0) && sh.to > sh.from;
-  if (shaking) {
-    const step = 1 / Math.max(2, sh.freq * 2);
-    for (let t = Math.max(0, sh.from); t <= Math.min(end, sh.to) + EPS; t += step) times.add(r3(t));
-    times.add(r3(Math.min(end, sh.to)));
-  }
-  return [...times]
-    .filter((t) => t >= 0 && t <= end + EPS)
-    .sort((x, y) => x - y)
-    .map((t) => {
-      const p = poseAt(a, t);
-      if (!shaking || t <= sh.from + EPS || t >= sh.to - EPS) return p;
-      const life = (t - sh.from) / (sh.to - sh.from);
-      const fade = sh.decay ? 1 - life : 1;
-      const x = t * sh.freq;
-      const q = quatOf(p.rot);
-      const right = new Vector3(1, 0, 0).applyQuaternion(q);
-      const up = new Vector3(0, 1, 0).applyQuaternion(q);
-      const off = right.multiplyScalar(noise(x, 1) * sh.amount * fade).add(up.multiplyScalar(noise(x, 2) * sh.amount * fade));
-      // Roblox x is the builder's -x (and z its -z).
-      const pos = [p.pos[0] - off.x, p.pos[1] + off.y, p.pos[2] - off.z];
-      const rot = [p.rot[0] + noise(x, 3) * sh.turn * fade, p.rot[1] + noise(x, 4) * sh.turn * fade, p.rot[2] + noise(x, 5) * sh.turn * fade * 0.5];
-      return { ...p, pos, rot };
-    });
+    if (shaky(K) || (shaky(N) && !N.cut)) {
+      const step = 1 / Math.max(2, freq * 2);
+      for (let t = K.t + step; t < N.t - 0.002; t += step) times.add(r3(t));
+    }
+    for (const t of [...times].filter((t) => t > K.t + EPS && t < N.t - EPS).sort((x, y) => x - y))
+      out.push(jitter(a, poseAt(a, t)));
+  });
+  return out;
 }
 
 // ─── Writing the chain ──────────────────────────────────────────────────
@@ -207,9 +292,14 @@ export function chainNodes(a, frameAt = null) {
   // Only key to key: each piece eases as its key says, in JJS itself.
   // Otherwise the pieces are short and Linear, and the easing is in where
   // they're sampled.
-  const plain = pts.length === a.keys.length;
+  const plain = pts.every((p) => p.key);
   const F = (t) => (frameAt ? frameAt(t) : new Matrix4());
-  const legs = pts.slice(0, -1).map((p, i) => [p, pts[i + 1]]);
+  // A jump cut's two poses share a moment: no piece between them, the next
+  // piece simply starts at the cut key.
+  const legs = pts
+    .slice(0, -1)
+    .map((p, i) => [p, pts[i + 1]])
+    .filter(([from, to]) => to.t - from.t > 0.0005);
   if (a.hold > 0) legs.push([pts.at(-1), { ...pts.at(-1), t: pts.at(-1).t + a.hold }]);
   for (const [from, to] of legs) {
     const time = Math.max(0.001, to.t - from.t);

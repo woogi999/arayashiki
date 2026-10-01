@@ -852,8 +852,9 @@ export async function openText({ text, name: label, file }) {
   return true;
 }
 
+/** New Character: a blank moveset, one empty skill to start adding nodes to. */
 export function newMoveset() {
-  change(starterMoveset());
+  change([blankSkill('SKILL')]);
   batch(() => {
     name.value = DEFAULT_NAME;
     filePath.value = null;
@@ -912,6 +913,23 @@ export function pickInView({ kind, event, additive, index }) {
   }
 }
 export const resetCamera = () => scene?.resetCamera();
+
+/**
+ * The viewport's camera settings back to how they start: the Free camera,
+ * Follow on, the skill's own camera on, the auto camera's defaults, and the
+ * view framed again. Recorded keys stay (Clear camera keys removes them).
+ */
+export function resetCameraSettings() {
+  batch(() => {
+    camMode.value = 'free';
+    follow.value = true;
+    skillCamera.value = true;
+    autoCam.value = {};
+    camPath.value = { ...camPath.peek(), shake: null };
+  });
+  resetCamera();
+  status.value = 'Camera settings reset.';
+}
 /** The 3D view, once it's up (capture, camera keys): null before. */
 export const sceneNow = () => scene;
 

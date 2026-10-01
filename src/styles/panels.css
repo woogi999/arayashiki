@@ -124,9 +124,9 @@ body.is-moving * {
 }
 
 .key-row {
-  /* #, time, position, rotation, size, transparency, easing, delete */
+  /* #, time, position, rotation, size, transparency, easing, cut, delete */
   display: grid;
-  grid-template-columns: 26px 58px 176px 176px 56px 50px 168px 24px;
+  grid-template-columns: 26px 58px 176px 176px 56px 50px 168px 30px 24px;
   align-items: center;
   gap: 6px;
   min-width: max-content;
@@ -134,8 +134,13 @@ body.is-moving * {
   border-radius: var(--radius-sm);
 }
 
+/* the camera: #, time, position, rotation, shake, turn, easing, cut, delete */
 .key-row.is-camera {
-  grid-template-columns: 26px 58px 176px 176px 168px 24px;
+  grid-template-columns: 26px 58px 176px 176px 50px 50px 168px 30px 24px;
+}
+
+.key-cut {
+  justify-self: center;
 }
 
 /* the camera path: #, time, position, turn, FOV, easing, actions */

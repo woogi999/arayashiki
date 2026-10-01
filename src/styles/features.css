@@ -888,3 +888,140 @@
     transform: translateY(-3px) scale(0.98);
   }
 }
+
+/* Submenus (Add node ▸, Panel layout ▸) and their group headings. */
+.context-menu {
+  max-height: calc(100vh - 12px);
+  overflow-y: auto;
+}
+
+.context-heading {
+  padding: 6px 8px 2px;
+  color: var(--text-3);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.context-more {
+  color: var(--text-3);
+}
+
+.context-item.is-open {
+  background: var(--widget-hover);
+}
+
+.context-check .kind-chip {
+  width: 15px;
+  height: 15px;
+}
+
+.modal-small {
+  width: min(420px, calc(100vw - 48px));
+}
+
+.cam-menu-reset {
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+/* ─── Models on this PC (src/ai/local-ui.jsx) ───────────────────────── */
+
+.local {
+  display: grid;
+  gap: 8px;
+}
+
+.local-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.local-row > .input {
+  flex: 1;
+  min-width: 0;
+}
+
+.local-list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.local-model {
+  display: grid;
+  gap: 4px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--area);
+}
+
+.local-model.is-used {
+  border-color: #5a5a5a;
+  background: var(--row-selected);
+}
+
+.local-model-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.local-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.local-tag {
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--widget-on);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.local-size,
+.local-pct {
+  color: var(--text-3);
+  font-size: var(--text-xs);
+  white-space: nowrap;
+}
+
+.local-note {
+  color: var(--text-2);
+  font-size: var(--text-xs);
+  line-height: 1.45;
+}
+
+.local-bar {
+  flex: 1;
+  height: 6px;
+  overflow: hidden;
+  border: 1px solid #070707;
+  border-radius: 4px;
+  background: var(--field);
+}
+
+.local-bar > span {
+  display: block;
+  height: 100%;
+  background: #d8d8d8;
+  transition: width 200ms ease-out;
+}
+
+.local-error {
+  white-space: pre-wrap;
+}

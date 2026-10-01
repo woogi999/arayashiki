@@ -32,7 +32,11 @@
     "active": true,
     "targets": ["nsis"],
     "category": "DeveloperTool",
+    "publisher": "woogi999",
+    "copyright": "Arayashiki by woogi999 · MIT",
+    "homepage": "https://github.com/woogi999/arayashiki",
     "shortDescription": "JJS Skill Builder editor and simulator",
+    "longDescription": "Jujutsu Shenanigans' Skill Builder as a desktop app: open a moveset's code, edit it node by node, simulate skills on a 3D character, and copy the code back into the game.",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -42,7 +46,13 @@
     ],
     "windows": {
       "nsis": {
-        "installMode": "currentUser"
+        "installMode": "currentUser",
+        "installerIcon": "icons/icon.ico",
+        "uninstallerIcon": "icons/icon.ico",
+        "headerImage": "installer/header.bmp",
+        "uninstallerHeaderImage": "installer/header.bmp",
+        "sidebarImage": "installer/sidebar.bmp",
+        "startMenuFolder": "Arayashiki"
       }
     }
   }

@@ -5,9 +5,13 @@
 // from its corner.
 //
 // Ways in: "New camera animation" and "New visual animation" (the Nodes
-// panel's Animate menu, the search, the viewport's right-click menu) add the
-// VISUAL and open it; "Animate" (Ctrl+K) opens the picked VISUAL.
-import { useEffect } from 'preact/hooks';
+// panel's Animate menu, the search, the viewport's right-click menu) start a
+// draft, which goes into the skill only with "Write to skill"; "Animate"
+// (Ctrl+K) opens the picked VISUAL, and its edits are written as you go.
+//
+// Play runs the skill from the animation's start and looks through the
+// camera being animated (or "Look through it" does, while you scrub).
+import { useEffect, useRef } from 'preact/hooks';
 import { effect, signal } from '@preact/signals';
 import { Matrix4, Quaternion, Vector3 } from 'three';
 import * as S from '../store.js';
@@ -22,19 +26,31 @@ import {
   keyFrom,
   keyMatrix,
   lineTimes,
+  normalize,
   poseAt,
   removeChain,
   samples,
+  shakenAt,
   writeChain,
 } from '../animator.js';
 import { Button, IconButton, Segmented, Switch } from './controls.jsx';
-import { EaseSelect, FloatingPanel, Num, ShakeFields, Vec } from './keys-ui.jsx';
+import { EaseSelect, FloatingPanel, Num, Vec } from './keys-ui.jsx';
 
-// Where the animation sits: the skill, branch and when its first node runs.
-const where = signal(null); // { uid, branch, index, start }
+// Where the animation sits: the skill, branch and when its first node runs
+// (`draft`: not in the skill yet; `index` is where it will go).
+const where = signal(null); // { uid, branch, index, start, draft }
 const gizmoMode = signal('translate');
 const lookThrough = signal(false);
+const previewing = signal(false); // Play: looking through it while the skill plays
 const note = signal(null);
+
+// Shake presets for the picked key: [label, studs, degrees].
+const SHAKES = [
+  ['None', 0, 0],
+  ['Light', 0.12, 0.6],
+  ['Medium', 0.3, 1.4],
+  ['Heavy', 0.6, 2.8],
+];
 
 export const PART_EFFECTS = ANIMATABLE.filter((e) => e !== 'Camera');
 const specKey = (w, a) => `${w.uid}:${w.branch}:${a.tag}`;
@@ -56,6 +72,15 @@ function startOf(index) {
   return e ? e.t : (lineTimes(S.line.peek())[index] ?? 0);
 }
 
+/** When a node put in at `index` would run: as the node there now does, or after the last WAIT. */
+function timeAt(index) {
+  const line = S.line.peek();
+  const e = S.run.peek()?.events.find((x) => x.branch === S.branch.peek() && x.index === index);
+  if (e) return e.t;
+  const times = lineTimes([...line, {}]);
+  return times[Math.min(index, line.length)] ?? 0;
+}
+
 /** Opens the animator on the picked node (a VISUAL the animator can drive). */
 export function openAnimator() {
   const node = S.selectedNode.peek();
@@ -70,12 +95,13 @@ export function openAnimator() {
     tag = freshTag(S.program.peek(), S.branch.peek());
     S.setNodeField('VISUAL TAG', tag);
   }
-  const w = { uid: S.skillUid.peek(), branch: S.branch.peek(), index, start: startOf(index) };
+  const w = { uid: S.skillUid.peek(), branch: S.branch.peek(), index, start: startOf(index), draft: false };
   const saved = S.animSpecs.peek()[specKey(w, { tag })];
   where.value = w;
-  anim.value = saved ?? fromNode({ ...node, 'VISUAL TAG': tag }, tag);
+  anim.value = normalize(saved ?? fromNode({ ...node, 'VISUAL TAG': tag }, tag));
   animKey.value = 0;
   lookThrough.value = false;
+  previewing.value = false;
   note.value = null;
   S.animatorOpen.value = true;
   return true;
@@ -86,59 +112,73 @@ export function keyFromViewShortcut() {
   if (anim.peek()) addKey();
 }
 
-// A new VISUAL after the picked node (or at the end), opened in the animator.
-function addVisual(fields) {
+// A draft animation of a new VISUAL, to go after the picked node (or at the
+// end) once it's written. Nothing changes in the skill until then.
+function startDraft(fields) {
   if (!S.skill.peek()) {
     S.status.value = 'Open a skill first.';
     return false;
   }
   S.workspace.value = 'skills';
   S.showStart.value = false;
-  S.addNode('VISUAL');
-  for (const [k, v] of Object.entries(fields)) S.setNodeField(k, v);
-  S.simulateNow();
-  return openAnimator();
+  import('./campath.jsx').then((m) => m.closeCameraPath());
+  const line = S.line.peek();
+  const index = line.length ? Math.min(S.nodeIndex.peek() + 1, line.length) : 0;
+  const tag = freshTag(S.program.peek(), S.branch.peek());
+  const node = { K_NAME: 'VISUAL', ...fields, 'VISUAL TAG': tag };
+  where.value = { uid: S.skillUid.peek(), branch: S.branch.peek(), index, start: timeAt(index), draft: true };
+  anim.value = fromNode(node, tag);
+  animKey.value = 0;
+  lookThrough.value = false;
+  previewing.value = false;
+  S.animatorOpen.value = true;
+  return true;
 }
 
 /** A new camera shot: two keys a second apart, both where your view is now. Fly, then set the second. */
 export function newCameraAnimation() {
-  if (!addVisual({ EFFECT: 'Camera', TIME: 1, 'BODY PART': 'HumanoidRootPart' })) return;
+  // Keys are set from your own view: the Free camera.
+  S.camMode.value = 'free';
+  if (!startDraft({ EFFECT: 'Camera', TIME: 1, 'BODY PART': 'HumanoidRootPart' })) return;
   const a = anim.peek();
   anim.value = { ...a, keys: a.keys.map((k, i) => ({ ...k, t: i, ease: 'Sine InOut' })) };
   setKeyToView(0);
   setKeyToView(1);
   S.seek(where.peek().start);
-  apply();
-  note.value = 'Two keys where your view is. Move the playhead, fly to the next shot, and press “Key from view” (K).';
+  note.value = 'A draft: two keys where your view is. Move the playhead, fly to the next shot and press “Key from view” (K); Play to watch it. “Write to skill” puts it in.';
 }
 
 /** A new animated part (a Block, unless `effect` says otherwise): from in front of you to further out. */
 export function newVisualAnimation(effect = 'Block') {
-  if (!addVisual({ EFFECT: effect, TIME: 1, 'BODY PART': 'HumanoidRootPart', SIZE: 2, POSITION: '0, 0, 3', ROTATION: '0, 0, 0' })) return;
+  if (!startDraft({ EFFECT: effect, TIME: 1, 'BODY PART': 'HumanoidRootPart', SIZE: 2, POSITION: '0, 0, 3', ROTATION: '0, 0, 0' })) return;
   const a = anim.peek();
   anim.value = {
     ...a,
     smooth: true,
     keys: [
-      { t: 0, pos: [0, 0, 3], rot: [0, 0, 0], size: 2, opacity: 0, ease: 'Sine InOut' },
-      { t: 1, pos: [0, 2, 12], rot: [0, 180, 0], size: 2, opacity: 0, ease: 'Sine InOut' },
+      { t: 0, pos: [0, 0, 3], rot: [0, 0, 0], size: 2, opacity: 0, ease: 'Sine InOut', shake: 0, turn: 0 },
+      { t: 1, pos: [0, 2, 12], rot: [0, 180, 0], size: 2, opacity: 0, ease: 'Sine InOut', shake: 0, turn: 0 },
     ],
   };
   S.seek(where.peek().start);
-  apply();
-  note.value = 'Drag the gizmo on a key (G move, R turn), add keys along the way, and set each key’s easing.';
+  note.value = 'A draft: drag the gizmo on a key (G move, R turn), add keys along the way and set each key’s easing. “Write to skill” puts it in.';
 }
 
 export const closeAnimator = () => {
+  if (where.peek()?.draft) S.status.value = 'The draft animation was closed without writing it to the skill.';
   anim.value = null;
   where.value = null;
+  previewing.value = false;
   S.animatorOpen.value = false;
 };
 
 // ─── Changing it ────────────────────────────────────────────────────────
 
+// A draft only changes the panel and the viewport's path; an animation in
+// the skill is written again as you go.
 function setAnim(patch, { now = false } = {}) {
   anim.value = { ...anim.value, ...patch };
+  if (where.peek()?.draft) return;
   if (now) apply();
   else applySoon();
 }
@@ -167,24 +207,20 @@ function setKeyToView(i) {
 }
 
 /**
- * Adds a key: at the playhead, or, when the playhead is on a key already
- * (or before the first), half way to the next key or half a second after the
- * last. Never replaces one. A camera's new key is your view; a part's is
- * where the animation has it then. The playhead moves to the new key.
+ * Adds a key after the last one, the newest at the bottom of the list, and
+ * picks it: at the playhead when that's past the last key, else half a
+ * second after it. A camera's new key is your view; a part's is where the
+ * animation has it then. The playhead moves to the new key.
  */
 function addKey() {
   const a = anim.peek();
   const w = where.peek();
   if (!a || !w) return;
+  const last = a.keys.at(-1);
   let t = r3(S.time.peek() - w.start);
-  const near = (x) => a.keys.findIndex((k) => Math.abs(k.t - x) < 0.02);
-  if (t < 0 || near(t) >= 0) {
-    const at = t < 0 ? 0 : near(t);
-    const next = a.keys[at + 1];
-    t = r3(next ? (a.keys[at].t + next.t) / 2 : a.keys.at(-1).t + 0.5);
-  }
-  const base = poseAt({ ...a, shake: null }, t);
-  const key = { ...base, t, pos: base.pos.map(r3), rot: base.rot.map(r3), ease: a.keys.findLast((k) => k.t <= t)?.ease ?? 'Sine InOut' };
+  if (!(t > last.t + 0.02)) t = r3(last.t + 0.5);
+  const base = poseAt(a, t);
+  const key = { ...base, t, pos: base.pos.map(r3), rot: base.rot.map(r3), shake: last.shake ?? 0, turn: last.turn ?? 0, cut: false, ease: last.ease ?? 'Sine InOut' };
   if (a.effect === 'Camera' && S.sceneNow()) Object.assign(key, viewPose(t));
   const keys = [...a.keys, key].sort((x, y) => x.t - y.t);
   animKey.value = keys.indexOf(key);
@@ -206,13 +242,13 @@ function deleteKey(i) {
 /** Changes what it animates (a Block into a Sphere, say), or which part it's on. */
 function setLook(patch) {
   const a = anim.peek();
-  const removed = removeChain(S.line.peek(), a);
+  const removed = where.peek()?.draft ? null : removeChain(S.line.peek(), a);
   if (removed) {
     S.replaceLine(removed.line, `anim:${a.tag}`);
     where.value = { ...where.peek(), index: removed.index };
   }
   anim.value = { ...a, ...patch, template: { ...a.template, ...(patch.effect ? { EFFECT: patch.effect } : {}), ...(patch.part ? { 'BODY PART': patch.part } : {}), ...(patch.template ?? {}) } };
-  apply();
+  if (!where.peek()?.draft) apply();
 }
 
 let timer = 0;
@@ -232,21 +268,22 @@ function apply() {
     return;
   }
   const nodes = chainNodes(a, frameAt);
-  const lineStart = lineTimes(S.line.peek())[w.index] ?? 0;
+  const lineStart = lineTimes([...S.line.peek(), {}])[w.index] ?? 0;
   const { line, extended } = writeChain(S.line.peek(), a, nodes, { index: w.index, time: lineStart });
   S.replaceLine(line, `anim:${a.tag}`);
   S.animSpecs.value = { ...S.animSpecs.peek(), [specKey(w, a)]: a };
   const first = line.findIndex((n) => n?.K_NAME === 'VISUAL' && n['VISUAL TAG'] === a.tag && n.EFFECT === a.effect);
   if (first >= 0) {
     S.nodeIndex.value = first;
-    where.value = { ...w, index: first };
+    where.value = { ...w, index: first, draft: false };
   }
-  note.value = `${nodes.length} VISUAL node${nodes.length === 1 ? '' : 's'} in the skill${extended ? `; the line now waits ${extended}s longer at the end to fit it` : ''}.`;
+  note.value = `${nodes.length} VISUAL node${nodes.length === 1 ? '' : 's'} in the skill${extended ? `; the line now waits ${extended}s longer at the end to fit it` : ''}. Changes are written as you make them now.`;
 }
 
 function removeAnimation() {
   const a = anim.peek();
   const w = where.peek();
+  if (w.draft) return closeAnimator();
   const removed = removeChain(S.line.peek(), a);
   if (removed) S.replaceLine(removed.line);
   const { [specKey(w, a)]: _gone, ...rest } = S.animSpecs.peek();
@@ -284,8 +321,48 @@ effect(() => {
       const local = frameAt(k.t).invert().multiply(m);
       anim.value = { ...anim.peek(), keys: anim.peek().keys.map((x, j) => (j === i ? { ...x, ...keyFrom(local) } : x)) };
     },
-    onDragEnd: () => apply(),
+    onDragEnd: () => !where.peek()?.draft && apply(),
   });
+});
+
+// ─── Looking through it ─────────────────────────────────────────────────
+
+/** Plays the skill from the animation's start, looking through the camera. */
+function playPreview() {
+  const w = where.peek();
+  if (!w) return;
+  if (previewing.peek() && S.playing.peek()) {
+    S.stop();
+    return;
+  }
+  previewing.value = true;
+  S.seek(w.start);
+  S.play();
+}
+// The camera to look through: the animation's, from its start to its end
+// (and its hold), shake and all; outside that, your own.
+effect(() => {
+  const a = anim.value;
+  const w = where.value;
+  const on = a?.effect === 'Camera' && w && (previewing.value || lookThrough.value);
+  const scene = S.sceneNow();
+  if (!scene) return;
+  if (!on) return scene.setPreviewCamera(null);
+  const end = a.keys.at(-1).t + (a.hold ?? 0);
+  scene.setPreviewCamera((t) => {
+    const local = t - w.start;
+    if (local < -1e-6 || local > end + 1e-6) return null;
+    const pose = shakenAt(a, Math.min(local, a.keys.at(-1).t));
+    const m = frameAt(local).multiply(keyMatrix(pose));
+    const position = new Vector3();
+    const quaternion = new Quaternion();
+    m.decompose(position, quaternion, new Vector3());
+    return { position, quaternion };
+  });
+});
+// Play's look-through ends with the playback.
+effect(() => {
+  if (!S.playing.value && previewing.peek()) previewing.value = false;
 });
 S.setAnimPick((i) => {
   if (!anim.peek()) return import('./campath.jsx').then((m) => m.pickCameraKey(i));
@@ -294,14 +371,13 @@ S.setAnimPick((i) => {
   if (k && where.peek()) S.seek(where.peek().start + k.t);
 });
 // While flying to set camera keys, the skill's own camera stays out of the
-// way (unless you ask to look through it).
+// way (the preview looks through the animation instead).
 let hadCamera = false;
 effect(() => {
   const a = anim.value;
-  const through = lookThrough.value;
   if (a?.effect === 'Camera') {
     hadCamera = true;
-    S.skillCamera.value = through;
+    S.skillCamera.value = false;
   } else if (hadCamera) {
     hadCamera = false;
     S.skillCamera.value = true;
@@ -313,6 +389,11 @@ effect(() => {
 export function AnimatorPanel() {
   const a = anim.value;
   const w = where.value;
+  const table = useRef(null);
+  // The picked key stays in sight (a new key lands at the bottom).
+  useEffect(() => {
+    table.current?.querySelector('.key-row.is-picked')?.scrollIntoView({ block: 'nearest' });
+  }, [animKey.value, a?.keys.length]);
   useEffect(() => {
     if (!a) return;
     const key = (e) => {
@@ -326,18 +407,35 @@ export function AnimatorPanel() {
   if (!a || !w) return null;
   const camera = a.effect === 'Camera';
   const picked = animKey.value;
-  const end = a.keys.at(-1).t;
+  const pk = a.keys[picked] ?? a.keys[0];
+  const playingPreview = previewing.value && S.playing.value;
   return (
-    <FloatingPanel key={camera ? "cam" : "vis"} id={camera ? "animator-camera" : "animator-visual"} icon={camera ? 'camera' : 'wand'} title={camera ? 'Camera animation' : 'Visual animation'} badge={a.tag} onClose={closeAnimator} width={camera ? 740 : 900} height={600}>
+    <FloatingPanel
+      key={camera ? 'cam' : 'vis'}
+      id={camera ? 'animator-camera-2' : 'animator-visual-2'}
+      icon={camera ? 'camera' : 'wand'}
+      title={camera ? 'Camera animation' : 'Visual animation'}
+      badge={w.draft ? `${a.tag} · draft` : a.tag}
+      onClose={closeAnimator}
+      width={camera ? 900 : 1000}
+      height={620}
+    >
       <div class="key-toolbar">
-        <Button icon="plus" onClick={addKey} title={`Add a key (${camera ? 'your view' : 'the pose there'}) at the playhead, or after the last key (K)`}>
+        <Button icon="plus" onClick={addKey} title={`A new key after the last one (${camera ? 'your view' : 'the pose there'}), at the playhead if it's past the last key (K)`}>
           {camera ? 'Key from view' : 'Add key'}
         </Button>
         {camera && (
-          <Button icon="camera" onClick={() => (setKeyToView(picked), applySoon())} title="Put the picked key where your view is">
+          <Button icon="camera" onClick={() => (setKeyToView(picked), w.draft ? (anim.value = { ...anim.value }) : applySoon())} title="Put the picked key where your view is">
             Set key {picked + 1} to view
           </Button>
         )}
+        <Button
+          icon={playingPreview ? 'pause' : 'play'}
+          onClick={playPreview}
+          title={camera ? 'Play the skill from the animation’s start, looking through this camera' : 'Play the skill from the animation’s start'}
+        >
+          {playingPreview ? 'Stop' : 'Play'}
+        </Button>
         <span class="spacer" />
         {!camera && (
           <Segmented
@@ -377,7 +475,7 @@ export function AnimatorPanel() {
         </div>
       )}
 
-      <div class="key-table" role="table" aria-label="Keys">
+      <div class="key-table" role="table" aria-label="Keys" ref={table}>
         <div class={`key-row is-head ${camera ? 'is-camera' : ''}`} role="row">
           <span>#</span>
           <span>Time</span>
@@ -385,7 +483,10 @@ export function AnimatorPanel() {
           <span>Rotation (°)</span>
           {!camera && <span>Size</span>}
           {!camera && <span>Transp.</span>}
+          {camera && <span title="How hard the camera shakes at this key, in studs; it eases to the next key's">Shake</span>}
+          {camera && <span title="How much the shake turns the camera at this key, in degrees">Turn</span>}
           <span>Easing to next</span>
+          <span title="Jump cut: be at this key at once, instead of moving there from the key before">Cut</span>
           <span />
         </div>
         {a.keys.map((k, i) => (
@@ -398,7 +499,26 @@ export function AnimatorPanel() {
             <Vec label="Rotation" step={5} value={k.rot} onChange={(rot) => setKey(i, { rot })} />
             {!camera && <Num label="Size" step={0.1} value={k.size} onChange={(v) => setKey(i, { size: v })} />}
             {!camera && <Num label="Transparency (0 solid, 1 gone)" step={0.1} width={48} min={0} max={1} value={k.opacity} onChange={(v) => setKey(i, { opacity: v })} />}
-            {i < a.keys.length - 1 ? <EaseSelect value={k.ease} onChange={(ease) => setKey(i, { ease })} /> : <span class="hint">last</span>}
+            {camera && <Num label="Shake (studs)" step={0.05} width={50} min={0} value={k.shake ?? 0} onChange={(v) => setKey(i, { shake: Math.max(0, v) })} />}
+            {camera && <Num label="Shake turn (degrees)" step={0.2} width={50} min={0} value={k.turn ?? 0} onChange={(v) => setKey(i, { turn: Math.max(0, v) })} />}
+            {i < a.keys.length - 1 ? (
+              a.keys[i + 1].cut ? (
+                <span class="hint" title="The next key is a jump cut: this key holds until it">holds, then cuts</span>
+              ) : (
+                <EaseSelect value={k.ease} onChange={(ease) => setKey(i, { ease })} />
+              )
+            ) : (
+              <span class="hint">last</span>
+            )}
+            <input
+              type="checkbox"
+              class="key-cut"
+              disabled={i === 0}
+              checked={Boolean(k.cut) && i > 0}
+              aria-label={`Key ${i + 1}: jump cut`}
+              title={i === 0 ? 'The first key is where it starts' : 'Jump cut: be at this key at once, instead of moving there'}
+              onChange={(e) => setKey(i, { cut: e.currentTarget.checked })}
+            />
             <IconButton icon="trash-2" class="danger" size={12} label={`Delete key ${i + 1}`} onClick={() => deleteKey(i)} />
           </div>
         ))}
@@ -422,8 +542,29 @@ export function AnimatorPanel() {
         {camera && (
           <>
             <h4 class="section-title">Shake</h4>
-            <p class="hint">JJS’s screen shakes don’t move a Camera block’s view, so the shake goes into the camera’s own path.</p>
-            <ShakeFields shake={a.shake} end={end} onChange={(shake) => setAnim({ shake })} />
+            <p class="hint">
+              Each key has its own shake (studs) and turn (degrees), easing to the next key’s: key a shake up and down to
+              make it hit and die away. (JJS’s screen shakes don’t move a Camera block’s view, so it goes into the camera’s
+              own path.)
+            </p>
+            <div class="key-shake-presets" role="group" aria-label={`Shake at key ${picked + 1}`}>
+              <span class="hint">Key {picked + 1}:</span>
+              {SHAKES.map(([label, shake, turn]) => (
+                <button
+                  key={label}
+                  type="button"
+                  class="chip"
+                  aria-pressed={(pk.shake ?? 0) === shake && (pk.turn ?? 0) === turn}
+                  onClick={() => setKey(picked, { shake, turn })}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <label class="prop-row">
+              <span>Shakes a second</span>
+              <Num label="Shakes a second" step={1} min={1} max={30} value={a.shakeFreq ?? 14} onChange={(v) => setAnim({ shakeFreq: Math.max(1, Math.min(30, v)) })} />
+            </label>
             <label class="prop-row">
               <span>Look through it while editing</span>
               <Switch checked={lookThrough.value} label="Look through the animated camera" onChange={(on) => (lookThrough.value = on)} />
@@ -434,8 +575,9 @@ export function AnimatorPanel() {
       {note.value && <p class="hint key-note">{note.value}</p>}
       <div class="modal-actions">
         <Button variant="ghost" class="danger" icon="trash-2" onClick={removeAnimation}>
-          Remove animation
+          {w.draft ? 'Discard draft' : 'Remove animation'}
         </Button>
+        {w.draft && <span class="hint">Not in the skill yet.</span>}
         <span class="spacer" />
         <Button variant="primary" icon="check" onClick={apply}>
           Write to skill
@@ -449,7 +591,7 @@ export function AnimatorPanel() {
  * The AI tool's way in (app_animate): animates node `node` of the open
  * branch with the keys given, and writes it into the skill.
  */
-export async function runAnimation({ node, keys, smooth = true, easing = 'Linear', hold = 0, shake }) {
+export async function runAnimation({ node, keys, smooth = true, easing = 'Linear', hold = 0, shake, shakeFreq }) {
   const line = S.line.peek();
   if (!line[node]) throw new Error(`The open branch has no node ${node} (it has ${line.length}).`);
   S.pickNode(node);
@@ -457,15 +599,27 @@ export async function runAnimation({ node, keys, smooth = true, easing = 'Linear
   const a = anim.peek();
   const base = a.keys[0];
   const ease = easing.includes(' ') ? easing : `${easing} InOut`;
-  anim.value = {
+  // `shake` (one shake from..to) is the older way: it lands on the keys.
+  anim.value = normalize({
     ...a,
     smooth,
     hold,
     keys: keys
-      .map((k) => ({ t: k.t, pos: k.pos, rot: k.rot ?? base.rot, size: k.size ?? base.size, opacity: k.opacity ?? base.opacity, ease: k.ease ?? ease }))
+      .map((k) => ({
+        t: k.t,
+        pos: k.pos,
+        rot: k.rot ?? base.rot,
+        size: k.size ?? base.size,
+        opacity: k.opacity ?? base.opacity,
+        ease: k.ease ?? ease,
+        shake: k.shake,
+        turn: k.turn,
+        cut: Boolean(k.cut),
+      }))
       .sort((x, y) => x.t - y.t),
-    shake: shake ? { amount: 0, turn: 0, freq: 14, from: 0, to: keys.at(-1).t, decay: true, ...shake } : a.shake,
-  };
+    shakeFreq: shakeFreq ?? shake?.freq ?? a.shakeFreq ?? 14,
+    ...(shake ? { shake: { amount: 0, turn: 0, freq: 14, from: 0, to: keys.at(-1).t, decay: true, ...shake } } : {}),
+  });
   apply();
   return { tag: anim.peek().tag, keys: anim.peek().keys.length, note: note.peek() };
 }

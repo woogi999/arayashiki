@@ -11,14 +11,16 @@ import * as S from '../store.js';
 
 export const PANELS = ['nodes', 'view', 'time', 'outliner', 'properties'];
 
+// The Outliner over the Nodes on the left, the Viewport over the Timeline in
+// the middle, and Properties the whole height of the right.
 export const DEFAULT_LAYOUT = {
   root: {
     split: 'row',
     sizes: [0.22, 0.56, 0.22],
     children: [
-      { panel: 'nodes' },
+      { split: 'col', sizes: [0.38, 0.62], children: [{ panel: 'outliner' }, { panel: 'nodes' }] },
       { split: 'col', sizes: [0.72, 0.28], children: [{ panel: 'view' }, { panel: 'time' }] },
-      { split: 'col', sizes: [0.45, 0.55], children: [{ panel: 'outliner' }, { panel: 'properties' }] },
+      { panel: 'properties' },
     ],
   },
   floating: [],
@@ -149,6 +151,68 @@ export function dockBack(id) {
 }
 
 export const resetLayout = () => (S.layout.value = clone(DEFAULT_LAYOUT));
+
+// The arrangement, without sizes: "row(nodes,col(view,time),…)".
+const shapeOf = (node) => (node.panel ? node.panel : `${node.split}(${node.children.map(shapeOf).join(',')})`);
+const OLD_DEFAULT = 'row(nodes,col(view,time),col(outliner,properties))';
+
+/**
+ * Once, after the default changed: a layout still arranged as the old
+ * default moves to the new one (sizes and all). Layouts people made are kept.
+ */
+export function migrateLayout() {
+  try {
+    if (localStorage.getItem('arayashiki-layout-v2')) return;
+    localStorage.setItem('arayashiki-layout-v2', '1');
+  } catch {
+    return;
+  }
+  const L = S.layout.peek();
+  if (!L || (L.floating?.length === 0 && shapeOf(L.root) === OLD_DEFAULT)) resetLayout();
+}
+
+// ─── Saved layouts, by name, in this browser's storage ──────────────────
+
+const SAVED = 'arayashiki-layouts';
+function readSaved() {
+  try {
+    const all = JSON.parse(localStorage.getItem(SAVED) ?? '{}');
+    return all && typeof all === 'object' && !Array.isArray(all) ? all : {};
+  } catch {
+    return {};
+  }
+}
+export const savedLayouts = signal(readSaved());
+function writeSaved(all) {
+  savedLayouts.value = all;
+  try {
+    localStorage.setItem(SAVED, JSON.stringify(all));
+  } catch {
+    // not kept
+  }
+}
+
+/** Keeps the layout as it is now under `name` (replacing one of that name). */
+export function saveLayout(name) {
+  const key = String(name ?? '').trim().slice(0, 40);
+  if (!key) return false;
+  writeSaved({ ...savedLayouts.peek(), [key]: clone(S.layout.peek()) });
+  S.status.value = `Saved the layout “${key}”.`;
+  return true;
+}
+
+export function loadLayout(name) {
+  const L = savedLayouts.peek()[name];
+  if (!L) return;
+  S.layout.value = sane(clone(L));
+  S.status.value = `Layout “${name}”.`;
+}
+
+export function deleteLayout(name) {
+  const { [name]: _, ...rest } = savedLayouts.peek();
+  writeSaved(rest);
+  S.status.value = `Deleted the layout “${name}”.`;
+}
 
 // Where a header drag would drop: { target, side }.
 const drop = signal(null);

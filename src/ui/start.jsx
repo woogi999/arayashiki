@@ -12,6 +12,7 @@ import { Icon } from '../icons.jsx';
 import { bindingOf } from '../keybinds.js';
 import { isDesktop } from '../platform.js';
 import { openSearch } from './search.jsx';
+import { startTour } from '../onboarding.js';
 import markUrl from '../assets/arayashiki-mark.png';
 
 const close = () => (S.showStart.value = false);
@@ -145,7 +146,7 @@ function SkillActions() {
         primary
         icon="file-plus"
         label="New Character"
-        detail="A fresh moveset to build from the starter skills"
+        detail="A blank moveset: one empty skill to build from"
         keys={bindingOf('new')}
         onClick={() => {
           S.workspace.value = 'skills';
@@ -259,6 +260,9 @@ export function StartScreen() {
           <nav class="start-refs" aria-label="Help">
             <button type="button" class="link" onClick={() => (S.dialog.value = 'manual')}>
               User manual
+            </button>
+            <button type="button" class="link" onClick={startTour}>
+              Quick tour
             </button>
             <button type="button" class="link" onClick={() => openSearch()}>
               Search everything <kbd>{bindingOf('search')}</kbd>

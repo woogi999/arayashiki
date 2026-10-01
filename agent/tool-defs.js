@@ -306,15 +306,16 @@ export const APP_TOOLS = [
     name: 'app_animate',
     title: 'Keyframe a VISUAL',
     description:
-      'Writes a keyframed animation for a VISUAL (a Mesh/Block/Sphere/Cylinder/Wedge part effect, or a Camera) into the open branch as a chain of VISUAL nodes, splitting WAITs so each piece fires on time. node: the index of the VISUAL to animate (its effect, part and look are kept). keys: [{ t (seconds from the node), pos [x left, y up, z forward] on the body part, rot [degrees, as ROTATION], size, opacity }], at least two. For a Camera, rot [0, 0, 0] looks the way the character faces and [0, 180, 0] looks back at them; positive y turns toward their left, negative x looks down (a camera 10 studs behind and 4 up looking at them: pos [0, 4, -10], rot [-15, 0, 0]). smooth runs a curve through the keys; shake adds a camera shake ({ amount studs, turn degrees, freq, from, to }).',
+      'Writes a keyframed animation for a VISUAL (a Mesh/Block/Sphere/Cylinder/Wedge part effect, or a Camera) into the open branch as a chain of VISUAL nodes, splitting WAITs so each piece fires on time. node: the index of the VISUAL to animate (its effect, part and look are kept). keys: [{ t (seconds from the node), pos [x left, y up, z forward] on the body part, rot [degrees, as ROTATION], size, opacity }], at least two. For a Camera, rot [0, 0, 0] looks the way the character faces and [0, 180, 0] looks back at them; positive y turns toward their left, negative x looks down (a camera 10 studs behind and 4 up looking at them: pos [0, 4, -10], rot [-15, 0, 0]). Each key can also have shake (studs) and turn (degrees): how hard the camera shakes there, easing to the next key’s, so a shake can build and die away; shakeFreq is shakes a second (default 14). cut: true on a key makes a jump cut (it holds the key before until then, and is at the cut key at once). smooth runs a curve through the keys. (shake: { amount, turn, freq, from, to } is the older single shake; it is put on the keys.)',
     shape: {
       node: z.number(),
       keys: z
-        .array(z.object({ t: z.number(), pos: z.array(z.number()).length(3), rot: z.array(z.number()).length(3).optional(), size: z.number().optional(), opacity: z.number().optional() }))
+        .array(z.object({ t: z.number(), pos: z.array(z.number()).length(3), rot: z.array(z.number()).length(3).optional(), size: z.number().optional(), opacity: z.number().optional(), shake: z.number().optional(), turn: z.number().optional(), cut: z.boolean().optional() }))
         .min(2),
       smooth: z.boolean().optional(),
       easing: z.string().optional(),
       hold: z.number().optional(),
+      shakeFreq: z.number().optional(),
       shake: z.object({ amount: z.number().optional(), turn: z.number().optional(), freq: z.number().optional(), from: z.number().optional(), to: z.number().optional() }).optional(),
     },
   },

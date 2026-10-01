@@ -13,6 +13,7 @@ import {
   BufferAttribute,
   BufferGeometry,
   CustomBlending,
+  DoubleSide,
   Matrix4,
   Mesh,
   OneFactor,
@@ -72,6 +73,9 @@ export function particleMaterial() {
     fragmentShader: FRAGMENT,
     transparent: true,
     depthWrite: false,
+    // Both faces, as Roblox draws them: a velocity-aligned particle can face
+    // away (Wind Expand's ring lies flat, facing down, seen from above).
+    side: DoubleSide,
     blending: CustomBlending,
     blendSrc: OneFactor,
     blendDst: OneMinusSrcAlphaFactor,
@@ -286,12 +290,10 @@ export class Emitter {
         R.copy(camRight);
         U.copy(camUp);
       }
-      // Velocity-aligned particles keep their stretched axis along the
-      // flight and turn only the picture (a streak texture drawn sideways
-      // with Rotation 90 lies along its path, as Clash's sparks do); the
-      // others spin the whole particle.
-      const turnPicture = orient === 'VelocityParallel';
-      if (angle && !turnPicture) {
+      // Velocity-parallel particles keep the picture's up along the flight
+      // and ignore Rotation, as Roblox does: Sparks' vertical streak (with
+      // Rotation 90) flies point first, not sideways. The others spin.
+      if (angle && orient !== 'VelocityParallel') {
         const c = Math.cos(angle);
         const sn = Math.sin(angle);
         const r2 = R.clone().multiplyScalar(c).addScaledVector(U, sn);
@@ -325,16 +327,7 @@ export class Emitter {
         P[o + 1] = pos.y + R.y * a + U.y * b;
         P[o + 2] = pos.z + R.z * a + U.z * b;
         const ou = (i * 4 + c) * 2;
-        let [tu, tv] = [u, v];
-        if (angle && turnPicture) {
-          // Sample the picture turned by the particle's rotation.
-          const cs = Math.cos(-angle);
-          const sn = Math.sin(-angle);
-          const du = u - 0.5;
-          const dv = v - 0.5;
-          tu = 0.5 + du * cs - dv * sn;
-          tv = 0.5 + du * sn + dv * cs;
-        }
+        const [tu, tv] = [u, v];
         UV[ou] = cu + tu / gx;
         UV[ou + 1] = 1 - (cv + (1 - tv) / gy);
         const oc = (i * 4 + c) * 4;

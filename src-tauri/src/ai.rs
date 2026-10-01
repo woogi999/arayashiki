@@ -73,6 +73,7 @@ fn allowed_url(url: &str) -> bool {
 /// a Bearer token (the rest).
 #[tauri::command]
 pub async fn ai_fetch(
+    app: tauri::AppHandle,
     provider: String,
     url: String,
     method: String,
@@ -96,7 +97,12 @@ pub async fn ai_fetch(
         }
         req = req.header(k, v);
     }
-    if let Some(key) = key_of(&provider) {
+    if provider == "local" {
+        // The built-in engine's key for this run (local.rs).
+        if let Some(key) = crate::local::server_key(&app) {
+            req = req.bearer_auth(key);
+        }
+    } else if let Some(key) = key_of(&provider) {
         req = if provider == "anthropic" { req.header("x-api-key", key) } else { req.bearer_auth(key) };
     }
     if let Some(body) = body {

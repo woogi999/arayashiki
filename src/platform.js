@@ -292,3 +292,58 @@ export async function onOpenRequest(handler) {
   if (first) handler(first);
   await listen('open-code', (event) => handler(event.payload));
 }
+
+// ─── Updates (src-tauri/src/updates.rs) ─────────────────────────────────
+
+const REPO = 'woogi999/arayashiki';
+export const RELEASES_PAGE = `https://github.com/${REPO}/releases`;
+
+const newer = (a, b) => {
+  const parts = (v) => String(v).replace(/^v/i, '').split(/[-+]/)[0].split('.').map((n) => Number(n) || 0);
+  const [x, y] = [parts(a), parts(b)];
+  for (let i = 0; i < 3; i++) if ((x[i] ?? 0) !== (y[i] ?? 0)) return (x[i] ?? 0) > (y[i] ?? 0);
+  return false;
+};
+
+/**
+ * The latest GitHub release against this build: { current, latest, newer,
+ * name, notes, page, published, installer: { name, size, url } | null }.
+ */
+export async function checkForUpdate() {
+  if (isDesktop) return call('update_check');
+  // The browser preview asks GitHub itself.
+  const current = __APP_VERSION__;
+  const res = await fetch(`https://api.github.com/repos/${REPO}/releases/latest`);
+  if (res.status === 404) return { current, latest: current, newer: false, notes: '', page: RELEASES_PAGE, installer: null };
+  if (!res.ok) throw new Error(`GitHub answered ${res.status}.`);
+  const r = await res.json();
+  const latest = String(r.tag_name ?? '').replace(/^v/i, '');
+  const exe = r.assets?.find((a) => /-setup\.exe$/i.test(a.name));
+  return {
+    current,
+    latest,
+    newer: newer(latest, current),
+    name: r.name || r.tag_name,
+    notes: r.body ?? '',
+    page: r.html_url,
+    published: r.published_at,
+    installer: exe ? { name: exe.name, size: exe.size, url: exe.browser_download_url } : null,
+  };
+}
+
+/** Downloads an installer; `onProgress({ got, total })`. Resolves its path. */
+export async function downloadUpdate(url, onProgress) {
+  const { Channel } = await import('@tauri-apps/api/core');
+  const progress = new Channel();
+  progress.onmessage = onProgress;
+  return call('update_download', { url, progress });
+}
+
+/** Starts the downloaded installer; the app closes. */
+export const installUpdate = (path) => call('update_install', { path });
+
+/** Opens an https link in the default browser. */
+export async function openExternal(url) {
+  if (isDesktop) return call('open_url', { url });
+  window.open(url, '_blank', 'noopener');
+}

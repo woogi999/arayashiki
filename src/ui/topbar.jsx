@@ -5,11 +5,27 @@ import * as S from '../store.js';
 import * as B from '../barmaker/state.js';
 import { IconButton } from './controls.jsx';
 import { AccountButton } from './account.jsx';
+import { Icon } from '../icons.jsx';
+import { openUpdates, pendingUpdate } from '../updates.js';
+import { layoutItems, openMenu } from './context-menu.jsx';
 import markUrl from '../assets/arayashiki-mark.png';
 
 // The app's mark: the katana (src-tauri/icons/app-icon.png), in the accent lime.
 export function Mark() {
   return <img class="mark" src={markUrl} alt="" aria-hidden="true" />;
+}
+
+/** Shown when a newer release is out on GitHub: opens the Updates window. */
+function UpdatePill() {
+  const r = pendingUpdate.value;
+  if (!r) return null;
+  return (
+    <button type="button" class="upd-pill" title={`Arayashiki ${r.latest} is out: see what’s new`} onClick={openUpdates}>
+      <span class="upd-pill-dot" aria-hidden="true" />
+      <Icon name="download" size={13} />
+      <span>Update {r.latest}</span>
+    </button>
+  );
 }
 
 const menu = (label, title, onClick, className = '') => (
@@ -66,6 +82,10 @@ function SkillsBar() {
         )}
         {menu('Save As', 'Save to another .txt (Ctrl+Shift+S)', () => S.saveHere({ as: true }))}
         {menu('Templates', 'Ready-made skills: fill in a form, get the skills (Ctrl+T)', () => open('templates'))}
+        {menu('Layout', 'Reset the panels, or save and load your own layouts', (e) => {
+          const r = e.currentTarget.getBoundingClientRect();
+          openMenu(r.left, r.bottom + 4, layoutItems());
+        })}
         {menu('Settings', 'Keybinds, appearance, the AI tools (MCP), Roblox caches', () => open('settings'))}
       </nav>
       <div class="moveset-name">
@@ -87,6 +107,7 @@ function SkillsBar() {
         )}
       </div>
       <div class="topbar-right">
+        <UpdatePill />
         <AccountButton />
         <History past={S.past.value.length} future={S.future.value.length} undo={S.undo} redo={S.redo} />
         <button
@@ -129,6 +150,7 @@ function BarsBar() {
         )}
       </div>
       <div class="topbar-right">
+        <UpdatePill />
         <AccountButton />
         <History past={B.past.value.length} future={B.future.value.length} undo={B.undo} redo={B.redo} />
         <button

@@ -6,13 +6,15 @@
 //   Claude          the official Anthropic SDK, its fetch routed through the shell
 //   everything else OpenAI-compatible chat completions: OpenAI, Google Gemini,
 //                   OpenRouter, Groq, xAI, DeepSeek, Mistral, and models on this
-//                   PC (Ollama, LM Studio), or any compatible address
+//                   PC: built in (src/ai/local.js, llama.cpp's server), Ollama or
+//                   LM Studio, or any compatible address
 //
 // Each `turn()` streams one model reply: text as it comes (onText), then
 // the finished reply with any tool calls in a provider-neutral form.
 
 import Anthropic from '@anthropic-ai/sdk';
 import { isDesktop } from '../platform.js';
+import { localBase, refreshLocal } from './local.js';
 
 export const PROVIDERS = [
   {
@@ -30,6 +32,7 @@ export const PROVIDERS = [
   { id: 'xai', label: 'xAI (Grok)', base: 'https://api.x.ai/v1', keyUrl: 'https://console.x.ai', vision: true },
   { id: 'deepseek', label: 'DeepSeek', base: 'https://api.deepseek.com/v1', keyUrl: 'https://platform.deepseek.com/api_keys' },
   { id: 'mistral', label: 'Mistral', base: 'https://api.mistral.ai/v1', keyUrl: 'https://console.mistral.ai/api-keys' },
+  { id: 'local', label: 'On this PC (built in, free)', local: true, builtin: true },
   { id: 'ollama', label: 'Ollama (on this PC, free)', base: 'http://localhost:11434/v1', local: true },
   { id: 'lmstudio', label: 'LM Studio (on this PC, free)', base: 'http://localhost:1234/v1', local: true },
   { id: 'custom', label: 'Another OpenAI-compatible service', base: '', keyUrl: null },
@@ -200,7 +203,7 @@ async function* sse(response) {
   }
 }
 
-async function openAiTurn({ provider, base, model, system, history, tools, signal, onText }) {
+async function openAiTurn({ provider, base, model, system, history, tools, signal, onText, onThinking }) {
   const url = `${base.replace(/\/$/, '')}/chat/completions`;
   const body = {
     model,
@@ -227,6 +230,8 @@ async function openAiTurn({ provider, base, model, system, history, tools, signa
     const choice = chunk.choices?.[0];
     if (!choice) continue;
     const d = choice.delta ?? {};
+    // Reasoning models on llama.cpp and others stream their thinking apart.
+    if (d.reasoning_content) onThinking?.(d.reasoning_content);
     if (d.content) {
       text += d.content;
       onText(d.content);
@@ -275,6 +280,10 @@ function openAiResults(results, vision) {
 /** One model reply. `config`: { provider, model, base, effort }. */
 export function turn(config, args) {
   if (config.provider === 'anthropic') return claudeTurn({ ...args, model: config.model, effort: config.effort ?? 'medium' });
+  if (config.provider === 'local')
+    return localBase(config.model, { ctx: config.ctx, gpu: config.gpu }).then((base) =>
+      openAiTurn({ ...args, provider: 'local', base, model: config.model }),
+    );
   const base = config.provider === 'custom' ? config.base : (config.base || providerOf(config.provider).base);
   if (!base) throw new Error('Set the service’s address first (the gear above).');
   if (!config.model) throw new Error('Pick a model first (the gear above).');
@@ -291,6 +300,7 @@ export const userMessage = (config, text) => ({ role: 'user', content: text });
 /** The models an OpenAI-compatible service offers (its /models), or []. */
 export async function listModels(config) {
   if (config.provider === 'anthropic') return providerOf('anthropic').models;
+  if (config.provider === 'local') return ((await refreshLocal())?.models ?? []).filter((m) => !m.partial).map((m) => m.file);
   const base = config.provider === 'custom' ? config.base : (config.base || providerOf(config.provider).base);
   if (!base) return [];
   const res = await shellFetch(config.provider)(`${base.replace(/\/$/, '')}/models`, { method: 'GET' });

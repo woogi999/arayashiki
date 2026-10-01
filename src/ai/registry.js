@@ -269,9 +269,9 @@ const APP = {
     return json(result && { path: result.path, frames: result.frames, codec: result.codec, seconds: Math.round(result.seconds * 10) / 10, sounds: result.audio?.used ?? 0, soundsMissing: result.audio?.missing ?? 0 });
   },
 
-  async app_animate({ node, keys, smooth = true, easing = 'Linear', hold = 0, shake }) {
+  async app_animate({ node, keys, smooth = true, easing = 'Linear', hold = 0, shake, shakeFreq }) {
     const { runAnimation } = await import('../ui/animator.jsx');
-    return json(await runAnimation({ node, keys, smooth, easing, hold, shake }));
+    return json(await runAnimation({ node, keys, smooth, easing, hold, shake, shakeFreq }));
   },
 
   async app_undo({ redo = false, steps = 1 }) {

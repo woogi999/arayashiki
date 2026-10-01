@@ -10,7 +10,10 @@ import { Icon } from '../icons.jsx';
 import { Button, IconButton } from '../ui/controls.jsx';
 import { PROVIDERS, keyStatus, listModels, providerOf, resultsMessages, setKey, turn, userMessage } from './providers.js';
 import { TOOLS, callTool } from './registry.js';
-import { isDesktop } from '../platform.js';
+import { isDesktop, openExternal } from '../platform.js';
+import { lazy } from '../ui/lazy.jsx';
+
+const LocalModels = lazy(() => import('./local-ui.jsx'), 'LocalModels');
 
 export const toggleAssistant = () => (S.assistantOpen.value = !S.assistantOpen.peek());
 
@@ -36,7 +39,14 @@ function setConfig(patch) {
 const active = () => {
   const c = config.peek();
   const p = providerOf(c.provider);
-  return { provider: c.provider, model: c.models[c.provider] ?? p.model ?? '', base: c.bases[c.provider] ?? p.base ?? '', effort: c.effort };
+  return {
+    provider: c.provider,
+    model: c.models[c.provider] ?? p.model ?? '',
+    base: c.bases[c.provider] ?? p.base ?? '',
+    effort: c.effort,
+    ctx: c.localCtx ?? 32768,
+    gpu: c.localGpu ?? true,
+  };
 };
 
 const keys = signal({});
@@ -142,6 +152,7 @@ function friendly(error) {
   const m = String(error?.message ?? error);
   if (/401|authentication|invalid.*key|api key/i.test(m)) return `The service didn’t accept the key. Check it in the settings (gear). (${m.slice(0, 200)})`;
   if (/429|rate/i.test(m)) return `Too many requests for now: wait a moment and try again. (${m.slice(0, 200)})`;
+  if (config.peek().provider === 'local') return m.slice(0, 800);
   if (/Couldn.t reach|fetch|network|ECONN/i.test(m)) return `Couldn’t reach the service. ${providerOf(config.peek().provider).local ? 'Is it running on this PC?' : 'Check your internet.'} (${m.slice(0, 200)})`;
   return m.slice(0, 600);
 }
@@ -196,7 +207,16 @@ function Settings({ onDone }) {
           ))}
         </select>
       </label>
-      {(c.provider === 'custom' || p.local) && (
+      {p.builtin && (
+        <LocalModels
+          model={c.models.local ?? ''}
+          ctx={c.localCtx ?? 32768}
+          gpu={c.localGpu ?? true}
+          onModel={(file) => setConfig({ models: { ...c.models, local: file } })}
+          onOptions={(patch) => setConfig(patch)}
+        />
+      )}
+      {(c.provider === 'custom' || (p.local && !p.builtin)) && (
         <label class="prop-row">
           <span>Address</span>
           <input
@@ -207,6 +227,7 @@ function Settings({ onDone }) {
           />
         </label>
       )}
+      {!p.builtin && (
       <label class="prop-row">
         <span>Model</span>
         <span class="ai-model">
@@ -227,6 +248,7 @@ function Settings({ onDone }) {
           )}
         </span>
       </label>
+      )}
       {c.provider === 'anthropic' && (
         <label class="prop-row">
           <span>Effort</span>
@@ -251,7 +273,7 @@ function Settings({ onDone }) {
           {p.keyUrl && (
             <p class="hint">
               Get a key at{' '}
-              <a href={p.keyUrl} onClick={(e) => (e.preventDefault(), window.open(p.keyUrl, '_blank', 'noopener'))}>
+              <a href={p.keyUrl} onClick={(e) => (e.preventDefault(), openExternal(p.keyUrl))}>
                 {p.keyUrl.replace('https://', '')}
               </a>
               . You pay the service for what you use; the key stays in Windows’ Credential Manager and goes only to {p.label}.
@@ -259,7 +281,7 @@ function Settings({ onDone }) {
           )}
         </>
       )}
-      {p.local && <p class="hint">Free and private: the model runs on this PC. Start {p.label.split(' ')[0]} first, and pick a model that supports tools (function calling).</p>}
+      {p.local && !p.builtin && <p class="hint">Free and private: the model runs on this PC. Start {p.label.split(' ')[0]} first, and pick a model that supports tools (function calling).</p>}
       {note && <p class="hint">{note}</p>}
       <div class="modal-actions">
         <span class="spacer" />
@@ -389,8 +411,8 @@ export function AssistantPanel() {
                 <div class="assistant-intro">
                   <h3>Bring your own AI</h3>
                   <p class="hint">
-                    Pick the AI you use and paste its API key, or run a free model on this PC with Ollama or LM Studio. The
-                    assistant can read and edit the open moveset, simulate it, look at the viewport, export videos and animate
+                    Pick the AI you use and paste its API key, or run a free model on this PC: pick “On this PC” in the
+                    settings and download one (Qwen, Gemma, gpt-oss…). Ollama and LM Studio work too. The assistant can read and edit the open moveset, simulate it, look at the viewport, export videos and animate
                     cameras. Everything it changes can be undone with Ctrl+Z.
                   </p>
                   <p class="hint">

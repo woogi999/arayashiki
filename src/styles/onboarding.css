@@ -1,0 +1,764 @@
+/* The quick start (src/ui/tour.jsx) and updates (src/ui/updates.jsx).
+ * The welcome borrows the start screen's stage: the katana on the viewport's
+ * grey, drawing in, with the one sanctioned lime in its glow. The tour is a
+ * spotlight that glides between the editors with a card beside it, all in
+ * the interface's greys: lit-up means lighter, never a hue. */
+
+/* ─── The welcome ────────────────────────────────────────────────────── */
+
+.tw {
+  width: min(780px, calc(100vw - 48px));
+  max-height: calc(100vh - 64px);
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  background: var(--head);
+  color: var(--text);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 5%) inset,
+    0 40px 100px rgb(0 0 0 / 65%);
+}
+
+.tw[open] {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  animation: tw-in 640ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.tw::backdrop {
+  background: rgb(0 0 0 / 62%);
+  backdrop-filter: blur(3px);
+  animation: tw-fade 400ms ease-out both;
+}
+
+@keyframes tw-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.97);
+    filter: blur(6px);
+  }
+}
+
+@keyframes tw-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.tw-art {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 380px;
+  overflow: hidden;
+  background:
+    radial-gradient(260px 220px at 50% 42%, rgb(200 245 66 / 10%), transparent 70%),
+    linear-gradient(180deg, #252525 0%, #1b1b1b 100%);
+  border-right: 1px solid #262626;
+}
+
+/* Rings that ripple out from the katana, like a skill going off. */
+.tw-rings {
+  position: absolute;
+  top: 42%;
+  left: 50%;
+  translate: -50% -50%;
+}
+
+.tw-rings span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 150px;
+  height: 150px;
+  translate: -50% -50%;
+  border: 1px solid rgb(255 255 255 / 14%);
+  border-radius: 50%;
+  animation: tw-ripple 3.6s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+  opacity: 0;
+}
+
+.tw-rings span:nth-child(2) {
+  animation-delay: 1.2s;
+}
+
+.tw-rings span:nth-child(3) {
+  animation-delay: 2.4s;
+}
+
+@keyframes tw-ripple {
+  0% {
+    opacity: 0;
+    scale: 0.6;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    scale: 2.3;
+  }
+}
+
+.tw-mark {
+  position: relative;
+  z-index: 1;
+  margin-top: -40px;
+  filter: drop-shadow(0 10px 28px rgb(200 245 66 / 28%));
+  animation:
+    start-draw 1100ms cubic-bezier(0.16, 1, 0.3, 1) 260ms both,
+    tw-float 6s ease-in-out 1.4s infinite;
+}
+
+@keyframes tw-float {
+  50% {
+    translate: 0 -6px;
+  }
+}
+
+/* The viewport's floor, a stud grid running off into the grey. */
+.tw-floor {
+  position: absolute;
+  inset: auto -40% -8% -40%;
+  height: 52%;
+  background:
+    repeating-linear-gradient(90deg, #303030 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(0deg, #303030 0 1px, transparent 1px 28px);
+  transform: perspective(240px) rotateX(58deg);
+  transform-origin: 50% 100%;
+  mask-image: linear-gradient(to top, rgb(0 0 0 / 85%), transparent 80%);
+  animation: tw-floor 8s linear infinite;
+}
+
+@keyframes tw-floor {
+  to {
+    background-position: 0 28px;
+  }
+}
+
+.tw-text {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 34px 34px 26px;
+  overflow: auto;
+}
+
+/* The words arrive one after another. */
+.tw-text > * {
+  animation: tw-up 560ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.tw-text > :nth-child(1) {
+  animation-delay: 180ms;
+}
+.tw-text > :nth-child(2) {
+  animation-delay: 240ms;
+}
+.tw-text > :nth-child(3) {
+  animation-delay: 300ms;
+}
+.tw-text > :nth-child(4) {
+  animation-delay: 360ms;
+}
+.tw-text > :nth-child(5) {
+  animation-delay: 440ms;
+}
+.tw-text > :nth-child(6) {
+  animation-delay: 500ms;
+}
+
+@keyframes tw-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.tw-kicker {
+  color: var(--text-3);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tw-title {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.tw-line {
+  color: var(--text-2);
+  font-size: var(--text-md);
+  line-height: 1.55;
+}
+
+.tw-points {
+  display: grid;
+  gap: 2px;
+  margin: 2px 0 6px;
+  padding: 0;
+  list-style: none;
+}
+
+.tw-points li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: 6px;
+  color: var(--text);
+  font-size: var(--text-sm);
+}
+
+.tw-points li:nth-child(odd) {
+  background: rgb(255 255 255 / 2.5%);
+}
+
+.tw-points .icon {
+  color: var(--text-3);
+}
+
+.tw-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tw-actions .btn {
+  height: 32px;
+  padding: 0 16px;
+}
+
+.tw-go .icon {
+  transition: translate 200ms ease;
+}
+
+.tw-go:hover .icon {
+  translate: 3px 0;
+}
+
+.tw-later {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  color: var(--text-3);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+}
+
+.tw-later kbd {
+  font-size: 10px;
+}
+
+@media (max-width: 760px) {
+  .tw[open] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .tw-art {
+    min-height: 180px;
+    border-right: 0;
+    border-bottom: 1px solid #262626;
+  }
+
+  .tw-mark {
+    width: 96px;
+    height: 96px;
+    margin-top: 0;
+  }
+}
+
+/* ─── The tour ───────────────────────────────────────────────────────── */
+
+.tt {
+  --tt-glide: 560ms cubic-bezier(0.65, 0, 0.35, 1);
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  animation: tw-fade 360ms ease-out both;
+}
+
+/* A hole in the scrim, around what's lit up; it glides between steps. */
+.tt-spot {
+  position: absolute;
+  border-radius: 9px;
+  box-shadow:
+    0 0 0 1px rgb(255 255 255 / 55%),
+    0 0 0 9999px rgb(0 0 0 / 64%);
+  transition:
+    left var(--tt-glide),
+    top var(--tt-glide),
+    width var(--tt-glide),
+    height var(--tt-glide),
+    border-radius var(--tt-glide),
+    box-shadow 400ms ease;
+  pointer-events: none;
+}
+
+.tt-spot::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  border: 1.5px solid rgb(255 255 255 / 45%);
+  border-radius: 13px;
+  animation: tt-pulse 1.9s ease-out infinite;
+}
+
+@keyframes tt-pulse {
+  0% {
+    opacity: 0.9;
+    scale: 1;
+  }
+  100% {
+    opacity: 0;
+    scale: 1.035;
+  }
+}
+
+.tt.is-center .tt-spot {
+  border-radius: 50%;
+  box-shadow: 0 0 0 9999px rgb(0 0 0 / 70%);
+}
+
+.tt.is-center .tt-spot::after {
+  display: none;
+}
+
+.tt-card {
+  position: absolute;
+  overflow: hidden;
+  border: 1px solid #2e2e2e;
+  border-radius: 10px;
+  background: var(--head);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 5%) inset,
+    0 24px 64px rgb(0 0 0 / 60%);
+  transition:
+    left var(--tt-glide),
+    top var(--tt-glide);
+  animation: tt-card-in 520ms cubic-bezier(0.16, 1, 0.3, 1) 120ms both;
+}
+
+@keyframes tt-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+}
+
+.tt-card.is-final {
+  background: radial-gradient(320px 160px at 50% 0%, rgb(255 255 255 / 6%), transparent 70%), var(--head);
+}
+
+.tt-bar {
+  height: 2px;
+  background: #262626;
+}
+
+.tt-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #8a8a8a, #f2f2f2);
+  transition: width var(--tt-glide);
+}
+
+.tt-content {
+  padding: 16px 18px 4px;
+  animation: tt-in 460ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes tt-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+    filter: blur(3px);
+  }
+}
+
+.tt-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.tt-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid #3a3a3a;
+  border-radius: 9px;
+  background: linear-gradient(180deg, #353535, #2a2a2a);
+  color: var(--text);
+  animation: tt-pop 560ms cubic-bezier(0.34, 1.56, 0.64, 1) 80ms both;
+}
+
+@keyframes tt-pop {
+  from {
+    opacity: 0;
+    scale: 0.5;
+    rotate: -12deg;
+  }
+}
+
+.tt-count {
+  display: block;
+  color: var(--text-3);
+  font-size: 10.5px;
+}
+
+.tt-title {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.tt-body {
+  color: var(--text-2);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.tt-body p + p {
+  margin-top: 8px;
+}
+
+.tt-body strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.tt-body kbd {
+  font-size: 10.5px;
+}
+
+.tt-dim {
+  color: var(--text-3);
+  font-size: var(--text-xs);
+}
+
+.tt-keys {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tt-keys li {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--line);
+  animation: tw-up 460ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.tt-keys li:last-child {
+  border-bottom: 0;
+}
+
+.tt-keys li:nth-child(2) {
+  animation-delay: 70ms;
+}
+.tt-keys li:nth-child(3) {
+  animation-delay: 140ms;
+}
+.tt-keys li:nth-child(4) {
+  animation-delay: 210ms;
+}
+
+.tt-keys kbd {
+  justify-self: start;
+}
+
+.tt-done {
+  flex: none;
+}
+
+.tt-done circle,
+.tt-done path {
+  fill: none;
+  stroke: #f2f2f2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.tt-done circle {
+  stroke: #5a5a5a;
+  stroke-dasharray: 107;
+  animation: tt-draw 700ms cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+.tt-done path {
+  stroke-width: 2.4;
+  stroke-dasharray: 24;
+  animation: tt-draw 420ms cubic-bezier(0.65, 0, 0.35, 1) 520ms both;
+}
+
+@keyframes tt-draw {
+  from {
+    stroke-dashoffset: var(--len, 107);
+  }
+}
+
+.tt-done path {
+  --len: 24;
+}
+
+.tt-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 18px 10px;
+}
+
+.tt-skip {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text-3);
+  font-size: var(--text-xs);
+}
+
+.tt-skip:hover {
+  color: var(--text);
+}
+
+.tt-dots {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 0 12px;
+}
+
+.tt-dots button {
+  width: 6px;
+  height: 6px;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: #383838;
+  transition:
+    width 360ms cubic-bezier(0.16, 1, 0.3, 1),
+    background 300ms ease;
+}
+
+.tt-dots button.is-past {
+  background: #6a6a6a;
+}
+
+.tt-dots button.is-on {
+  width: 18px;
+  background: #e2e2e2;
+}
+
+/* ─── Updates ────────────────────────────────────────────────────────── */
+
+.modal-updates {
+  width: min(580px, calc(100vw - 48px));
+}
+
+.upd-hero {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 4px 0 2px;
+  animation: tw-up 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.upd-hero h3 {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.upd-hero .hint {
+  margin-top: 2px;
+}
+
+.upd-badge {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid #3a3a3a;
+  border-radius: 11px;
+  background: var(--widget);
+  color: var(--text);
+}
+
+.upd-badge.is-new {
+  border-color: #cfcfcf;
+  background: #e8e8e8;
+  color: #111;
+  animation: tt-pop 600ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.upd-badge.is-warn {
+  color: var(--warn);
+}
+
+.upd-spin {
+  animation: upd-spin 900ms linear infinite;
+}
+
+@keyframes upd-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+.upd-notes {
+  max-height: 280px;
+  padding: 10px 14px;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--field);
+  font-size: var(--text-sm);
+}
+
+.upd-progress {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-2);
+  font-size: var(--text-xs);
+}
+
+.upd-progress-track {
+  height: 6px;
+  overflow: hidden;
+  border: 1px solid #070707;
+  border-radius: 4px;
+  background: var(--field);
+}
+
+.upd-progress-fill {
+  height: 100%;
+  background: repeating-linear-gradient(-45deg, rgb(0 0 0 / 12%) 0 6px, transparent 6px 12px), #d8d8d8;
+  background-size:
+    17px 100%,
+    auto;
+  transition: width 200ms ease-out;
+  animation: upd-stripes 700ms linear infinite;
+}
+
+@keyframes upd-stripes {
+  to {
+    background-position:
+      17px 0,
+      0 0;
+  }
+}
+
+.upd-ready {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.upd-ready .icon {
+  flex: none;
+  margin-top: 2px;
+}
+
+/* The top bar's "Update" button: the account button's pill, one step lighter. */
+.upd-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  margin-right: 6px;
+  padding: 0 10px 0 8px;
+  border: 1px solid #070707;
+  border-radius: 999px;
+  background: #474747;
+  color: #fff;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  animation: upd-pill-in 600ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.upd-pill:hover {
+  background: #555;
+}
+
+@keyframes upd-pill-in {
+  from {
+    opacity: 0;
+    scale: 0.7;
+  }
+}
+
+.upd-pill-dot {
+  position: relative;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.upd-pill-dot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #fff;
+  animation: upd-ping 1.8s ease-out infinite;
+}
+
+@keyframes upd-ping {
+  to {
+    opacity: 0;
+    scale: 2.6;
+  }
+}
+
+.settings-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tw[open],
+  .tw::backdrop,
+  .tw-text > *,
+  .tw-rings span,
+  .tw-floor,
+  .tt,
+  .tt-card,
+  .tt-content,
+  .tt-icon,
+  .tt-keys li,
+  .tt-spot::after,
+  .tt-done circle,
+  .tt-done path,
+  .upd-hero,
+  .upd-badge.is-new,
+  .upd-progress-fill,
+  .upd-pill,
+  .upd-pill-dot::after {
+    animation: none;
+  }
+
+  .tw-mark {
+    animation: none;
+  }
+
+  .tt-spot,
+  .tt-card,
+  .tt-bar-fill {
+    transition: none;
+  }
+}

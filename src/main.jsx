@@ -12,6 +12,7 @@ import './styles/barmaker.css';
 import './styles/start.css';
 import './styles/features.css';
 import './styles/panels.css';
+import './styles/onboarding.css';
 import { render } from 'preact';
 import { warmCodec } from '#codec';
 import { App } from './app.jsx';
@@ -20,6 +21,9 @@ import { isDesktop, onCloseRequest, onOpenRequest } from './platform.js';
 import { requestExit } from './exit.js';
 import { startBridge } from './ai/bridge.js';
 import { loadAccount } from './account.js';
+import { checkOnLaunch } from './updates.js';
+import { migrateLayout } from './ui/dock.jsx';
+import { welcomeOnFirstRun } from './onboarding.js';
 
 // The UI's errors go to ui.log in the app's config folder (no console in
 // release builds), for bug reports.
@@ -33,6 +37,7 @@ ${e.error?.stack ?? ''}`));
 // Restoring is one IndexedDB read (a few ms); waiting for it avoids a flash
 // of the starter moveset. It never holds the window up for long.
 await Promise.race([S.restore(), new Promise((resolve) => setTimeout(resolve, 400))]);
+migrateLayout();
 render(<App />, document.getElementById('app'));
 // For UI checks (screenshot scripts): open a dialog by name.
 window.__arayashikiOpen = (name) => (S.dialog.value = name);
@@ -55,3 +60,8 @@ startBridge().catch(() => {});
 
 // The Roblox account, if signed in before: name, picture, avatar on "You".
 loadAccount({ refresh: true });
+
+// The first launch offers the quick tour (src/ui/tour.jsx); every launch
+// quietly asks GitHub for a newer release (src/updates.js).
+welcomeOnFirstRun();
+checkOnLaunch();

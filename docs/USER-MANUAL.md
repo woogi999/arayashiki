@@ -19,6 +19,36 @@ Run `Arayashiki_x.y.z_x64-setup.exe`. It installs for your Windows account
 only (no administrator needed) and adds Arayashiki to the Start menu. Windows
 11 already has everything it needs (WebView2).
 
+### The quick tour
+
+The first time you open Arayashiki, it asks whether you'd like a quick tour.
+The tour lights up each part of the window in turn (the menus, the
+workspaces, the Outliner, Nodes, the Viewport, the Timeline, Properties,
+Export and signing in) and says what it's for. Use <kbd>→</kbd> and
+<kbd>←</kbd> (or Next and Back) to move through it, and <kbd>Esc</kbd> to
+leave. It ends by pointing you here.
+
+To take it again, pick **Quick tour** at the bottom of the start screen,
+search for "tour" with <kbd>Ctrl+Space</kbd>, or use the button in Settings →
+Updates.
+
+### Updates
+
+New versions of Arayashiki come out on
+[GitHub](https://github.com/woogi999/arayashiki/releases). A few seconds
+after it opens, Arayashiki checks for one; when there is, an **Update**
+button appears at the top right. It opens the Updates window, with what's new
+in that version:
+
+- **Download and install** fetches the installer. **Install and restart**
+  then saves any unsaved work, closes Arayashiki and runs the installer. Your
+  movesets, settings and sign-in stay as they are.
+- **Skip this version** hides the button until the next version comes out.
+- **On GitHub** opens the release page in your browser.
+
+To check yourself, search for "check for updates", or use Settings → Updates,
+where the check at launch can also be turned off.
+
 ### Signing in with Roblox
 
 The first time you open Arayashiki, the start screen asks you to sign in with
@@ -40,7 +70,7 @@ The start screen is what Arayashiki opens on. Pick a workspace on the right:
 - **Meter Maker**: draw a meter (a progress bar) and make the skill that shows it.
 
 Then pick how to start. In the Skill Builder, **New Character** comes first: a
-fresh moveset built from the starter skills. You can also open a `.txt`
+blank moveset, with one empty skill to start adding nodes to. You can also open a `.txt`
 holding a code, paste a code from JJS (**Import a code**), or start from a
 **Template**. Files you opened lately are listed under **Recent**.
 
@@ -68,16 +98,27 @@ back. The start screen then says the app didn't close properly and offers
 The window is laid out like Blender. Every panel has a header strip; drag a
 header onto another panel to dock it at that side (or onto its middle to swap
 them), use the button at the right of a header to float a panel, and drag the
-gaps between panels to resize them. **Reset the panel layout** (search for it)
-puts everything back.
+gaps between panels to resize them.
 
 | Panel | What it's for |
 |---|---|
-| **Nodes** (left) | The open skill's line of nodes, its branches along the top, and **Add** for new nodes. |
+| **Outliner** (top left) | The moveset: categories, skills, and the open skill's branches. |
+| **Nodes** (bottom left) | The open skill's line of nodes, its branches along the top, and **Add** for new nodes. |
 | **Viewport** (middle) | Your character and the dummy playing the skill. |
-| **Timeline** (bottom) | The frame meter: what fired when, on you and on the dummy. The **Log** tab lists every step. |
-| **Outliner** (top right) | The moveset: categories, skills, and the open skill's branches. |
-| **Properties** (bottom right) | The picked node's fields, the branch's conditions, the skill's settings, and the simulation's settings. |
+| **Timeline** (under the viewport) | The frame meter: what fired when, on you and on the dummy. The **Log** tab lists every step. |
+| **Properties** (right) | The picked node's fields, the branch's conditions, the skill's settings, and the simulation's settings. |
+
+**Layout** in the top bar keeps your arrangements:
+
+- **Reset to the default layout** puts every panel back where it starts.
+- **Save this layout…** keeps where the panels are and how big, under a name
+  ("Animating", "Big viewport").
+- Your saved layouts are listed under it: pick one to switch to it. **Delete a
+  saved layout** removes one.
+
+The same menu is under **Panel layout** when you right-click an empty spot,
+and **Save the panel layout** and **Reset the panel layout** are in the
+search.
 
 ### Opening and saving movesets
 
@@ -170,6 +211,12 @@ The viewport's header has three cameras:
 **The skill's own camera** (in **Camera…**) decides whether the skill's Camera
 blocks, Field of View changes and shakes take over the view while they run,
 as they would on the player's screen in JJS.
+
+**Reset camera settings** (at the bottom of **Camera…**, or in the viewport's
+right-click menu) puts the cameras back as they start: the Free camera,
+Follow on, the skill's own camera on, the Auto camera's defaults, and the view
+framed on your character again. Recorded camera keys stay (**Clear camera
+keys** removes them).
 
 ## Exporting: code, videos and pictures
 
@@ -293,18 +340,25 @@ Start one from the Nodes panel's **Animate** menu:
   already there (a Mesh, Block, Sphere, Cylinder, Wedge or Camera effect).
 
 The animator is a floating window: drag it by its header, size it from its
-corner. As you change it, it writes the chain of VISUAL nodes into the line,
-splitting WAITs so each piece fires exactly on time without moving any other
-node. Everything it does is one undo step at a time (<kbd>Ctrl+Z</kbd>).
+corner. A **new** animation is a draft (its badge says so): nothing goes into
+the skill until you press **Write to skill**, and closing it (or **Discard
+draft**) leaves the skill as it was. Once it's in the skill, and for a VISUAL
+you opened with **Animate**, every change is written as you make it: the
+chain of VISUAL nodes, with WAITs split so each piece fires exactly on time
+without moving any other node. Each write is one undo step
+(<kbd>Ctrl+Z</kbd>).
+
+**Play** runs the skill from where the animation starts (for a camera, looking
+through it; press it again to stop).
 
 ### Animating a mesh or part
 
 1. Pick the **effect** (Block, Sphere, Cylinder, Wedge or Mesh, with its mesh
    and texture IDs) and the **body part** it hangs from.
-2. **Add key** (<kbd>K</kbd>) adds a key at the playhead, posed as the
-   animation is there. If the playhead is on a key already, the new key goes
-   half way to the next one (or half a second after the last). It never
-   replaces a key.
+2. **Add key** (<kbd>K</kbd>) adds a key after the last one, at the bottom of
+   the list, and picks it: at the playhead if that's past the last key, or
+   else half a second after it. It's posed as the animation is there. (Change
+   its **Time** to move it anywhere.)
 3. Pick a key (in the list, or click its box in the viewport) and drag the
    gizmo: <kbd>G</kbd> to move, <kbd>R</kbd> to turn. Or type exact numbers:
    position on the body part (x left, y up, z forward, in studs), rotation in
@@ -312,6 +366,9 @@ node. Everything it does is one undo step at a time (<kbd>Ctrl+Z</kbd>).
 4. Set each key's **easing to the next** key: Linear, Sine, Quad, Cubic,
    Quart, Quint, Exponential, Circular, Back, Bounce or Elastic, In, Out or
    InOut.
+5. Tick **Cut** on a key for a jump cut: instead of moving there from the key
+   before, the animation holds the key before until the cut's moment, then is
+   at the cut key at once. Cutscenes cut from shot to shot this way.
 
 **Smooth curve** runs a curve through your keys (the chain gets more, shorter
 pieces to follow it: set how many a second; the easing still applies). With
@@ -320,14 +377,17 @@ end** keeps the effect where it stopped for a while.
 
 ### Animating a camera
 
-1. **Animate → New camera animation** adds a Camera VISUAL after the picked
-   node, with its first keys where your view is.
+1. **Animate → New camera animation** starts a draft for a Camera VISUAL
+   after the picked node, with its first keys where your view is. The
+   viewport switches to the Free camera, since you key it by flying.
 2. Move the playhead, fly to the next shot, and press **Key from view**
-   (<kbd>K</kbd>). **Set key N to view** moves the picked key to your view.
+   (<kbd>K</kbd>): the new key goes at the bottom of the list, as the latest,
+   and is picked. **Set key N to view** moves the picked key to your view.
 3. While the animator is open, the skill's own camera stays out of the way so
-   you can fly freely. Turn on **Look through it while editing** to watch the
-   shot as the player will see it.
-4. Set each key's easing, and smoothing, as for a part.
+   you can fly freely. **Play** plays the skill looking through the animated
+   camera; **Look through it while editing** does the same while you scrub.
+4. Set each key's easing, jump cuts and smoothing, as for a part.
+5. **Write to skill** puts it in.
 
 Camera keys are stored relative to your character, so the shot follows the
 character as JJS's Camera blocks do. Rotation `0, 0, 0` looks the way you
@@ -336,15 +396,19 @@ face; `0, 180, 0` looks back at you.
 ### Camera shake
 
 Screen shakes (Shake Light / Medium / Heavy) don't move a Camera block's view
-in JJS, so a camera animation can't be shaken that way. The animator puts the
-shake into the camera's path itself instead: pick **Light**, **Medium** or
-**Heavy**, or set the strength (studs and degrees), when it starts and stops,
-how fast it shakes, and whether it fades out.
+in JJS, so the animator puts the shake into the camera's path itself. Shake is
+keyed like everything else: each key has a **Shake** (how far it jitters, in
+studs) and a **Turn** (how much it wobbles, in degrees), and they ease from
+key to key. Key a shake of 0, then a hard one at the impact, then 0 again,
+and the shake hits and dies away. The **Light**, **Medium** and **Heavy**
+buttons set the picked key's shake; **Shakes a second** sets how fast it
+jitters.
 
 ### Removing an animation
 
 **Remove animation** takes the whole chain out of the skill and joins the
-WAITs it split.
+WAITs it split. For a draft, **Discard draft** closes it without changing the
+skill.
 
 ## Templates
 
@@ -399,15 +463,23 @@ With nothing typed, it shows your favourites and what you ran lately.
 Right-click shows a menu for what you clicked:
 
 - a **node**: animate it (VISUALs), duplicate, move, copy and paste nodes as
-  JSON, play from it, delete;
-- a **skill** in the Outliner: play, add, duplicate, move, copy its code for
-  JJS, delete;
-- a **branch**: add a branch, play from it, delete;
-- the **viewport**: play, the cameras, camera takes, Follow, hitboxes,
-  pictures and videos, and a new camera animation;
+  JSON, play from it, **Add node ▸** and **Add visual effect ▸** (after it),
+  delete;
+- a **skill** in the Outliner: play, **Add node ▸** and **Add visual effect
+  ▸**, add, duplicate, move, copy its code for JJS, delete;
+- a **branch**: add nodes to it, add a branch, play from it, delete;
+- an empty spot in the **Nodes** or **Outliner** panel: add nodes (or a
+  skill), and **Panel layout ▸**;
+- the **viewport**: play, the cameras, camera takes, reset the camera or its
+  settings, Follow, hitboxes, pictures and videos, and a new camera animation;
 - the **timeline**: play and the speeds;
 - a **text field**: cut, copy, paste, select all;
-- anywhere else: search, undo, save, export, settings, this manual.
+- anywhere else: search, undo, save, export, the panel layout, settings,
+  this manual.
+
+**Add node ▸** lists every node kind by group (Flow, Motion, Combat, Look);
+**Add visual effect ▸** adds a VISUAL with that effect already set. Hover or
+press <kbd>→</kbd> to open a submenu, <kbd>←</kbd> to close it.
 
 A right-drag in the viewport turns the camera and doesn't open a menu.
 
@@ -425,8 +497,9 @@ Press <kbd>Ctrl+J</kbd>. Pick your AI and paste its API key:
 - **Claude** (Anthropic), **OpenAI** (ChatGPT's models), **Google Gemini**,
   **OpenRouter** (hundreds of models with one key), **Groq**, **xAI**,
   **DeepSeek**, **Mistral**, or any OpenAI-compatible service;
-- or a free model running on your PC with **Ollama** or **LM Studio** (no
-  key; pick a model that supports tool use).
+- or a free model on your own PC: **On this PC** (built in, below), or
+  **Ollama** or **LM Studio** if you already use them (no key; pick a model
+  that supports tool use).
 
 Keys are kept in Windows' Credential Manager, never in the app's files, and
 are sent only to the service they belong to. You pay the service for what you
@@ -436,6 +509,32 @@ Then ask: "what does this skill do?", "why doesn't my M1 hit?", "make a dash
 that launches the dummy upward", "film this at quarter speed with a
 transparent background". Click a tool line in the chat to see exactly what it
 did.
+
+### Free models on this PC
+
+Pick **On this PC (built in, free)** in the assistant's settings (the gear).
+Nothing to install separately and nothing leaves your PC:
+
+1. **Get the engine** (about 35 MB, once): llama.cpp, which runs the models.
+   It uses your graphics card through Vulkan (NVIDIA, AMD and Intel); **CPU
+   only** is for a PC whose graphics card can't.
+2. **Download** a model. **Qwen3.5 4B** is the one to start with: good with
+   tools and fine on most PCs (8 GB of memory). The list also has smaller
+   (Qwen3.5 2B) and bigger ones (Qwen3.5 9B, Google's Gemma 4, OpenAI's
+   gpt-oss 20B, Qwen3.8 27B, Qwen3 Coder, Qwen3.6 35B), each with its size and
+   what it needs. A download can be paused (the ×) and picked up later.
+3. Press **Use** on a downloaded model, and chat.
+
+The model loads when you send the first message (a few seconds, longer for
+big models) and stays loaded until Arayashiki closes; **Stop** frees its
+memory sooner. **Context** is how much of the conversation it keeps in mind
+(more needs more memory), and **Use the graphics card** off runs it on the
+processor only. Any other model from Hugging Face works too: paste the link
+to its `.gguf` file under **Another model from Hugging Face** (a Q4_K_M file
+of a model that supports tool calling).
+
+Small models are quicker but slip up more on long tasks than Claude or GPT:
+give them one thing at a time.
 
 ### Connecting the AI app you already use (MCP)
 
@@ -454,7 +553,7 @@ command (`arayashiki.exe --mcp`) and a JSON snippet.
 
 ## Settings
 
-Settings (search for it) has four tabs:
+Settings (search for it) has five tabs:
 
 - **Keybinds**: click a shortcut, press the new keys. Every shortcut in this
   manual can be changed.
@@ -464,6 +563,8 @@ Settings (search for it) has four tabs:
 - **Roblox**: the index of Roblox's own cache on your PC (assets come from
   there when Roblox already downloaded them), and deleting what Arayashiki
   downloaded.
+- **Updates**: the version you have, checking for a newer one (and whether
+  to check at launch), and taking the quick tour again.
 
 ## Keyboard shortcuts
 

@@ -56,6 +56,16 @@ function CameraMenu() {
           {S.recordingCam.value ? 'Stop recording' : 'Record a take'}
         </button>
       </div>
+      <div class="cam-menu-actions cam-menu-reset">
+        <button
+          type="button"
+          class="btn btn-ghost"
+          title="Free camera, Follow on, the skill’s own camera on, the auto camera’s defaults, and the view framed again. Recorded keys stay."
+          onClick={S.resetCameraSettings}
+        >
+          Reset camera settings
+        </button>
+      </div>
     </div>
   );
 }

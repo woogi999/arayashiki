@@ -478,6 +478,9 @@ export function mountSkillScene(host, { textureUrl = async () => null, meshData 
   let pathOptions = { smooth: true, shake: null };
   let skillCamera = true;
   let track = null; // the auto camera's track for this run, made when first needed
+  // A camera to look through while editing one (the animator's preview):
+  // t → { position, quaternion, fov } or null. It comes before any mode.
+  let previewCamera = null;
   // The camera effects face (billboards, particles): the view's, or an export's.
   let drawingFor = camera;
 
@@ -1017,7 +1020,9 @@ export function mountSkillScene(host, { textureUrl = async () => null, meshData 
     } else followFrom = null;
     // The mode's camera or a Camera block takes the view; then it's yours again.
     const saved = { position: camera.position.clone(), quaternion: camera.quaternion.clone() };
-    const from = modeCamera(camMode, t);
+    const preview = previewCamera?.(t) ?? null;
+    animGroup.visible = !preview;
+    const from = preview ?? modeCamera(camMode, t);
     camera.userData.baseFov = BASE_FOV;
     if (from) {
       camera.position.copy(from.position);
@@ -1397,6 +1402,10 @@ export function mountSkillScene(host, { textureUrl = async () => null, meshData 
       followFrom = null;
       track = null;
       show(0);
+      // An edit re-runs the skill: the camera stays where it is. (Follow
+      // starts again from wherever the playhead shows next, rather than
+      // carrying the camera from frame 0 to it.)
+      followFrom = null;
     },
     show,
     get time() {
@@ -1415,6 +1424,11 @@ export function mountSkillScene(host, { textureUrl = async () => null, meshData 
       pathKeys = keys ?? [];
       skillCamera = skill;
       followFrom = null;
+      show(time);
+    },
+    /** Looks through `fn(t)` → { position, quaternion, fov } (null: your own camera). */
+    setPreviewCamera(fn) {
+      previewCamera = fn;
       show(time);
     },
     /** Your camera now, as a key at t (for a recorded path). */

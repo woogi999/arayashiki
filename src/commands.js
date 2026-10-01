@@ -8,6 +8,8 @@ import { bindingOf } from './keybinds.js';
 import { requestExit } from './exit.js';
 import { setAppearance, appearance, BACKGROUNDS } from './prefs.js';
 import { resetLayout } from './ui/dock.jsx';
+import { startTour } from './onboarding.js';
+import { openUpdates } from './updates.js';
 
 const skills = () => S.workspace.peek() === 'skills';
 const editing = () => skills() && !S.showStart.peek();
@@ -62,6 +64,7 @@ export const COMMANDS = [
   { id: 'follow', title: 'Follow both characters', group: 'View', icon: 'navigation', keywords: 'follow camera track', run: () => (S.follow.value = !S.follow.peek()) },
   { id: 'sounds', title: 'Sounds on / off', group: 'View', icon: 'volume-2', keywords: 'audio sfx mute', run: () => (S.sounds.value = !S.sounds.peek()) },
   { id: 'dummy', title: 'Show / hide the dummy', group: 'View', icon: 'person-standing', keywords: 'dummy target', run: () => S.setDummy({ present: S.dummy.peek().present === false }) },
+  { id: 'resetCameraSettings', title: 'Reset camera settings', group: 'Camera', icon: 'refresh', keywords: 'camera settings default reset follow auto free options', run: () => S.resetCameraSettings() },
   { id: 'resetCamera', title: 'Reset the camera', group: 'Camera', icon: 'locate-fixed', keywords: 'home view frame', run: () => S.resetCamera() },
   { id: 'camFree', title: 'Camera: Free (fly yourself)', group: 'Camera', icon: 'camera', keywords: 'camera free manual fly', run: () => (S.camMode.value = 'free') },
   { id: 'camAuto', title: 'Camera: Auto (cinematic)', group: 'Camera', icon: 'aperture', keywords: 'camera auto cinematic follow director', run: () => (S.camMode.value = 'auto') },
@@ -81,10 +84,13 @@ export const COMMANDS = [
   // Workspaces and windows
   { id: 'toSkills', title: 'Go to the Skill Builder', group: 'Workspace', icon: 'swords', keywords: 'skills workspace builder', run: toSkills },
   { id: 'toMeter', title: 'Go to the Meter Maker', group: 'Workspace', icon: 'battery', keywords: 'meter progress bar maker workspace', run: () => ((S.workspace.value = 'bars'), (S.showStart.value = false)) },
-  { id: 'resetLayout', title: 'Reset the panel layout', group: 'Workspace', icon: 'layout', keywords: 'panels dock layout default', run: () => resetLayout() },
+  { id: 'resetLayout', title: 'Reset the panel layout', group: 'Workspace', icon: 'layout', keywords: 'panels dock layout default reset workspace', run: () => resetLayout() },
+  { id: 'saveLayout', title: 'Save the panel layout…', group: 'Workspace', icon: 'save', keywords: 'panels dock layout workspace save keep preset', run: dialog('save-layout') },
   { id: 'search', title: 'Search everything', group: 'Help', icon: 'command', keywords: 'search find command palette', run: () => import('./ui/search.jsx').then((m) => m.openSearch()) },
   { id: 'assistant', title: 'AI assistant', group: 'AI', icon: 'bot', keywords: 'ai chat assistant claude gpt gemini help', run: () => assistant().then((m) => m.toggleAssistant()) },
   { id: 'connectAi', title: 'Connect an AI app (MCP)', group: 'AI', icon: 'plug', keywords: 'mcp claude desktop cursor vscode codex connect', run: dialog('connect-ai') },
+  { id: 'tour', title: 'Quick tour (where everything is)', group: 'Help', icon: 'sparkles', keywords: 'onboarding quick start guide tour welcome intro tutorial walkthrough basics', run: startTour },
+  { id: 'checkUpdates', title: 'Check for updates', group: 'Help', icon: 'refresh', keywords: 'update upgrade new version release github download install', run: openUpdates },
   { id: 'manual', title: 'User manual', group: 'Help', icon: 'help', keywords: 'help manual guide how docs', run: dialog('manual') },
   { id: 'settings', title: 'Settings', group: 'Settings', icon: 'settings', keywords: 'preferences options', run: dialog('settings') },
   { id: 'keybinds', title: 'Keyboard shortcuts', group: 'Settings', icon: 'keyboard', keywords: 'keys hotkeys shortcuts bindings', run: () => ((S.settingsTab.value = 'keys'), (S.dialog.value = 'settings')) },

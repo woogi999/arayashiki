@@ -5,6 +5,7 @@
 import { useEffect, useMemo, useRef } from 'preact/hooks';
 import * as S from '../store.js';
 import { Modal } from './controls.jsx';
+import { openExternal } from '../platform.js';
 import text from '../../docs/USER-MANUAL.md?raw';
 
 const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -33,7 +34,7 @@ function inline(s, key = 0) {
           onClick={(e) => {
             e.preventDefault();
             if (local) document.getElementById(href.slice(1))?.scrollIntoView({ behavior: 'smooth' });
-            else if (/^https?:/.test(href)) window.open(href, '_blank', 'noopener');
+            else if (/^https:/.test(href)) openExternal(href);
           }}
         >
           {label}
@@ -46,7 +47,8 @@ function inline(s, key = 0) {
   return out;
 }
 
-function render(md) {
+/** Markdown to elements (also the release notes in the Updates window). */
+export function render(md) {
   const lines = md.replace(/\r\n?/g, '\n').split('\n');
   const out = [];
   let i = 0;
