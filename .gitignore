@@ -1,0 +1,17 @@
+/dist/
+/node_modules/
+/src-tauri/target/
+/src-tauri/gen/
+/.impeccable/review/
+/DEBUG/
+/.claude/
+/.impeccable/
+/AGENTS.md
+/CLAUDE.md
+/DESIGN.md
+/PRODUCT.md
+/docs/ai/README.md
+
+# The JJS exports and guides the handbook and library are built from. Some
+# are other people's characters, so they stay on this machine.
+/data/

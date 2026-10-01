@@ -1,0 +1,69 @@
+/* Arayashiki's design tokens: Blender's layout and greys.
+ *
+ * The interface is grayscale. Colour is reserved for what carries meaning:
+ * the node kinds (the game's own colours, set per element as --kind), the
+ * playback (the lime playhead and play button, red hits), and who acted
+ * (you in blue, the dummy in amber).
+ */
+
+:root {
+  --font-ui: 'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', monospace;
+
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-md: 13px;
+  --text-lg: 15px;
+
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 24px;
+
+  --radius-sm: 3px;
+  --radius: 4px;
+  --radius-area: 6px;
+  --control-h: 24px;
+  --head-h: 30px;
+
+  /* Greys, darkest first. */
+  --ground: #0b0b0b; /* the window, the gutters between areas */
+  --area: #161616; /* editor backgrounds: lists, the log */
+  --head: #1c1c1c; /* area headers, the top and status bars */
+  --panel: #202020; /* property panels */
+  --panel-head: #262626;
+  --field: #0f0f0f; /* text and number fields */
+  --widget: #2e2e2e; /* buttons */
+  --widget-hover: #393939;
+  --widget-on: #4c4c4c; /* pressed toggles, the chosen segment */
+  --row-hover: #212121;
+  --row-selected: #333333;
+  --line: #262626;
+  --line-strong: #363636;
+  --text: #e2e2e2;
+  --text-2: #a8a8a8;
+  --text-3: #8a8a8a;
+  --sel-line: #f2f2f2; /* the selected node, outlined */
+
+  /* Playback. */
+  --play: #c8f542;
+  --play-ink: #151a05;
+  --hit: #ff5c5f;
+  --hit-soft: rgb(255 92 95 / 14%);
+
+  /* Who acted. */
+  --you: #5aa9ff;
+  --dummy: #f0a44b;
+
+  --warn: #d9b36a;
+  --focus: #9a9a9a;
+  --scrim: rgb(0 0 0 / 55%);
+  --kind-chip-ink: #111111;
+
+  /* Names the frame meter reads. */
+  --bg-1: var(--area);
+  --line-accent: var(--play);
+
+  color-scheme: dark;
+}

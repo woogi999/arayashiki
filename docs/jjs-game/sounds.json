@@ -1,0 +1,8802 @@
+[
+ {
+  "path": "ReplicatedStorage.Modules.MVP.Domain Invasion.SFX",
+  "id": "86006918532629",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Modules.MVP.King Of Curses.Voice",
+  "id": "14890923579",
+  "volume": 5.31
+ },
+ {
+  "path": "ReplicatedStorage.Modules.MVP.Meditation.birds-chirping",
+  "id": "112547910241091",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Modules.MVP.Meditation.Clap Todo",
+  "id": "107979696453490",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Modules.MVP.Meditation.waterfall3_looped",
+  "id": "72131057531506",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Modules.MVP.Phenomenal.Effect",
+  "id": "98358603909283",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Modules.MVP.Phenomenal.Music",
+  "id": "1841702701",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Modules.MVP.Phenomenal.Voice",
+  "id": "72464904668459",
+  "volume": 2.5
+ },
+ {
+  "path": "ReplicatedStorage.Modules.MVP.Stalemate Collapse.Music",
+  "id": "130627474773425",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Modules.MVP.Stalemate Collapse.SFX",
+  "id": "70959568320346",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Modules.MVP.Stalemate Collapse.Voice",
+  "id": "106624026710853",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Modules.MVP.Stand Proud.SFX",
+  "id": "112029146347544",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Modules.MVP.Stand Proud.Voice",
+  "id": "113890505876961",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Modules.MVP.True Value.SFX",
+  "id": "107855800047653",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Modules.MVP.Watch Your Head.Music",
+  "id": "81565701409447",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Modules.MVP.Watch Your Head.SFX",
+  "id": "84654058372902",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Modules.MVP.Watch Your Head.Voice",
+  "id": "88920548611517",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.AA",
+  "id": "73577798886122",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.AE",
+  "id": "73577798886122",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.AH",
+  "id": "133591936656116",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.AO",
+  "id": "84310755945447",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.AW",
+  "id": "113458745646611",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.AY",
+  "id": "131293641618242",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.B",
+  "id": "77863336216942",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.CH",
+  "id": "131257550526363",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.D",
+  "id": "127134864097863",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.DH",
+  "id": "86437573995743",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.EH",
+  "id": "103091003243759",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.ER",
+  "id": "74585000611364",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.EY",
+  "id": "99656223484067",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.F",
+  "id": "81652896516418",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.G",
+  "id": "119198374043669",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.GASTER",
+  "id": "4742745849",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.HH",
+  "id": "135244577636868",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.IH",
+  "id": "117022809234182",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.IY",
+  "id": "70755878701400",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.JH",
+  "id": "107816331170332",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.K",
+  "id": "98690375420363",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.L",
+  "id": "98467785084459",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.M",
+  "id": "93035605587754",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.N",
+  "id": "133379202159135",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.NG",
+  "id": "139644515004340",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.OW",
+  "id": "108208932589144",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.OY",
+  "id": "138825785098960",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.P",
+  "id": "101042919669248",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.R",
+  "id": "106603246040092",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.S",
+  "id": "127292913160839",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.SH",
+  "id": "110279898362779",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.T",
+  "id": "104904192090892",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.TH",
+  "id": "131745713700456",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.UH",
+  "id": "122817586168529",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.UW",
+  "id": "122978152434566",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.V",
+  "id": "119947627370393",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.W",
+  "id": "129997735043101",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.Y",
+  "id": "116244296777624",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.Z",
+  "id": "93980372377105",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Modules.Settings.Audio.TTS.TextToZee.Voices.TTZ.ZH",
+  "id": "122462943738113",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Modules.StyleAura.Assets.Stance",
+  "id": "122695485344398",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Charles.Despair.Hit1",
+  "id": "94107281648467",
+  "volume": 1.2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Charles.Despair.Hit2",
+  "id": "103563218704266",
+  "volume": 1.2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Charles.Despair.Hit3",
+  "id": "103563218704266",
+  "volume": 1.2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Charles.Despair.Spin",
+  "id": "102170331317268",
+  "volume": 1.2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Charles.Despair.Startup",
+  "id": "107284905728635",
+  "volume": 1.2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Charles.Despair.Swing",
+  "id": "98574727138893",
+  "volume": 1.2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Charles.EyeCatch.Dodge",
+  "id": "128854350040211",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Charles.EyeCatch.Hit",
+  "id": "125025280611426",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Charles.M1.Hit1",
+  "id": "94107281648467",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Charles.M1.Hit2",
+  "id": "103563218704266",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Charles.M1.Hit3",
+  "id": "103563218704266",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Charles.M1.Hit4",
+  "id": "8595974357",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Charles.ShutUp.Hit",
+  "id": "140443001346012",
+  "volume": 1.2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Charles.ShutUp.Hit2",
+  "id": "104974135649084",
+  "volume": 1.2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Charles.ShutUp.Stab",
+  "id": "134654946718633",
+  "volume": 1.2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Charles.ShutUp.Swing",
+  "id": "128854350040211",
+  "volume": 1.2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Charles.ShutUp.Throw",
+  "id": "123300556709057",
+  "volume": 1.2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Charles.Throw",
+  "id": "123300556709057",
+  "volume": 1.2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Charles.Ult",
+  "id": "135733886312570",
+  "volume": 1.2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Charles.UltStart",
+  "id": "114694152385335",
+  "volume": 1.2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Charles.UltVoice",
+  "id": "83082182015605",
+  "volume": 1.2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Choso.Awaken",
+  "id": "119654508166149",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Choso.BloodBurst",
+  "id": "3739364168",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Choso.BloodBurst2",
+  "id": "18427761019",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Choso.BloodEdge.Dash",
+  "id": "3755636152",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Choso.BloodEdge.StabHit",
+  "id": "3932142219",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Choso.BloodMerge",
+  "id": "9120086654",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Choso.BloodRain.End",
+  "id": "99414146840490",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Choso.BloodRain.Loop",
+  "id": "79801008789998",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Choso.BloodRain.Start",
+  "id": "137790880409950",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Choso.Convergence",
+  "id": "4459578169",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Choso.Counter",
+  "id": "9113764330",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Choso.M1.Hit1",
+  "id": "8595975878",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Choso.M1.Hit2",
+  "id": "8595975878",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Choso.M1.Hit3",
+  "id": "8595975878",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Choso.M1.Hit4",
+  "id": "8595975458",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Choso.Nobara.NailHit",
+  "id": "5473058688",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Choso.Nobara.Slam",
+  "id": "295837588",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Choso.Nobara.Snap",
+  "id": "9114428331",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Choso.PiercingBlood.Clap",
+  "id": "18259558246",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Choso.PiercingBlood.Fire",
+  "id": "124532419231032",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Choso.PiercingBlood.Hit",
+  "id": "4086202171",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Choso.PiercingBlood.Pressure",
+  "id": "9074099528",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Choso.PiercingBlood.Pressure2",
+  "id": "9074099528",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Choso.PiercingBlood.Startup",
+  "id": "9125615451",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Choso.PlasmaWave.Fire",
+  "id": "9120610973",
+  "volume": 5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Choso.PlasmaWave.Swarm",
+  "id": "9114828109",
+  "volume": 5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Choso.SlicingExorcism.Reflect",
+  "id": "12222124",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Choso.SlicingExorcism.Reflect2",
+  "id": "12222124",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Choso.SlicingExorcism.Saw",
+  "id": "8847056740",
+  "volume": 0
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Choso.SlicingExorcism.Saw1",
+  "id": "114060318185092",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.BlindsOff",
+  "id": "4458760518",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.DragThrow",
+  "id": "82926856324306",
+  "volume": 2.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.FistSlam",
+  "id": "9066673412",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.GrabBlinds",
+  "id": "3929467888",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.HollowPurple.Explode",
+  "id": "7602599324",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.HollowPurple.Hit",
+  "id": "698224146",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.HollowPurple.MaxCharge",
+  "id": "4299624634",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.HollowPurple.Merge",
+  "id": "17018019870",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.HollowPurple.Music",
+  "id": "14326861262",
+  "volume": 0
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.HollowPurple.Music2",
+  "id": "14457960806",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.HollowPurple.Smash",
+  "id": "4776197442",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.HollowPurple.Snap",
+  "id": "15075475525",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.HollowPurple.Summon",
+  "id": "4858918400",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.InfiniteVoid.Barrage",
+  "id": "127027345708590",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.InfiniteVoid.Boost1",
+  "id": "93070893390347",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.InfiniteVoid.Boost2",
+  "id": "126837281119039",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.InfiniteVoid.Breathe",
+  "id": "82179939991290",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.InfiniteVoid.Hits.Hit1",
+  "id": "130525286637724",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.InfiniteVoid.Hits.Hit2",
+  "id": "94234054127236",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.InfiniteVoid.Hits.Hit3",
+  "id": "108671308229639",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.InfiniteVoid.InfiniteVoid",
+  "id": "15171602676",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.InfiniteVoid.Music",
+  "id": "16071901783",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.InfiniteVoid.Shatter",
+  "id": "6737581507",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.InfiniteVoid.ShortDomain",
+  "id": "136494030417281",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.InfiniteVoid.ShortDomain2",
+  "id": "77956271026948",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.InfiniteVoid.ShortDomain3",
+  "id": "86891100502580",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.InfiniteVoid.ShortOpen",
+  "id": "111507747920000",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.InfiniteVoid.Slowdown",
+  "id": "76523688182264",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.InfiniteVoid.Startup",
+  "id": "135405966044594",
+  "volume": 5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.InfiniteVoid.Voice",
+  "id": "6667923288",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.LapseBlue.Absorb",
+  "id": "4299623070",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.LapseBlue.DebreeThrow",
+  "id": "9120704078",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.LapseBlue.Grab",
+  "id": "9105467029",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.LapseBlue.Infinity",
+  "id": "9066732918",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.LapseBlue.LapseBlue",
+  "id": "411286671",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.LapseBlue.Wind",
+  "id": "9056932358",
+  "volume": 0
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.M1.Hit1",
+  "id": "8595975878",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.M1.Hit2",
+  "id": "8595975878",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.M1.Hit3",
+  "id": "8595975458",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.M1.Hit4",
+  "id": "8595974357",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.RedFlip",
+  "id": "79055523886516",
+  "volume": 7
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.Remember",
+  "id": "17284219852",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.ReversalRed.Aim",
+  "id": "16773286492",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.ReversalRed.Charge",
+  "id": "966888080",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.ReversalRed.Explode",
+  "id": "3059775624",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.ReversalRed.MaxCharge",
+  "id": "16828657609",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.ReversalRed.MaxFire",
+  "id": "16828657180",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.ReversalRed.Throw",
+  "id": "154787303",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.ReversalRed.Wind",
+  "id": "6006851551",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.Teleport",
+  "id": "6737581315",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.Teleport2",
+  "id": "9118159096",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Gojo.TeleportDrag",
+  "id": "93186173642807",
+  "volume": 2.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Goku.Appear",
+  "id": "85130356326236",
+  "volume": 10
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Goku.ChestBeat",
+  "id": "8595975878",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Goku.ExplodeKi",
+  "id": "78258660213953",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Goku.HitKi",
+  "id": "73984021575636",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Goku.Kamehameha.Finisher",
+  "id": "75819928865032",
+  "volume": 1.15
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Goku.Kamehameha.Use",
+  "id": "128138421943286",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Goku.M2DownslamHit",
+  "id": "75355001910260",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Goku.MonkeyScream",
+  "id": "2473639958",
+  "volume": 8
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Goku.ShootKi",
+  "id": "136181939400388",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Goku.StaffExtend.Hit",
+  "id": "132043726972669",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Goku.StaffExtend.Swing",
+  "id": "84803863795019",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Goku.StaffUppercut.Hit",
+  "id": "136281286882999",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Goku.StaffUppercut.Swing",
+  "id": "113917760201943",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Goku.StaffUppercut.Twinkle",
+  "id": "100203512874792",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Goku.Vanish",
+  "id": "86916080610201",
+  "volume": 10
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.Counter.Slam",
+  "id": "6324841214",
+  "volume": 0.6
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.Counter.Startup",
+  "id": "9125615451",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.Counter.Swing",
+  "id": "9126228977",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.EnergySurge.Dash",
+  "id": "17169364965",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.EnergySurge.Hit1",
+  "id": "17169365111",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.EnergySurge.Hit2",
+  "id": "17169365331",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.EnergySurge.Swag",
+  "id": "9119122635",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.EnergySurge.Swing",
+  "id": "17169364647",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.EnergySurge.Teleport",
+  "id": "17169364809",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.FeverBreak.CrushSwing",
+  "id": "100606314590244",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.FeverBreak.Dash",
+  "id": "17101065425",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.FeverBreak.Hit1",
+  "id": "17101065020",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.FeverBreak.Swing",
+  "id": "17101065238",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.IdleDeath.ClashTravel",
+  "id": "128943569339571",
+  "volume": 2.2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.IdleDeath.IdleDeath",
+  "id": "7252480818",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.IdleDeath.Jackpot",
+  "id": "6644505962",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.IdleDeath.Laugh",
+  "id": "106962844189281",
+  "volume": 2.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.IdleDeath.Music",
+  "id": "9039704032",
+  "volume": 1.1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.IdleDeath.Roll",
+  "id": "3299794881",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.IdleDeath.Shatter",
+  "id": "6737581507",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.IdleDeath.Travel",
+  "id": "16943255415",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.IdleDeath.Voice",
+  "id": "137100901601126",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.Impact",
+  "id": "71472197762839",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.M1.Hit1",
+  "id": "8595975878",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.M1.Hit2",
+  "id": "8595975878",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.M1.Hit3",
+  "id": "8595975458",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.M1.Hit4",
+  "id": "8595974357",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.OverLuck.Charge",
+  "id": "17046377464",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.OverLuck.Dash",
+  "id": "17046281380",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.OverLuck.Hit1",
+  "id": "17046282624",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.OverLuck.Hit2",
+  "id": "17046281074",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.OverLuck.Speed1",
+  "id": "17046282310",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.OverLuck.Speed2",
+  "id": "17046281650",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.OverLuck.Swing",
+  "id": "17046505673",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.ReserveBalls.Fire",
+  "id": "9114427348",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.ReserveBalls.Impact",
+  "id": "7512928742",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.Shock",
+  "id": "120458587618994",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.ShutterDoors.Slam",
+  "id": "9116684884",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.ShutterDoors.Spawn",
+  "id": "9125644321",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hakari.ShutterDoors.Swing",
+  "id": "858508159",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hanami.AOESpikes.Spear1",
+  "id": "115026144285429",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hanami.AOESpikes.Spear2",
+  "id": "132548164020742",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hanami.AOESpikes.Spikes",
+  "id": "92699785397200",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hanami.AOESpikes.SpikesWindup",
+  "id": "124210128005270",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hanami.AOESpikes.WoodBallsAppear",
+  "id": "118077996038991",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hanami.ArmWrapRip",
+  "id": "88996378164806",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hanami.Awaken",
+  "id": "110390473056942",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hanami.AwakenVL",
+  "id": "126773261759823",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hanami.BudShot.Hit1",
+  "id": "84674642106437",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hanami.BudShot.Hit2",
+  "id": "84359158055042",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hanami.BudShot.Startup",
+  "id": "107077525770659",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hanami.BudShot.Throw",
+  "id": "83883449987100",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hanami.CursedBuds.Appear",
+  "id": "101070040828999",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hanami.CursedBuds.Disappear",
+  "id": "72452993576371",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hanami.CursedBuds.Start",
+  "id": "78278433425386",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hanami.DefenseResponse.AirStartup",
+  "id": "78330240985463",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hanami.DefenseResponse.Hit1",
+  "id": "79583362062555",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hanami.DefenseResponse.Hit2",
+  "id": "83044567135942",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hanami.DefenseResponse.Root",
+  "id": "77781927063804",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hanami.DefenseResponse.Startup",
+  "id": "78001037313968",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hanami.DomainOST",
+  "id": "127491777315078",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hanami.DomainVL",
+  "id": "123270105224744",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hanami.Empower",
+  "id": "121507843776522",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hanami.EmpowerStart",
+  "id": "126484135817532",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hanami.FlowerBeam.Shoot",
+  "id": "128589895747977",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hanami.FlowerBeam.Windup",
+  "id": "136525288045173",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hanami.FlowersField.Field",
+  "id": "76363463402061",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hanami.FlowersField.Hit",
+  "id": "118109994896373",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hanami.FlowersField.Startup",
+  "id": "117000088170934",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hanami.RootDisappear",
+  "id": "115236945194905",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hanami.RootRampage.OST",
+  "id": "124241243130190",
+  "volume": 0.6
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hanami.RootRampage.RootAppear",
+  "id": "96909600400910",
+  "volume": 1.25
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hanami.RootRampage.RootLoop",
+  "id": "76362638159759",
+  "volume": 1.25
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hanami.RootRampage.Start",
+  "id": "130090012774324",
+  "volume": 1.25
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hanami.RootSwarm.Disappear",
+  "id": "98476421854862",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hanami.RootSwarm.Startup",
+  "id": "102970184623188",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hanami.RootSwarm.Swarm",
+  "id": "103290587422612",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hanami.Uppercut",
+  "id": "70368862351097",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.AmbushHit",
+  "id": "130435802660891",
+  "volume": 2.6
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.AmbushSwing",
+  "id": "75682608773801",
+  "volume": 3.2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.AnkleCutterHit",
+  "id": "132826787704625",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.AnkleCutterWhoosh",
+  "id": "138973781931655",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.Backstab",
+  "id": "130463319586107",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.BackstabBack",
+  "id": "80957966391322",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.BackstabFinisher.Hey1",
+  "id": "75660974097025",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.BackstabFinisher.Hey2",
+  "id": "88274646195912",
+  "volume": 2.7
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.BackstabFinisher.Hey3",
+  "id": "99078118605055",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.BackstabFinisher.Hey4",
+  "id": "104798254336982",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.BackstabFinisher.Kick",
+  "id": "95892971602016",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.BackstabFinisher.Slam",
+  "id": "93759638792144",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.BackstabFinisher.Stab1",
+  "id": "135261472366923",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.BackstabFinisher.Stab2",
+  "id": "89737091208099",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.BackstabFinisher.Stab3",
+  "id": "106465008429448",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.BackstabFinisher.Whoosh",
+  "id": "73908470610021",
+  "volume": 2.7
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.BackstabFront",
+  "id": "88483086994779",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.Catch",
+  "id": "118484407389443",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.CheapShotHit",
+  "id": "88685272276380",
+  "volume": 1.2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.Gain",
+  "id": "135375336346189",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.Hightime",
+  "id": "77439795464226",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.Jawbreaker",
+  "id": "94680472414828",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.Lose",
+  "id": "106582622347034",
+  "volume": 6
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.M1.Hit1",
+  "id": "73369470591089",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.M1.Hit2",
+  "id": "129306040953825",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.M1.Hit3",
+  "id": "133798286166675",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.M1.Hit4",
+  "id": "8595974357",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.M1.Swing1",
+  "id": "94221495279664",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.M1.Swing2",
+  "id": "111701118737902",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.M1.Swing3",
+  "id": "121592312107730",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.M1.Swing4",
+  "id": "117243892822517",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.Swing",
+  "id": "137122553198327",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.SwordSpin",
+  "id": "109830368249561",
+  "volume": 1.25
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.SwordThrow",
+  "id": "96689127096230",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.Taunt",
+  "id": "116250724334609",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.Throw",
+  "id": "73631684392213",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.Trip",
+  "id": "116070235847840",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.Trip2",
+  "id": "18782451032",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.Trip3",
+  "id": "4390298761",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Haruta.Wave",
+  "id": "80175764312084",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.CleaveFlashVoice",
+  "id": "78658251839338",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.CleaveStart",
+  "id": "109660701821480",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.CleaveVoice",
+  "id": "97960256382964",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.CleaveVoice2",
+  "id": "77732395767858",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.Dismantle.Fire",
+  "id": "125288142627715",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.Dismantle.FireWCS",
+  "id": "4299584756",
+  "volume": 0.7
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.Dismantle.Hit",
+  "id": "74232847084175",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.Dismantle.Start",
+  "id": "70482785888704",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.Dismantle.WCSCharge",
+  "id": "4299626748",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.Dismantle1",
+  "id": "134011003057260",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.Dismantle2",
+  "id": "97581017049145",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.Dismantle3",
+  "id": "115955384025484",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.Dismantle4",
+  "id": "124265527510765",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.FireArrow.Arrow",
+  "id": "7278163473",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.FireArrow.Clap",
+  "id": "6874043782",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.FireArrow.Explode",
+  "id": "331888892",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.FireArrow.Fire",
+  "id": "5801273676",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.FireArrow.FlameIdle",
+  "id": "7978653185",
+  "volume": 0
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.FireArrow.FugaVoice",
+  "id": "78637547122675",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.FireArrow.Hands",
+  "id": "1072005487",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.FireArrow.Shockwave",
+  "id": "5447233442",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.FireArrow.Voice",
+  "id": "100843467610521",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.Flames",
+  "id": "78637547122675",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.Kamutoke.Equip",
+  "id": "6605239584",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.Kamutoke.Equip2",
+  "id": "3744393890",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.Kamutoke.Fire.1",
+  "id": "3750993658",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.Kamutoke.Fire.2",
+  "id": "4299587602",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.Kamutoke.Fire.3",
+  "id": "4299513168",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.Kamutoke.Fire.4",
+  "id": "4776302225",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.Kamutoke.Hit",
+  "id": "74232847084175",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.MalevolentShrine.Music",
+  "id": "83360856832970",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.MalevolentShrine.Music2",
+  "id": "15583493700",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.MalevolentShrine.Slashes",
+  "id": "135309023186303",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.MalevolentShrine.Uhoh",
+  "id": "9125402735",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.MalevolentShrine.UhohStart",
+  "id": "252289753",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.MalevolentShrine.Voice",
+  "id": "130807317538504",
+  "volume": 6
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.MalevolentShrine.Voice2",
+  "id": "133077835308960",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.MalevolentShrine.Voice3",
+  "id": "124012721234128",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.Slashes2",
+  "id": "135309023186303",
+  "volume": 0
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Heian.WorldSlash3",
+  "id": "17053667034",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.Amplification.Absorb",
+  "id": "109731283975341",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.Amplification.Start",
+  "id": "84293649223671",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.Awaken",
+  "id": "83172464708469",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.Bang",
+  "id": "6404320398",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.DeadlySentence.BladeFall1",
+  "id": "139909937198149",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.DeadlySentence.BladeFall2",
+  "id": "90595957843917",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.DeadlySentence.BladeFallRope",
+  "id": "131470427554889",
+  "volume": 1.75
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.DeadlySentence.BladeUp",
+  "id": "120014212736094",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.DeadlySentence.Create",
+  "id": "9126282492",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.DeadlySentence.Fill",
+  "id": "4612385951",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.DeadlySentence.Music",
+  "id": "1838970386",
+  "volume": 1.1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.DeadlySentence.Music2",
+  "id": "1838873271",
+  "volume": 1.1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.DeadlySentence.Shatter",
+  "id": "6737581507",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.DeadlySentence.Slam",
+  "id": "8589723532",
+  "volume": 0.6
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.DeadlySentence.Sure",
+  "id": "117903543077117",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.DeadlySentence.Talk",
+  "id": "97182227194468",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.DeadlySentence.TalkFail",
+  "id": "97182227194468",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.DeadlySentence.Tick",
+  "id": "5473174633",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.DeadlySentence.Travel",
+  "id": "167123203",
+  "volume": 0
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.DeadlySentence.Voice",
+  "id": "94214404918647",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.DeadlySentence.Voice2",
+  "id": "137100901601126",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.Dodges",
+  "id": "83048216359043",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.Execution.Charge",
+  "id": "85889207849279",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.Execution.Curb",
+  "id": "133486111948739",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.Execution.Dash",
+  "id": "74107786334233",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.Execution.Flash",
+  "id": "122106379884893",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.Execution.Sever",
+  "id": "134273082284707",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.Execution.Sever2",
+  "id": "104869864560993",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.Execution.Stab",
+  "id": "91882353459943",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.Execution.Step",
+  "id": "5507815764",
+  "volume": 0.8
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.Fall",
+  "id": "79498136171279",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.Grapple.Energy",
+  "id": "120714138513879",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.Grapple.Fire",
+  "id": "6476902669",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.Grapple.Hit",
+  "id": "138752442741376",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.Grapple.Start",
+  "id": "18769330256",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.HeavySwing",
+  "id": "140527314975641",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.JudgeReach",
+  "id": "105213688680216",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.JudgeReachFinisher",
+  "id": "108121946929288",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.JudgeReachStart",
+  "id": "87590911386077",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.JudgeReachSwing",
+  "id": "102880207942198",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.M1.Hit1",
+  "id": "89850070587619",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.M1.Hit2",
+  "id": "139739650563219",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.M1.Hit3",
+  "id": "114146716369211",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.M1.Hit4",
+  "id": "89079427123853",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.M1Swing.Swing1",
+  "id": "113209095877671",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.M1Swing.Swing2",
+  "id": "84939324218501",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.M1Swing.Swing3",
+  "id": "135909874140545",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.M1Swing.Swing4",
+  "id": "79836302909830",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.M1SwordSwing.Swing1",
+  "id": "110077886238560",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.M1SwordSwing.Swing2",
+  "id": "97328834310548",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.M1SwordSwing.Swing3",
+  "id": "121671840621180",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.Recall",
+  "id": "117657083645864",
+  "volume": 0.65
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.Sprint",
+  "id": "102929342782364",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.Stab",
+  "id": "7072652156",
+  "volume": 0.8
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.Sweep",
+  "id": "132889926530295",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.Swing",
+  "id": "83275111049273",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.SwordPull",
+  "id": "5754299808",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.Throw",
+  "id": "76679357643386",
+  "volume": 1.4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.Throw2",
+  "id": "124837936201770",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.ThrowStart",
+  "id": "128159562878534",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.Twirl.1",
+  "id": "106620419375208",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.Twirl.2",
+  "id": "112766679326725",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.Twirl.3",
+  "id": "118282544664000",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.Twirl.Final",
+  "id": "95667653480776",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.Twirl.Hit",
+  "id": "138752442741376",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.Twirl.Start",
+  "id": "91477583246788",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.Verdict.Hit1",
+  "id": "115997745833984",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.Verdict.Hit2",
+  "id": "74801973019001",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.Verdict.RunSlash",
+  "id": "99035608979739",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.Verdict.RunSmack",
+  "id": "102251058729529",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Hiromi.Verdict.Start",
+  "id": "96847703906101",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Enviroment.BrickImpact.Impact1",
+  "id": "9118613208",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Enviroment.BrickImpact.Impact2",
+  "id": "1741599172",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Enviroment.BrickImpact.Impact3",
+  "id": "9118612306",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Enviroment.BrickImpact.Impact4",
+  "id": "9118612945",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Enviroment.GlassImpact.Impact1",
+  "id": "9103909576",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Enviroment.GlassImpact.Impact2",
+  "id": "2612674531",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Enviroment.GlassImpact.Impact3",
+  "id": "6737582037",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Enviroment.GlassImpact.Impact4",
+  "id": "260496290",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Enviroment.GlassImpact.Impact5",
+  "id": "6737582452",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Enviroment.GlassImpact.Impact6",
+  "id": "7140152893",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Enviroment.GlassImpact.Impact7",
+  "id": "1921336902",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Enviroment.GlassImpact.Impact8",
+  "id": "6737582966",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Enviroment.GrassImpact.Impact1",
+  "id": "3848076724",
+  "volume": 0.75
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Enviroment.GrassImpact.Impact2",
+  "id": "4307210855",
+  "volume": 0.75
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Enviroment.GrassImpact.Impact3",
+  "id": "3932587334",
+  "volume": 0.75
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Enviroment.MetalImpact.Impact1",
+  "id": "1194860367",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Enviroment.MetalImpact.Impact2",
+  "id": "1194860612",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Enviroment.MetalImpact.Impact3",
+  "id": "9116887885",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Enviroment.MetalImpact.Impact4",
+  "id": "9116887159",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Enviroment.MetalImpact.Impact5",
+  "id": "9116642648",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Enviroment.NeonImpact.Impact1",
+  "id": "9116279149",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Enviroment.NeonImpact.Impact2",
+  "id": "9116274241",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Enviroment.NeonImpact.Impact3",
+  "id": "9116272212",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Enviroment.NeonImpact.Impact4",
+  "id": "9116273793",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Enviroment.NeonImpact.Impact5",
+  "id": "9116278137",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Enviroment.StoneImpact.Impact1",
+  "id": "9118617342",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Enviroment.StoneImpact.Impact2",
+  "id": "9118615862",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Enviroment.StoneImpact.Impact3",
+  "id": "9118614058",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Enviroment.StoneImpact.Impact4",
+  "id": "9118616096",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Enviroment.WoodImpact.Impact1",
+  "id": "9120801590",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Enviroment.WoodImpact.Impact2",
+  "id": "7214216646",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Enviroment.WoodImpact.Impact3",
+  "id": "9120957620",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Enviroment.WoodImpact.Impact4",
+  "id": "9120957636",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Players.Death",
+  "id": "7446607037",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Players.MostExplodeSoundEverToGoWithMostGoreSoundEver",
+  "id": "6862108495",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Players.MostGoreSoundEver",
+  "id": "116931481265305",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Players.Perfect",
+  "id": "120584435827674",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Players.Ragdoll_Collision.Hit1",
+  "id": "4697378322",
+  "volume": 0.8
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Players.Ragdoll_Collision.Hit2",
+  "id": "4979513906",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Players.Ragdoll_Collision.Hit3",
+  "id": "8056754930",
+  "volume": 0.7
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Players.Ragdoll_Collision.Hit4",
+  "id": "7446610013",
+  "volume": 0.7
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Players.Ragdoll_Collision.Hit5",
+  "id": "4697381311",
+  "volume": 0.7
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Players.Ragdoll_Collision.Hit6",
+  "id": "6837725727",
+  "volume": 0.7
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Players.Ragdoll_Collision.Hit7",
+  "id": "4697383191",
+  "volume": 0.7
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Players.Ragdoll_Collision.Hit8",
+  "id": "9106402364",
+  "volume": 0.7
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Players.Ragdoll_Impact",
+  "id": "4086190876",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Players.RagdollFall1",
+  "id": "3784888301",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Players.RagdollFall2",
+  "id": "3784888809",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Impact.Players.RagdollFall3",
+  "id": "3784889529",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.AprilFools.Bass",
+  "id": "79009733296720",
+  "volume": 10
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.AprilFools.Explosion",
+  "id": "132355830653472",
+  "volume": 10
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.AprilFools.Explosion2",
+  "id": "116857312472782",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.AprilFools.Fah",
+  "id": "97437194994697",
+  "volume": 10
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.AprilFools.Surprise",
+  "id": "14757954161",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.CraniumSmash.Grab",
+  "id": "9120979105",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.CraniumSmash.Hit1",
+  "id": "9118609396",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.CraniumSmash.Hit2",
+  "id": "9118614717",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.CrushingBlow.GroundImpact",
+  "id": "7093763783",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.CrushingBlow.Hit1",
+  "id": "7307838125",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.CrushingBlow.Hit2",
+  "id": "9118614717",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.CursedStrikes.Hit",
+  "id": "16773286330",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.CursedStrikes.Spin",
+  "id": "8120249833",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.CursedStrikes.Startup",
+  "id": "16773286492",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.Dismantle.Explode",
+  "id": "2227416952",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.Dismantle.FinishSlash",
+  "id": "9119749145",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.Dismantle.Slash",
+  "id": "935843979",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.Dismantle.WorldSlash1",
+  "id": "17053666464",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.Dismantle.WorldSlash2",
+  "id": "17053670289",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.Dismantle.WorldSlash3",
+  "id": "17053667034",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.DivergentFist.BlackFlash",
+  "id": "9114314398",
+  "volume": 0.75
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.DivergentFist.BlackFlashHit",
+  "id": "12764933067",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.DivergentFist.Crack",
+  "id": "4403634269",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.DivergentFist.Divergent",
+  "id": "5795505380",
+  "volume": 0.4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.DivergentFist.DivergentHit",
+  "id": "7515452875",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.DivergentFist.Swing",
+  "id": "4059009185",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.DivergentFist.Voice",
+  "id": "12761286504",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.DivergentFist.Voice2",
+  "id": "106715878485112",
+  "volume": 6
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.DivergentFist.Wapam",
+  "id": "93167187278849",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.DivergentFist.Woosh",
+  "id": "102672006215074",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.FireArrow.Arrow",
+  "id": "7278163473",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.FireArrow.Clap",
+  "id": "6874043782",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.FireArrow.Explode",
+  "id": "331888892",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.FireArrow.Fire",
+  "id": "5801273676",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.FireArrow.Hands",
+  "id": "1072005487",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.FireArrow.Idle",
+  "id": "7978653185",
+  "volume": 0
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.M1.Hit1",
+  "id": "8595975878",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.M1.Hit2",
+  "id": "8595975878",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.M1.Hit3",
+  "id": "8595975878",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.M1.Hit4",
+  "id": "8595975458",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.MalevolantShrine.Music",
+  "id": "15583493700",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.MalevolantShrine.Ready",
+  "id": "8181034930",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.MalevolantShrine.Ring",
+  "id": "7817336081",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.MalevolantShrine.Shatter",
+  "id": "6737581507",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.MalevolantShrine.Voice",
+  "id": "7817341182",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.MalevolantShrine.WaterSplash",
+  "id": "9120548819",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.ManjiKick.Dodge",
+  "id": "6470740758",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.ManjiKick.Slam",
+  "id": "9113504593",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.ManjiKick.Startup",
+  "id": "9125615451",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.ManjiKick.Swing",
+  "id": "9126228977",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.PerfectHit",
+  "id": "112426502291350",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.Rush.Rush",
+  "id": "3084314259",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.Rush.RushBreak",
+  "id": "4086172909",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.Rush.RushHit",
+  "id": "3763467977",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.Rush.RushLaunch",
+  "id": "9114362943",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Itadori.Surprise",
+  "id": "14757954161",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.Bugnado.Explosion",
+  "id": "70550841608303",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.Bugnado.Start",
+  "id": "113266643332344",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.Bugnado.Tornado",
+  "id": "82589163918117",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.Chokehold.CleaveGrab",
+  "id": "104198667495225",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.Chokehold.CleaveHit1",
+  "id": "109402680359235",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.Chokehold.CleaveHit2",
+  "id": "108072576247551",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.Chokehold.PunchGrab",
+  "id": "113019008368244",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.Chokehold.PunchHit1",
+  "id": "112347897421173",
+  "volume": 2.45
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.Chokehold.PunchHit2",
+  "id": "117318006773809",
+  "volume": 2.45
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.Chokehold.Start",
+  "id": "90805933413832",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.Detach.Detach",
+  "id": "109029348910711",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.Detach.Hit",
+  "id": "137501745215626",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.Detach.Reattach",
+  "id": "135978563187719",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.Detach.WallHit",
+  "id": "93140879342737",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.EatStart",
+  "id": "73225130279309",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.Egg1",
+  "id": "99300073151078",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.Egg2",
+  "id": "116964825206058",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.Egg3",
+  "id": "86783201350495",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.Egg4",
+  "id": "72909343949477",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.FesteringStrikes.FinalHit1",
+  "id": "99724696924791",
+  "volume": 1.75
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.FesteringStrikes.FinalHit2",
+  "id": "85421364144658",
+  "volume": 1.75
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.FesteringStrikes.Hit1",
+  "id": "116242006916525",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.FesteringStrikes.Hit2",
+  "id": "98493239356787",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.FesteringStrikes.Hit3",
+  "id": "101346445611474",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.FesteringStrikes.PunchSwing1",
+  "id": "88980176364383",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.FesteringStrikes.PunchSwing2",
+  "id": "81109554460735",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.FesteringStrikes.PunchSwing3",
+  "id": "99060595035893",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.FesteringStrikes.Swing1",
+  "id": "93286266865153",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.FesteringStrikes.Swing2",
+  "id": "104907904159399",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.FesteringStrikes.Swing3",
+  "id": "106311045947290",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.FesteringStrikes.Throw",
+  "id": "133398263235788",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.Hatch",
+  "id": "84206413372567",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.InsectTrance.BugAppear",
+  "id": "96413924453295",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.InsectTrance.BugDisappear",
+  "id": "127107526984301",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.InsectTrance.BugExplode",
+  "id": "121940982680472",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.InsectTrance.FlyLoop",
+  "id": "101147988114470",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.InsectTrance.Screen",
+  "id": "131607143679266",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.InsectTrance.Start",
+  "id": "72746768653220",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.M1.Hit1",
+  "id": "79820354186531",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.M1.Hit2",
+  "id": "125485263588435",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.M1.Hit3",
+  "id": "106665047526422",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.M1.Swing1",
+  "id": "130832989916480",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.M1.Swing3",
+  "id": "140347479317758",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.Parthenogenesis.Explode",
+  "id": "72012026236266",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.Parthenogenesis.Explode2",
+  "id": "106970207163140",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.Parthenogenesis.Startup",
+  "id": "140489322474010",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.RoachSwarm.Explosion",
+  "id": "86411356240367",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.RoachSwarm.Hit",
+  "id": "93651725220212",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.RoachSwarm.Swarm1",
+  "id": "74666116625885",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.RoachSwarm.Swarm2",
+  "id": "75559353370329",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.RoachSwarm.SwarmFollowup",
+  "id": "79232669620094",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.RoachSwarm.SwarmFollowupWhoosh",
+  "id": "70700553092129",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.StartInvade",
+  "id": "106428537939718",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.Tick.Tick1",
+  "id": "131578725133089",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.Tick.Tick2",
+  "id": "78365892014897",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Kurourushi.Tick.Tick3",
+  "id": "74362920031076",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Locust.BlackMucus.Explode",
+  "id": "78710776102497",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Locust.BlackMucus.Fire",
+  "id": "100827769870979",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Locust.BlackMucus.Hit",
+  "id": "75618749388830",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Locust.BlackMucus.Use",
+  "id": "113347338503767",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Locust.Chomp.Bite1",
+  "id": "116622642632294",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Locust.Chomp.Bite2",
+  "id": "76763256436030",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Locust.Chomp.Bite3",
+  "id": "95015102526752",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Locust.Chomp.Dash",
+  "id": "125406418289203",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Locust.Chomp.Hit",
+  "id": "75618749388830",
+  "volume": 0.8
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Locust.Chomp.Slam",
+  "id": "123322530943923",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Locust.Chomp.Throw",
+  "id": "97479273744599",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Locust.Flight",
+  "id": "9114876115",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Locust.FourArmed",
+  "id": "80668615055821",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Locust.Slash.Hit",
+  "id": "138752442741376",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Locust.Slash.Punch",
+  "id": "106685608076122",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Locust.Slash.Slash",
+  "id": "6881026094",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Locust.Victory",
+  "id": "102259199317446",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.BlackFlash",
+  "id": "17520297840",
+  "volume": 2.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.BodyRepel.Clap",
+  "id": "18259558246",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.BodyRepel.Fire",
+  "id": "18259557789",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.BodyRepel.Start",
+  "id": "18259558562",
+  "volume": 1.3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.Chainwhip.Chains",
+  "id": "9113756883",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.Chainwhip.Hit",
+  "id": "7131799080",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.Chainwhip.Swing",
+  "id": "3751519865",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.CrushingRushdown.HairPull",
+  "id": "90579969522260",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.CrushingRushdown.Leap",
+  "id": "3848838070",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.CrushingRushdown.Morph",
+  "id": "4086172420",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.CrushingRushdown.Unmorph",
+  "id": "4086172099",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.DrillSplit.Drill",
+  "id": "4459571224",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.DrillSplit.DrillHit",
+  "id": "4988621662",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.DrillSplit.DrillWind",
+  "id": "9114240880",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.DrillSplit.Leap",
+  "id": "3848838070",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.DrillSplit.Morph",
+  "id": "4086172420",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.DrillSplit.Unmorph",
+  "id": "4086172099",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.Eat",
+  "id": "3043029786",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.ForceGrab.Fire",
+  "id": "4953187368",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.ForceGrab.Retract",
+  "id": "4459576395",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.ForceGrab.Swing",
+  "id": "3848838070",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.HeadSplit.Bass",
+  "id": "8406997653",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.HeadSplit.Slash",
+  "id": "9126229280",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.HeadSplit.Weave",
+  "id": "9114158056",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.HeadSplit.Weave2",
+  "id": "9120734610",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.HeadSplit.What",
+  "id": "83353502086066",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.Roll",
+  "id": "93437252503790",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.SelfPerfection.Music",
+  "id": "17856253579",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.SelfPerfection.Perfection",
+  "id": "17866727111",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.SelfPerfection.Shatter",
+  "id": "6737581507",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.SelfPerfection.Voice",
+  "id": "17866271934",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.Slap",
+  "id": "7837489886",
+  "volume": 2.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.Soulfire.Fire",
+  "id": "3742310026",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.Soulfire.Hit",
+  "id": "3932141920",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.Soulfire.Morph",
+  "id": "3929463305",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.Stockpile.Create",
+  "id": "4086172699",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.Stockpile.Swing",
+  "id": "3755636638",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.Stockpile.Swing2",
+  "id": "3755636825",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.Transfig.Eyes",
+  "id": "4085790525",
+  "volume": 1.6
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.Transfig.Start",
+  "id": "4086203738",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.Variants.M1.Hit1",
+  "id": "6603295565",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.Variants.M1.Hit2",
+  "id": "6603295565",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.Variants.M1.Hit3",
+  "id": "6603295565",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.Variants.M1.Hit4",
+  "id": "6603295565",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.Variants.M2.Hit1",
+  "id": "5507815764",
+  "volume": 0.7
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.Variants.M2.Hit2",
+  "id": "5507830815",
+  "volume": 0.7
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.Variants.M2.Hit3",
+  "id": "5507829691",
+  "volume": 0.7
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.Variants.M2.Hit4",
+  "id": "5507830449",
+  "volume": 0.7
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.Variants.M3.Hit1",
+  "id": "98835249800067",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.Variants.M3.Hit2",
+  "id": "70844809405348",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.Variants.M3.Hit3",
+  "id": "129416140764076",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.Variants.M3.Hit4",
+  "id": "136525465702097",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.Variants.Spin",
+  "id": "17866720253",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.Variants.Strike",
+  "id": "17866718764",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.Variants.StrikeStart",
+  "id": "17866719328",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.Variants.Transform1",
+  "id": "18110706601",
+  "volume": 0.75
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.Variants.Transform2",
+  "id": "18110706199",
+  "volume": 0.75
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.Variants.Transform3",
+  "id": "18110707051",
+  "volume": 0.75
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.WideSPStrike.Crush",
+  "id": "4307207693",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.WideSPStrike.Crush2",
+  "id": "3848082818",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.WideSPStrike.Flash",
+  "id": "18123145861",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.WideSPStrike.Hit1",
+  "id": "129416140764076",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.WideSPStrike.Hit2",
+  "id": "136525465702097",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.WideSPStrike.Hit3",
+  "id": "97547768328998",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.WideSPStrike.Hit4",
+  "id": "98835249800067",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.WideSPStrike.Hit5",
+  "id": "70844809405348",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.WideSPStrike.Start",
+  "id": "128285017632391",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.WideSPStrike.Voice",
+  "id": "17881719214",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.WideSPStrike.Voice2",
+  "id": "17899695571",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.Worms.Fire",
+  "id": "18259557789",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.Worms.Morph",
+  "id": "4459576395",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.Worms.Spit",
+  "id": "9114741340",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mahito.Worms.Whip",
+  "id": "9119747260",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Absolute.Beep",
+  "id": "125837392439907",
+  "volume": 0.3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Absolute.Dropkick",
+  "id": "93545676012051",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Absolute.FloorClimb",
+  "id": "139616349986648",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Absolute.Jump",
+  "id": "103299572527813",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Absolute.KickStart",
+  "id": "138284014987713",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Absolute.KickSwing",
+  "id": "77121845853523",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Absolute.LockOn.FastBeeps",
+  "id": "95875243041940",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Absolute.LockOn.Lock",
+  "id": "97775263336318",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Absolute.LockOn.LongBeep",
+  "id": "127728932215477",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Absolute.M1.Hit1",
+  "id": "130079449462583",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Absolute.M1.Hit2",
+  "id": "102360793155474",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Absolute.M1.Hit3",
+  "id": "89651789530111",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Absolute.M1.Hit4",
+  "id": "100238850813671",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Absolute.M1Swing.Swing1",
+  "id": "96898767418731",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Absolute.M1Swing.Swing2",
+  "id": "117701139875807",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Absolute.M1Swing.Swing3",
+  "id": "128596780293930",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Absolute.M1Swing.Swing4",
+  "id": "138499167704645",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Absolute.RedLight",
+  "id": "118151923808388",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Absolute.RedLightRock",
+  "id": "73595256824261",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Absolute.Special.LightningLoop",
+  "id": "102823781132282",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Absolute.Special.LightningStart",
+  "id": "119556501266993",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Absolute.Special.Shot",
+  "id": "97280758781987",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Absolute.Special.Start",
+  "id": "77485525406669",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Absolute.Stagger",
+  "id": "73163886324951",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Absolute.StaggerGetUp",
+  "id": "102801581537261",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Absolute.StaggerPunish",
+  "id": "133131441624810",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Absolute.StaggerPunishUser",
+  "id": "95981318308294",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Absolute.UltEnd",
+  "id": "97729347150924",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Absolute.VideoAppear",
+  "id": "116484709666672",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Absolute.VideoEnd",
+  "id": "134118844472163",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.AbsoluteDestruction.Jump",
+  "id": "79252900483987",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.AbsoluteDestruction.Run",
+  "id": "84658490737674",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.AbsoluteDestruction.Slam",
+  "id": "110146716041793",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.BoostOn.Booster",
+  "id": "74496850917248",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.BoostOn.DummyThrow",
+  "id": "129170380119486",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.BoostOn.Hit",
+  "id": "95000450601035",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.BoostOn.PunchWoosh",
+  "id": "133212067497301",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.BoostOn.SecondPart",
+  "id": "135426272617658",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.BoostOn.Start",
+  "id": "100318681703568",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.HeatEmission.Ignition",
+  "id": "79885225857047",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.HeatEmission.Start",
+  "id": "99141482888889",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.HeatEmission.Vent",
+  "id": "82105741477552",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.MiracleCannon.AttemptCharge",
+  "id": "93972901144059",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.MiracleCannon.AttemptChargePhase",
+  "id": "115628303287481",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.MiracleCannon.ChargeBeam",
+  "id": "133539727442636",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.MiracleCannon.Explosion",
+  "id": "83221875448666",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.MiracleCannon.OneYearCharge",
+  "id": "122877895405203",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.MiracleCannon.OneYearExplosion",
+  "id": "82895942326593",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Offload.ArmsFlyIn",
+  "id": "82392338052024",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Offload.BackSlide",
+  "id": "116673378176768",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Offload.Burst",
+  "id": "89529539001765",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Offload.Charge",
+  "id": "127886167245545",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Offload.Explode",
+  "id": "140013024412222",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Offload.FunnyFall",
+  "id": "92378884776528",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Offload.SmoothLanding",
+  "id": "85984454722167",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Offload.SmoothLanding2",
+  "id": "95331755325332",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Offload.Sparks",
+  "id": "89864850840092",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Offload.StopSound",
+  "id": "125624636902462",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.Offload.SupermanLand",
+  "id": "104732468256369",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.PigeonViola.Hit1",
+  "id": "100910853016629",
+  "volume": 1.35
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.PigeonViola.Hit2",
+  "id": "87672355641711",
+  "volume": 1.35
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.PigeonViola.Start",
+  "id": "116321073104316",
+  "volume": 1.85
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.PuppetBarrage.FlyUp",
+  "id": "79472437825772",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.PuppetBarrage.Grab",
+  "id": "86442687037437",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.PuppetBarrage.Kick",
+  "id": "117932005679311",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.UltraCannon.Albatros",
+  "id": "95402418269891",
+  "volume": 1.75
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.UltraCannon.Explode",
+  "id": "138458686172685",
+  "volume": 1.3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.UltraCannon.Shoot",
+  "id": "135423939868890",
+  "volume": 1.4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.UltraCannon.Start",
+  "id": "134210095047021",
+  "volume": 1.4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.UltraSpin.Dash",
+  "id": "140170031367282",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.UltraSpin.End",
+  "id": "137560249260973",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.UltraSpin.Finisher",
+  "id": "112571179914529",
+  "volume": 1.3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.UltraSpin.Hit",
+  "id": "130667216707870",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Mechamaru.UltraSpin.Start",
+  "id": "84086575329798",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Awaken",
+  "id": "125901185360744",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.DivineDog.Bite",
+  "id": "17392238265",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.DivineDog.BiteHit",
+  "id": "4459570664",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.DivineDog.Despawn",
+  "id": "17392238770",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.DivineDog.Slash",
+  "id": "17392240969",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.DivineDog.SlashHit",
+  "id": "3932141920",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.DivineDog.Spawn",
+  "id": "17392238439",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Elephant.Despawn",
+  "id": "17457463045",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Elephant.Explode",
+  "id": "4459572763",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Elephant.Hit",
+  "id": "4086190876",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Elephant.Spawn",
+  "id": "17457463445",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Mahoraga.Adapt",
+  "id": "17612867532",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Mahoraga.Adapt2",
+  "id": "17612867532",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Mahoraga.AdaptGlow",
+  "id": "3932669033",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Mahoraga.Earthquake.Attempt",
+  "id": "18205737752",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Mahoraga.Earthquake.Startup",
+  "id": "18205736907",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Mahoraga.Earthquake.Success",
+  "id": "18205737353",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Mahoraga.M1.Hit1",
+  "id": "3932145123",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Mahoraga.M1.Hit2",
+  "id": "3932145654",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Mahoraga.M1.Hit3",
+  "id": "3848125583",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Mahoraga.M1.Hit4",
+  "id": "8595974357",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Mahoraga.Parry",
+  "id": "4953120611",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Mahoraga.Parry2",
+  "id": "7868507340",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Mahoraga.Ritual.HalloweenSpawn",
+  "id": "109876272814067",
+  "volume": 5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Mahoraga.Ritual.Hit",
+  "id": "17607886878",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Mahoraga.Ritual.Moving",
+  "id": "17607887774",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Mahoraga.Ritual.Spawn",
+  "id": "17607885989",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Mahoraga.Ritual.Summon",
+  "id": "17607886466",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Mahoraga.Ritual.Summon2",
+  "id": "9038469500",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Mahoraga.Ritual.Timer",
+  "id": "17607887277",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Mahoraga.Takedown.Startup",
+  "id": "18440677683",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Mahoraga.Takedown.Teleport",
+  "id": "18440678071",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Mahoraga.Throw.Break",
+  "id": "3778609188",
+  "volume": 1.4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Mahoraga.Throw.Throw",
+  "id": "3932587669",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Mahoraga.Throw.Wind",
+  "id": "3848835272",
+  "volume": 0.6
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Mahoraga.WorldSlash.Startup",
+  "id": "4299625271",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Mahoraga.WorldSlash.Swing",
+  "id": "4299510555",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Nue.Despawn",
+  "id": "17269354990",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Nue.Hit1",
+  "id": "17269354824",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Nue.Hit2",
+  "id": "3929458922",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Nue.Spawn",
+  "id": "17269358415",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Rabbit.Despawn",
+  "id": "17206056478",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Rabbit.Eat",
+  "id": "9113723699",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Rabbit.Spawn",
+  "id": "17206057016",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Rabbit.Start",
+  "id": "17206057404",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Serpent.Despawn",
+  "id": "17513690981",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Serpent.Fly",
+  "id": "3778630178",
+  "volume": 0.75
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Serpent.Hit",
+  "id": "17513691220",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Serpent.Poison1",
+  "id": "3755119108",
+  "volume": 0.75
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Serpent.Poison2",
+  "id": "3755119738",
+  "volume": 0.75
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Serpent.Poison3",
+  "id": "3755119951",
+  "volume": 0.75
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Serpent.Spawn",
+  "id": "17513691442",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Serpent.Start",
+  "id": "17513691601",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.ShadowEnter",
+  "id": "4459057272",
+  "volume": 0.6
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.ShadowGarden.Music",
+  "id": "15048731914",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.ShadowGarden.Start",
+  "id": "17206057404",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Toad.Despawn",
+  "id": "17269355252",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Toad.Fly",
+  "id": "17269355114",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Toad.Flyback",
+  "id": "17269354618",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Toad.Hit",
+  "id": "17269354737",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Toad.Spawn",
+  "id": "17269355559",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Megumi.Voice",
+  "id": "89546683149159",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.BirdControl.CrowEye",
+  "id": "87021710886866",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.BirdControl.Fly",
+  "id": "79225972873710",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.BirdControl.Grab",
+  "id": "79048435945491",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.BirdControl.Hit",
+  "id": "94132201322663",
+  "volume": 1.25
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.BirdControl.Impact",
+  "id": "72894267845813",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.BirdoStrike",
+  "id": "118949230329479",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.Circling.AirSlash",
+  "id": "119142203253321",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.Circling.Charge1",
+  "id": "96429366234284",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.Circling.Charge2",
+  "id": "93758496042865",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.Circling.FinisherHit",
+  "id": "71283069341606",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.Circling.FinisherSlash",
+  "id": "107240505684079",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.Circling.FinisherWhoosh",
+  "id": "133644222097997",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.Circling.Hit1",
+  "id": "79490575410915",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.Circling.Hit2",
+  "id": "83282493896478",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.Circling.Slash1",
+  "id": "72700191895039",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.Circling.Slash2",
+  "id": "129555200163898",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.Circling.Start",
+  "id": "117215651521928",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.CrowExplode",
+  "id": "91758235658694",
+  "volume": 2.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.CrowHit",
+  "id": "121882405301734",
+  "volume": 2.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.CrowLaunch",
+  "id": "85696562056907",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.CrowSmash",
+  "id": "94384826964272",
+  "volume": 2.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.Crush",
+  "id": "115544964121243",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.Fall",
+  "id": "73946250167893",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.Flock",
+  "id": "74218342289851",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.Gliding.FallHit",
+  "id": "99243622771297",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.Gliding.FallSlash",
+  "id": "71184483202558",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.Gliding.Impact",
+  "id": "107260062344288",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.Gliding.Slash1",
+  "id": "78400218029025",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.Gliding.Slash2",
+  "id": "120697290435030",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.Gliding.Slash3",
+  "id": "99519848911330",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.Gliding.SpinHit1",
+  "id": "140010761148859",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.Gliding.SpinHit2",
+  "id": "119754485666227",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.Gliding.Start",
+  "id": "73914060900348",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.M1.Hit1",
+  "id": "133341853236210",
+  "volume": 1.2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.M1.Hit2",
+  "id": "125024159587132",
+  "volume": 1.2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.M1.Hit3",
+  "id": "136328533963688",
+  "volume": 1.2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.M1.Hit4",
+  "id": "139804351541539",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.M1.HitDown",
+  "id": "137270477988121",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.M1.HitUp",
+  "id": "72070015028896",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.M1.Swing1",
+  "id": "97397807195262",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.M1.Swing2",
+  "id": "125022411565210",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.M1.Swing3",
+  "id": "77024899974007",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.M1.Swing4",
+  "id": "111349415856272",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.M1.SwingDown",
+  "id": "97522655138696",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.M1.SwingUp",
+  "id": "79800397833188",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.Murmurate.AxeCatch",
+  "id": "111347810430996",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.Murmurate.AxeSpin",
+  "id": "119173276613424",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.Murmurate.AxeThrow",
+  "id": "134502721603797",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.Teleport",
+  "id": "77692827286515",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.UltStart",
+  "id": "86697140862266",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.UpdraftHit",
+  "id": "79423034421628",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.UpdraftSlash",
+  "id": "102930929366058",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.MeiMei.WingFlap",
+  "id": "110709965867348",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Bleed",
+  "id": "80064422113149",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Block.Block1",
+  "id": "4306994267",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Block.Block2",
+  "id": "4306994664",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Block.Block3",
+  "id": "4306994923",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Burst",
+  "id": "3763467000",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Burst2",
+  "id": "4085784226",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Chase",
+  "id": "4909206080",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Crow.Caw1",
+  "id": "9118066963",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Crow.Caw2",
+  "id": "9118066964",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Crow.Caw3",
+  "id": "9118066302",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.CrowMad",
+  "id": "6324425941",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.CrowMad2",
+  "id": "89659350030351",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Dash",
+  "id": "3929467229",
+  "volume": 5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Domain.ClashMusic",
+  "id": "89526560746434",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Domain.Domain",
+  "id": "7260423115",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Domain.DomainHit",
+  "id": "9114589190",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Domain.DomainOpen",
+  "id": "3059775781",
+  "volume": 0.6
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Domain.OldClashMusic",
+  "id": "133320805827478",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Evade",
+  "id": "114900496731174",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Footstep.Water",
+  "id": "9119481281",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Footstep.Water",
+  "id": "5639243489",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Footstep.Water",
+  "id": "5639243489",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Footstep.Water",
+  "id": "5639245918",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Footstep.Water",
+  "id": "5761648082",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Footstep.Water",
+  "id": "5639243992",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Footstep.Water",
+  "id": "5639243489",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Footstep.Water",
+  "id": "5639244517",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Footstep.Water",
+  "id": "5761648082",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Footstep.Water",
+  "id": "7437372937",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Footstep.Water",
+  "id": "619083295",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Footstep.Water",
+  "id": "3437778169",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Footstep.Water",
+  "id": "5632735811",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Footstep.Water",
+  "id": "5639245590",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Footstep.Water",
+  "id": "5639245164",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Footstep.Water",
+  "id": "5639243489",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Footstep.Water",
+  "id": "5632735811",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Items.BananaPeel",
+  "id": "1606631241",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Items.BananaPeelSlip",
+  "id": "129432532096499",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Items.Bolt",
+  "id": "131265718595511",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Items.Breakball",
+  "id": "115999447597500",
+  "volume": 2.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Items.Clash",
+  "id": "18991262906",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Items.Coin",
+  "id": "136124980150792",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Items.Crowbar",
+  "id": "113373990352365",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Items.Crowbar2",
+  "id": "114235921050731",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Items.Crowbar3",
+  "id": "111213038660342",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Items.CrowbarHIt",
+  "id": "95443546571326",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Items.Eye",
+  "id": "83364996869460",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Items.Gunbreak",
+  "id": "1358442317",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Items.Gunfire",
+  "id": "5735280081",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Items.Hitball",
+  "id": "79710336574311",
+  "volume": 2.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Items.Parry",
+  "id": "81202220081219",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Items.PlayfulSwing.Swing1",
+  "id": "116901112122156",
+  "volume": 0.8
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Items.PlayfulSwing.Swing2",
+  "id": "97228090794267",
+  "volume": 0.8
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Items.PlayfulSwing.Swing3",
+  "id": "103222009007167",
+  "volume": 0.8
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Items.PlayfulSwing.Swing4",
+  "id": "116901112122156",
+  "volume": 0.8
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Items.ScopeIn",
+  "id": "125800774064191",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Items.ScopeOut",
+  "id": "82008946278721",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Items.Sniperfire",
+  "id": "136523485",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Items.Snowball.Form",
+  "id": "9114109952",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Items.Snowball.Hit",
+  "id": "4518881974",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Items.Snowball.Hit2",
+  "id": "9119311802",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Items.Snowball.Startup",
+  "id": "85286564624278",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Items.SodaHit",
+  "id": "9125782023",
+  "volume": 7.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Items.TNT",
+  "id": "4633141679",
+  "volume": 7.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Items.TNTExplode",
+  "id": "90854697257230",
+  "volume": 10
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Items.Voice",
+  "id": "88080590196375",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Items.Voice2",
+  "id": "117637019344223",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Items.Voice3",
+  "id": "81923105628397",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Items.VoiceSwitch",
+  "id": "90506072322224",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Items.Wall",
+  "id": "134228799555671",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.M.Charm",
+  "id": "112059571775707",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.M.Kick",
+  "id": "89946857988684",
+  "volume": 1.2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.M.KickHit",
+  "id": "116276526396834",
+  "volume": 1.2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.M.Kill",
+  "id": "138251332",
+  "volume": 0.7
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.M.M1.Hit1",
+  "id": "138752442741376",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.M.M1.Hit2",
+  "id": "138752442741376",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.M.M1.Hit3",
+  "id": "138752442741376",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.M.M1.Hit4",
+  "id": "138752442741376",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.M.Mokou1Voice",
+  "id": "111966489777704",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.M.Mokou2Voice",
+  "id": "79485256652082",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.M.Mokou3Voice",
+  "id": "71929675243090",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.M.Mokou4Voice",
+  "id": "71264662912990",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.M.Mokou5Voice",
+  "id": "116993240226262",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.M.MokouOST",
+  "id": "88636981135097",
+  "volume": 0.2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.M.MokouSpawn",
+  "id": "128164862186488",
+  "volume": 1.2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.M.MokouSpawnVoice",
+  "id": "109633060909625",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.M.MokouUlt",
+  "id": "119327666805085",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.M.Revive",
+  "id": "111880963012962",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.M.Scorchrise",
+  "id": "132417039208978",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.M.Scorchrise2",
+  "id": "75820589314523",
+  "volume": 1.2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.M.Slash",
+  "id": "93912483498874",
+  "volume": 1.2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.M.Swing.1",
+  "id": "136567919489969",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.M.Swing.2",
+  "id": "95536331879360",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.M.Swing.3",
+  "id": "131984461281576",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.M.Swing.4",
+  "id": "112791460024229",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.M.Swing.5",
+  "id": "112343014637232",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Nep.Beep",
+  "id": "124455167265111",
+  "volume": 2.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Nep.Rage",
+  "id": "139428052559872",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Nep.Signal",
+  "id": "87233137675406",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Nep.Start",
+  "id": "2734269544",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Nep.StaticLoop",
+  "id": "6887676707",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Nep.Switch1",
+  "id": "6887672613",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Nep.Talk",
+  "id": "116264706492559",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Nep.TalkStart",
+  "id": "8152502771",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Parkour.Parkour",
+  "id": "3929467888",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Parkour.Roll",
+  "id": "9113470969",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Pipe",
+  "id": "85925942770579",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.S.Dash",
+  "id": "1295446488",
+  "volume": 5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.S.Dash2",
+  "id": "1295456280",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.S.Form",
+  "id": "127505140761416",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.S.Hit.Hit1",
+  "id": "17169365111",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.S.Hit.Hit2",
+  "id": "17169365331",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.S.On",
+  "id": "1292342610",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.S.OrbHit",
+  "id": "7515452875",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.SBleed",
+  "id": "113551991267513",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Swing.Fist",
+  "id": "4571259077",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Swing.Fist2",
+  "id": "3755636992",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Swing.Fist3",
+  "id": "3755637186",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Swing.Sword",
+  "id": "4085938599",
+  "volume": 0.4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.SwordBlock.Block1",
+  "id": "9125669515",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.SwordBlock.Block2",
+  "id": "9116709512",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.SwordBlock.Block3",
+  "id": "9116618112",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Throwable1",
+  "id": "3929467655",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Throwable2",
+  "id": "4086209336",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.Throwable3",
+  "id": "3755636825",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.UI.Achievement",
+  "id": "79492884728625",
+  "volume": 5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.UI.Announcement",
+  "id": "138718776377217",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.UI.CardFlip",
+  "id": "9113578540",
+  "volume": 5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.UI.Click",
+  "id": "8388724806",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.UI.Coin",
+  "id": "8997512318",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.UI.CoinTotal",
+  "id": "7381723507",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.UI.CoinTotal2",
+  "id": "96344550985110",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.UI.CoinZero",
+  "id": "1848197629",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.UI.CoinZero2",
+  "id": "103287988053146",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.UI.Countdown",
+  "id": "6238869231",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.UI.Create",
+  "id": "7545317681",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.UI.Destroya",
+  "id": "8284575295",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.UI.DuelEnd",
+  "id": "7464806648",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.UI.Error",
+  "id": "137921141959085",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.UI.Gamemode",
+  "id": "17161210152",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.UI.GamemodeSelect",
+  "id": "16480560696",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.UI.Hover",
+  "id": "10066942189",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.UI.Load1",
+  "id": "3320590485",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.UI.Load2",
+  "id": "9085317509",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.UI.Load3",
+  "id": "117303393612962",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.UI.Lose",
+  "id": "8713437441",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.UI.Purchase",
+  "id": "4612383453",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.UI.SpectateStart",
+  "id": "8930408685",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.UI.Squeak",
+  "id": "9125994570",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.UI.StockLose",
+  "id": "91191741418347",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.UI.Switch",
+  "id": "15675012262",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.UI.VowChoose",
+  "id": "1835642179",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.UI.Win",
+  "id": "4816978981",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.UI.Winner1",
+  "id": "110964600384165",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.UI.Winner2",
+  "id": "110964600384165",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.UI.Winner3",
+  "id": "110964600384165",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.UI.Wrap",
+  "id": "9117409728",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Misc.WaitAmbience",
+  "id": "9044821783",
+  "volume": 0
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.BlackFlash",
+  "id": "134439183521879",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.BluntCut.Charge",
+  "id": "93412218137356",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.BluntCut.ChargeFinish",
+  "id": "127509666571725",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.BluntCut.Dash",
+  "id": "115254148621223",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.BluntCut.Finisher",
+  "id": "87832618406303",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.BluntCut.Hit",
+  "id": "132547948177910",
+  "volume": 3.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.BluntCut.RatioHit",
+  "id": "71814504662867",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.BluntCut.Start",
+  "id": "120044543888205",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.CleavingWhirlwind.Hit",
+  "id": "112016169570826",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.CleavingWhirlwind.RatioHit",
+  "id": "135823111772524",
+  "volume": 3.6
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.CleavingWhirlwind.Start",
+  "id": "107147008159658",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.Collapse.Activate",
+  "id": "89971826287050",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.Collapse.Charge",
+  "id": "111660088544435",
+  "volume": 10
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.Collapse.DebreeDrop",
+  "id": "94475379772653",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.Collapse.Impact",
+  "id": "105799337452305",
+  "volume": 5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.Collapse.Jump",
+  "id": "84988803689953",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.CrossCut.Endlag",
+  "id": "105744438739845",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.CrossCut.Hit1",
+  "id": "106529011379327",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.CrossCut.Hit2",
+  "id": "78963760295110",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.CrossCut.RatioHit",
+  "id": "131561040394496",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.CrossCut.Slam",
+  "id": "88485819004378",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.CrossCut.Start",
+  "id": "81634276594833",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.CrossCut.Whoosh",
+  "id": "80326265097136",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.Dismember",
+  "id": "125624703041853",
+  "volume": 3.6
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.EyeFlash",
+  "id": "107311996562711",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.Hit",
+  "id": "109753304565459",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.Interrogate.FinisherHit",
+  "id": "133064355676720",
+  "volume": 3.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.Interrogate.Freeze",
+  "id": "85140820024591",
+  "volume": 3.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.Interrogate.Grab1",
+  "id": "86957506426946",
+  "volume": 3.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.Interrogate.Grab2",
+  "id": "75657430345285",
+  "volume": 3.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.Interrogate.Hit",
+  "id": "128041696595076",
+  "volume": 3.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.M1.Hit1",
+  "id": "91344226850535",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.M1.Hit2",
+  "id": "91019449442779",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.M1.Hit3",
+  "id": "139826126503063",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.M1.Hit4",
+  "id": "135674501661535",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.M1.Up",
+  "id": "116816804360404",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.Ratio.Appear",
+  "id": "91977155481568",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.Ratio.Break",
+  "id": "72705960325356",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.Ratio.Disappear",
+  "id": "74763348702619",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.Ratio.Success",
+  "id": "132640361437873",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.RatioBreaker.OST",
+  "id": "111627864602847",
+  "volume": 0.7
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.RatioBreaker.RB1.Charge",
+  "id": "140357722460039",
+  "volume": 7
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.RatioBreaker.RB1.Hit",
+  "id": "114890408068900",
+  "volume": 7
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.RatioBreaker.RB1.SlashHit",
+  "id": "70661569139566",
+  "volume": 7
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.RatioBreaker.RB1.Whoosh",
+  "id": "129476317253467",
+  "volume": 7
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.RatioBreaker.RB2.Hit",
+  "id": "128470369858785",
+  "volume": 7
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.RatioBreaker.RB2.Whoosh",
+  "id": "109606601595459",
+  "volume": 7
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.RatioBreaker.RB3.Charge",
+  "id": "138559373472111",
+  "volume": 7
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.RatioBreaker.RB3.Hit",
+  "id": "137417358886595",
+  "volume": 7
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.RatioBreaker.RB3.Jump",
+  "id": "131926569091906",
+  "volume": 7
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.RatioBreaker.RB3.Slam",
+  "id": "113305253204345",
+  "volume": 7
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.RatioBreaker.RB4.Dash",
+  "id": "115290636129284",
+  "volume": 5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.RatioBreaker.RB4.Hit",
+  "id": "77727716120757",
+  "volume": 3.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.RatioBreaker.RB4.Start",
+  "id": "114438794227487",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.SeveranceKick.HitBack",
+  "id": "91207251126673",
+  "volume": 3.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.SeveranceKick.HitBackStun",
+  "id": "80359210686967",
+  "volume": 3.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.SeveranceKick.HitFront",
+  "id": "123177859397652",
+  "volume": 3.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.SeveranceKick.WhooshBack",
+  "id": "81817452065610",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.SeveranceKick.WhooshFront",
+  "id": "89020571624799",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.Sharpen.Basic",
+  "id": "107873525040694",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.Sharpen.JumpSlash",
+  "id": "82587618521227",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.Sharpen.JumpWindup",
+  "id": "126091250245401",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.Sharpen.RatioHit",
+  "id": "124499225392363",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.Sharpen.Slash",
+  "id": "86053178684110",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.Stabilize.Spin",
+  "id": "112176479612273",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.Stabilize.SpinShort",
+  "id": "81674903851837",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.Stabilize.Start",
+  "id": "106889101756832",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Nanami.Ultimate",
+  "id": "99971740567145",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.Acceleration",
+  "id": "94144459580306",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.Bleedout.Afterimages",
+  "id": "123491349270512",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.Bleedout.FinisherStab",
+  "id": "135840401388179",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.Bleedout.Hit",
+  "id": "103711283192425",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.Bleedout.Startup",
+  "id": "120434937298193",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.Bleedout.Throw",
+  "id": "85770270274263",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.Cursory.Grab",
+  "id": "137048570141513",
+  "volume": 1.75
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.Cursory.Hit",
+  "id": "105590625569131",
+  "volume": 1.75
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.Cursory.Kick",
+  "id": "82810979613330",
+  "volume": 1.75
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.Cursory.KickHit",
+  "id": "90410999998931",
+  "volume": 1.75
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.Cursory.Swing",
+  "id": "83127118538873",
+  "volume": 1.75
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.Decisive.Boost",
+  "id": "122424752474476",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.Decisive.Ding",
+  "id": "9116384757",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.Decisive.FirstHit",
+  "id": "132856141242580",
+  "volume": 1.75
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.Decisive.Flicker1",
+  "id": "117817818925397",
+  "volume": 1.75
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.Decisive.Flicker2",
+  "id": "114943144739692",
+  "volume": 1.75
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.Decisive.Flicker3",
+  "id": "118465449349098",
+  "volume": 1.75
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.Decisive.Hit1",
+  "id": "135367226283909",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.Decisive.Hit2",
+  "id": "100905404143936",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.Decisive.Hit3",
+  "id": "116472527330220",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.Decisive.Hit4",
+  "id": "70397374333185",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.Decisive.SecondHit",
+  "id": "73629332494583",
+  "volume": 1.75
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.Decisive.Startup",
+  "id": "132967103418764",
+  "volume": 1.75
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.Decisive.Swing",
+  "id": "111770082377892",
+  "volume": 1.75
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.Decisive.Swing2",
+  "id": "102143839764358",
+  "volume": 1.75
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.Frame",
+  "id": "9116384757",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.Frame2",
+  "id": "9116384762",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.FrameBreak",
+  "id": "117947531369694",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.Frames",
+  "id": "9116426650",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.MoonPalace.Flicker",
+  "id": "9113678080",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.MoonPalace.Music",
+  "id": "103306767550001",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.MoonPalace.Shatter",
+  "id": "6737581507",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.MoonPalace.Voice",
+  "id": "99951577218359",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.Pass",
+  "id": "138307879334129",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.ProjectionBreaker.Kick",
+  "id": "117954571666770",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.ProjectionBreaker.Spin",
+  "id": "139629826004213",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.ProjectionBreaker.Weave",
+  "id": "109864853124500",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.TendrilGrab.Grab",
+  "id": "104531288598918",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.TendrilGrab.GrabEnd",
+  "id": "127414943518610",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.TendrilGrab.Preview",
+  "id": "131805187374240",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.TendrilGrab.Retrieve",
+  "id": "119812081621029",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.TendrilGrab.Start",
+  "id": "101436171540292",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.TopSpeed.Fly",
+  "id": "121692248969984",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.TopSpeed.SonicBoom",
+  "id": "123410783666130",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.TopSpeed.Startup",
+  "id": "76441723033793",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.Ultimate.Catch",
+  "id": "84738383989434",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.Ultimate.Fall",
+  "id": "84461843348673",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.Ultimate.Form",
+  "id": "78303395722270",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.Ultimate.Grab",
+  "id": "88458298681974",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.Ultimate.Grab2",
+  "id": "110744212285066",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Naoya.Ultimate.Parry",
+  "id": "106542373538584",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.BluntTrauma.Break1",
+  "id": "96902489129057",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.BluntTrauma.Break2",
+  "id": "94678591956485",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.BluntTrauma.Hit1",
+  "id": "102164697067872",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.BluntTrauma.Hit2",
+  "id": "136680620487323",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.BluntTrauma.Hit3",
+  "id": "109959088160341",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.BluntTrauma.Hit4",
+  "id": "138544666565067",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.BluntTrauma.Hit5",
+  "id": "85532716555972",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.BluntTrauma.Jump",
+  "id": "113083056429013",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.BluntTrauma.Start",
+  "id": "95348847008043",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.BluntTrauma.Whoosh1",
+  "id": "125154542788300",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.BluntTrauma.Whoosh2",
+  "id": "123238394993400",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.BluntTrauma.Whoosh3",
+  "id": "77372942368028",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.BluntTrauma.Whoosh4",
+  "id": "120766776714585",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.BluntTrauma.Whoosh5",
+  "id": "85676063616925",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.CouponBurn",
+  "id": "125716556337114",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.CouponBurn2",
+  "id": "114347179797315",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.CouponWhoosh",
+  "id": "108402568417321",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.Discard",
+  "id": "103301083087000",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.DroneStrike.DroneStart",
+  "id": "107291925076757",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.DroneStrike.Explode",
+  "id": "120730870285645",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.DroneStrike.Loop",
+  "id": "99028553321196",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.DroneStrike.Press",
+  "id": "110959680539377",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.DroneStrike.Whoosh",
+  "id": "118677354704379",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.Fleche.Dash",
+  "id": "105229282385221",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.Fleche.Hit",
+  "id": "112053484765331",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.Fleche.HitOpen",
+  "id": "129812008624405",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.Fleche.PullOut",
+  "id": "118548537635667",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.Fleche.Unleash",
+  "id": "136614680551054",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.Fleche.UnleashWhoosh",
+  "id": "122300114891560",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.GarageSale.Blood",
+  "id": "111249233187427",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.GarageSale.Metal2",
+  "id": "80999206489420",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.GarageSale.Metal3",
+  "id": "107796049493315",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.GarageSale.Plastic",
+  "id": "75753405975943",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.GarageSale.Wood",
+  "id": "140656310469778",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.GarageSale.Wood2",
+  "id": "116249662210202",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.GarageSale.Wood3",
+  "id": "101380531513364",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.GarageSaleFire",
+  "id": "91453853141113",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.Heal",
+  "id": "94308685887450",
+  "volume": 1.25
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.Homerun.BallFire",
+  "id": "133735049749688",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.Homerun.BallHit",
+  "id": "100207477013610",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.Homerun.BallLaunch1",
+  "id": "135769065921066",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.Homerun.BallLaunch2",
+  "id": "124003902760206",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.Homerun.Followup",
+  "id": "126020536706311",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.Homerun.Hit",
+  "id": "125930049555363",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.Homerun.Hit2",
+  "id": "81782379432866",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.Homerun.Hit2Homerun",
+  "id": "122913259127813",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.Homerun.Start",
+  "id": "114429572456597",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.KnifeHit",
+  "id": "71774765966659",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.KnifeThrow",
+  "id": "111244393435078",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.Littering.BallHit",
+  "id": "100748769985426",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.Littering.BallSpawn",
+  "id": "99759086455482",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.Littering.Land",
+  "id": "86764689887681",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.Littering.Start",
+  "id": "103301083087000",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.MayhemStart",
+  "id": "98547001406564",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.Metal1",
+  "id": "93805257936905",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.Metal2",
+  "id": "97222167506185",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.PianoBreak",
+  "id": "131621337491363",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.PianoFall",
+  "id": "92044295160013",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.Spa",
+  "id": "9125634964",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.SpeedCrash.Drive",
+  "id": "114988990044033",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.SpeedCrash.DriveBoost",
+  "id": "74389594563083",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.SpeedCrash.Explode",
+  "id": "74567233471387",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.SpeedCrash.Hit",
+  "id": "118132147240619",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.SpeedCrash.Slide",
+  "id": "82405804083158",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.SpeedCrash.Start",
+  "id": "109685696309687",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.Stamp",
+  "id": "111342135616334",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.TruckHit",
+  "id": "9120270688",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.TruckHorn",
+  "id": "115128547715948",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.Typing",
+  "id": "110901844957738",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Reggie.Ultimate",
+  "id": "114379547049860",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.Dessert.Dash",
+  "id": "80805627087578",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.Dessert.Hit",
+  "id": "95762461473174",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.Dessert.Impact",
+  "id": "105961802014473",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.Dessert.LongHit",
+  "id": "95356764606940",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.Dessert.Slide",
+  "id": "138870212952178",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.Dessert.Startup",
+  "id": "119992343011162",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.GraniteBlast.Charge",
+  "id": "107571923469306",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.GraniteBlast.Fire",
+  "id": "126461458989078",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.GraniteBlast.FireHard",
+  "id": "135255751694953",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.GraniteBlast.Hit",
+  "id": "106260518361457",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.HadNoIdea.Hit",
+  "id": "107116907231014",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.HadNoIdea.Startup",
+  "id": "116742641261240",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.Jingle",
+  "id": "129375015802470",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.NotInvited.ChargeStart",
+  "id": "114191015848865",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.NotInvited.Dash",
+  "id": "71672117204710",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.NotInvited.FullCharge",
+  "id": "85164048354891",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.NotInvited.Hit",
+  "id": "100409424308279",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.NotInvited.PowerDash",
+  "id": "110086889584801",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.NotInvited.Swing",
+  "id": "79379409212286",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.NotInvited.Windup",
+  "id": "125360177222726",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.Recovery.Comb",
+  "id": "82086397349945",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.Recovery.Sweet",
+  "id": "77659919167587",
+  "volume": 0.15
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.Recovery2.Comb",
+  "id": "77417792700571",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.Recovery2.Hair",
+  "id": "140476433079342",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.Recovery3",
+  "id": "120486776927289",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.SecondHelping.AirHit",
+  "id": "110428188752548",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.SecondHelping.AirHit2",
+  "id": "91193070042368",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.SecondHelping.Hit",
+  "id": "77586579310356",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.SecondHelping.Startup",
+  "id": "122087651309441",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.Ultimate",
+  "id": "137364280179144",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.UltimateFire",
+  "id": "117201550249538",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.UltimateStart",
+  "id": "89655786683392",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.UltimateVocals",
+  "id": "92475178445200",
+  "volume": 0
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.UltimateVocalsLarp",
+  "id": "73905683100406",
+  "volume": 0
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.Unsatisfied.Dash",
+  "id": "128456835641035",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.Unsatisfied.FinalHit1",
+  "id": "70449756871810",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.Unsatisfied.FinalHit2",
+  "id": "74324781247417",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.Unsatisfied.Hit1",
+  "id": "95723598539974",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.Unsatisfied.Hit2",
+  "id": "81751127529448",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.Unsatisfied.Hit3",
+  "id": "102321170538785",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Ryu.Unsatisfied.Weave",
+  "id": "135700558246306",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Todo.Awaken.Music",
+  "id": "98778929139784",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Todo.Awaken.SFX",
+  "id": "126354519236423",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Todo.Boom",
+  "id": "7188420724",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Todo.BruteForce.Hit",
+  "id": "98484366943330",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Todo.BruteForce.Start",
+  "id": "17725418857",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Todo.BruteForce.Swing",
+  "id": "7978512114",
+  "volume": 0.6
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Todo.Clap",
+  "id": "17156034319",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Todo.Debut.Jump",
+  "id": "16773286492",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Todo.Debut.Jump2",
+  "id": "17101065425",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Todo.Jump.Bell",
+  "id": "6810760581",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Todo.Jump.Jump2",
+  "id": "17101065425",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Todo.M1.Hit1",
+  "id": "8595975878",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Todo.M1.Hit2",
+  "id": "8595975878",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Todo.M1.Hit3",
+  "id": "8595975458",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Todo.M1.Hit4",
+  "id": "8595974357",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Todo.OST",
+  "id": "74736885961970",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Todo.Perfect",
+  "id": "1358454187",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Todo.SlideKick.Kick1",
+  "id": "120485588779441",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Todo.SlideKick.Kick2",
+  "id": "89572112622386",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Todo.SlideKick.Slide",
+  "id": "100428075749782",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Todo.SlideKick.WhooshKick2",
+  "id": "73229290081910",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Todo.Voice",
+  "id": "139430435061608",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Todo.Wapam",
+  "id": "83892455359949",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Todo.WapamVoice",
+  "id": "92231886696392",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Todo.Woosh",
+  "id": "105692714483194",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Uro.BlindRage.Fly",
+  "id": "72880483019101",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Uro.BlindRage.Swing1",
+  "id": "119543162312906",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Uro.BlindRage.Swing2",
+  "id": "102318601910197",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Uro.BlindRage.Swing3",
+  "id": "129081570292387",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Uro.BlindRage.Throw",
+  "id": "120706760824134",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Uro.SkyDistortion.Swing",
+  "id": "129081570292387",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Uro.SkyDistortion.Throw",
+  "id": "113748500437243",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Uro.ThinIceBreaker.Crack",
+  "id": "110205767230561",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Uro.ThinIceBreaker.Crack2",
+  "id": "97374948075214",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Uro.ThinIceBreaker.Die",
+  "id": "129058536378584",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Uro.ThinIceBreaker.Explode",
+  "id": "105792362821593",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Uro.ThinIceBreaker.Impact",
+  "id": "110825030672837",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Uro.ThinIceBreaker.Start",
+  "id": "140527314975641",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Uro.Ultimate.Break",
+  "id": "132457128699700",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Uro.Ultimate.Fly",
+  "id": "72880483019101",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Uro.Ultimate.Grab",
+  "id": "18265315478",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Uro.Ultimate.Grab2",
+  "id": "129081570292387",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Uro.Ultimate.Voice",
+  "id": "107283239051825",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Uro.Ultimate.Voice1",
+  "id": "82449568099992",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Uro.Ultimate.Voice2",
+  "id": "128241049474311",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.Charge.Charge",
+  "id": "130483916115974",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.Charge.ChargeFail",
+  "id": "124820387474864",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.Charge.End",
+  "id": "139253346216202",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.Charge.Finish",
+  "id": "75191661535842",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.Charge.Start",
+  "id": "137050048462822",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.Explode",
+  "id": "88293699924944",
+  "volume": 7
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.Explode2",
+  "id": "87859961098263",
+  "volume": 7
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.FirstWhip",
+  "id": "108271854301469",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.Freeze",
+  "id": "81202220081219",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.Grab",
+  "id": "131800911231116",
+  "volume": 5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.GrabOST",
+  "id": "15048731914",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.Hole.Charge",
+  "id": "74450486070886",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.Hole.Charge2",
+  "id": "106022395432817",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.Hole.Hole",
+  "id": "73828252330994",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.Mass.Dash",
+  "id": "92456342640262",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.Mass.Hit",
+  "id": "72214797814045",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.Mass.Hit2",
+  "id": "75089222303073",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.Mass.Miss",
+  "id": "105475201107176",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.Mass.Start",
+  "id": "115575205427140",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.Rebound.Bounce",
+  "id": "140210011421911",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.Rebound.Hit",
+  "id": "119835533022597",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.Rebound.Punch",
+  "id": "91677916810574",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.Rebound.Return",
+  "id": "124116283788613",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.Rebound.Slow",
+  "id": "93528549345434",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.Rebound.Startup",
+  "id": "94830582667262",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.RisingRage.Charge",
+  "id": "126216905119949",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.RisingRage.Hit",
+  "id": "130525286637724",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.RisingRage.Hit2",
+  "id": "94234054127236",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.RisingRage.Hit3",
+  "id": "108671308229639",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.RisingRage.Ring",
+  "id": "130590141070737",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.Scream",
+  "id": "17309157540",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.SecondWhip",
+  "id": "76311359826097",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.Secret",
+  "id": "118236938485267",
+  "volume": 6
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.SecretSFX",
+  "id": "102842409290495",
+  "volume": 6
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.Stab",
+  "id": "137783275962038",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.Startup",
+  "id": "83066231638545",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.Startup2",
+  "id": "9113837941",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.Swing",
+  "id": "114235921050731",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuki.WhipFlyBack",
+  "id": "104413303615093",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.BlackFlash.Land",
+  "id": "132472285449398",
+  "volume": 6
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.BlackFlash.Land2",
+  "id": "132879779265336",
+  "volume": 5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.BlackFlash.Land3",
+  "id": "91266524334221",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.BlackFlash.Windup",
+  "id": "126598851794168",
+  "volume": 6
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.BlackFlash.Windup2",
+  "id": "85972589629135",
+  "volume": 6
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.CursedSpeechStart",
+  "id": "76485051513534",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.ElbowRush.Barrage",
+  "id": "118844796311667",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.ElbowRush.Barrage2",
+  "id": "95680035639252",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.ElbowRush.Hit",
+  "id": "96377525338185",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.ElbowRush.Step1",
+  "id": "76842997698748",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.ElbowRush.Step2",
+  "id": "90282304902568",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.ElbowRush.Teleport",
+  "id": "106463408823054",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.ElbowRush.Whiff",
+  "id": "84493401750489",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.EnergyRipple.Bomb1",
+  "id": "73393411828542",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.EnergyRipple.Bomb2",
+  "id": "72879767828886",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.EnergyRipple.Feint.CEBurst",
+  "id": "102450195424013",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.EnergyRipple.Feint.Explosion",
+  "id": "129389928559036",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.EnergyRipple.Feint.Feint",
+  "id": "86382772357027",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.EnergyRipple.Feint.Hit",
+  "id": "128669563112488",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.EnergyRipple.Feint.Swing",
+  "id": "77514337135425",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.EnergyRipple.Start",
+  "id": "102285974755522",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.JacobLadder",
+  "id": "129174925057034",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.Leap",
+  "id": "128763907862260",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.LoveBeam.ChargeSFX",
+  "id": "114265785065488",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.LoveBeam.Music",
+  "id": "117663808507739",
+  "volume": 0
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.LoveBeam.RikaMovement",
+  "id": "94504796493417",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.LoveBeam.SmallBeam",
+  "id": "111645361582005",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.LoveBeam.SmallBeamHit",
+  "id": "136984517895785",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.LoveBeam.Voiceline",
+  "id": "82962697738747",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.M1.Hit1",
+  "id": "85608110116893",
+  "volume": 1.2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.M1.Hit2",
+  "id": "71064172624438",
+  "volume": 1.2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.M1.Hit3",
+  "id": "119908133360580",
+  "volume": 1.2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.M1.Hit4",
+  "id": "8595974357",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.M1.HitDown",
+  "id": "105620422413126",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.M1.HitUp",
+  "id": "78554756765213",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.M1.Swing1",
+  "id": "90045339954472",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.M1.Swing2",
+  "id": "101012088379497",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.M1.Swing3",
+  "id": "86863533715011",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.M1.Swing4",
+  "id": "4571259077",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.M1.Swing4Sword",
+  "id": "75487544146387",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.MetalHit",
+  "id": "113344342875514",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.MetalHit2",
+  "id": "108742052808505",
+  "volume": 0.8
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.MetalHit3",
+  "id": "104021116814815",
+  "volume": 0.8
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.MutualLove.AmbianceLoop",
+  "id": "91942331202663",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.MutualLove.CleaveSlash",
+  "id": "935843979",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.MutualLove.Glass1",
+  "id": "6737582452",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.MutualLove.Glass2",
+  "id": "7140152893",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.MutualLove.MiniRikaFly",
+  "id": "112981074280224",
+  "volume": 0.3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.MutualLove.MiniRikaSwarm",
+  "id": "80705570218040",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.MutualLove.MiniRikaToggle",
+  "id": "112205395048785",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.MutualLove.OldOST",
+  "id": "139647861430129",
+  "volume": 0.7
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.MutualLove.OST",
+  "id": "84395583379130",
+  "volume": 5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.MutualLove.OSTClash",
+  "id": "107921124631537",
+  "volume": 5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.MutualLove.PickupSword",
+  "id": "81157826243193",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.MutualLove.RunSlash",
+  "id": "93748708419116",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.MutualLove.Start",
+  "id": "121842315815683",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.MutualLove.SwordFall",
+  "id": "138229680778086",
+  "volume": 0.3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.MutualLove.SwordGround1",
+  "id": "72417515043142",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.MutualLove.SwordGround2",
+  "id": "95363686354809",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.MutualLove.SwordGround3",
+  "id": "128908669459793",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.MutualLove.Voice",
+  "id": "8098966252",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.MutualLove.VoiceCrush",
+  "id": "128573990774413",
+  "volume": 6
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.MutualLove.VoiceDie",
+  "id": "129151959162409",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.Outburst.Charge",
+  "id": "86752717770401",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.Outburst.Explosion",
+  "id": "83796511190884",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.Outburst.ExplosionHit",
+  "id": "82314797872585",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.Outburst.Start",
+  "id": "115816722667586",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.Outburst.Swing",
+  "id": "83164718262698",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.PunchSwing",
+  "id": "87521122552000",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.ResoluteHit",
+  "id": "125037643044310",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.ResoluteSlash",
+  "id": "14427790767",
+  "volume": 5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.RevolveDive",
+  "id": "113403339442588",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.RevolveLand",
+  "id": "122860314546755",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.Rika.Desummon",
+  "id": "114475539069233",
+  "volume": 0.6
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.Rika.Grab",
+  "id": "125806793535380",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.Rika.GrabHold",
+  "id": "135807588061582",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.Rika.GrabStart",
+  "id": "114224078354175",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.Rika.Haymaker",
+  "id": "92653689754693",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.Rika.Launch",
+  "id": "72050513112942",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.Rika.SlamLand",
+  "id": "121037032809909",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.Rika.SlamTry",
+  "id": "92772409642805",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.Rika.Slap",
+  "id": "14382989485",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.Rika.StartFly",
+  "id": "84072838662510",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.Rika.Summon",
+  "id": "81914373674135",
+  "volume": 0.6
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.Rika.SummonVL",
+  "id": "136734180743874",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.Rika.ThrowStart",
+  "id": "121746815389545",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.Rika.Ultimate.Break",
+  "id": "138460768017549",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.Rika.Ultimate.Start",
+  "id": "139810932198383",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.Rika.Ultimate.Voiceline",
+  "id": "120155303418484",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.Rika.UltimateZero.Break",
+  "id": "138460768017549",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.Rika.UltimateZero.Start",
+  "id": "123373069192090",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.Rika.UltimateZero.Voiceline",
+  "id": "85246358633776",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.SecondWind.Dash",
+  "id": "122018900711660",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.SecondWind.Grab",
+  "id": "80892604094179",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.SeveringPath.Hit1",
+  "id": "137337069510286",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.SeveringPath.Hit2",
+  "id": "86231967919037",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.SeveringPath.Hit3",
+  "id": "97003333926852",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.SeveringPath.Hit4",
+  "id": "117756899811635",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.SeveringPath.Start",
+  "id": "95876856890836",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.SeveringPath.Swing1",
+  "id": "120714154715812",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.SeveringPath.Swing2",
+  "id": "129682722005190",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.SeveringPath.Swing3",
+  "id": "73434180515706",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.Swing",
+  "id": "86506412325620",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.SwordGrab",
+  "id": "122209095269858",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.Ultimate.BreakChain",
+  "id": "87637812190192",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.Ultimate.EquipArm",
+  "id": "82010180737404",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.Ultimate.PutRing",
+  "id": "82858286583983",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.Ultimate.ShakeArm",
+  "id": "96857444594355",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.Ultimate.Start",
+  "id": "96210507614652",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.Ultimate.VL",
+  "id": "120155303418484",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.Ultimate.VLZero",
+  "id": "93926154797041",
+  "volume": 6
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.Veilstep",
+  "id": "121354995604661",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.VeilstepDive",
+  "id": "79148321721845",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.VeilstepHit",
+  "id": "90439756216771",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.VeilstepJump",
+  "id": "74892667038544",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Sounds.Yuta.VoiceDontMove",
+  "id": "99951281458108",
+  "volume": 6
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Damage.ThrowableHit.PianoSFX",
+  "id": "9117314713",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Damage.ThrowableHit.SmokeSFX",
+  "id": "9114437231",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Hakari.IdleDeath.Aura.Torso.JackpotMusic",
+  "id": "1841443579",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Kurourushi.Parthenogenesis.DomainHole.Break",
+  "id": "125989086975479",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Kurourushi.Parthenogenesis.DomainHole.Loop",
+  "id": "128018608724944",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Kurourushi.Parthenogenesis.DomainHole.Start",
+  "id": "97286482751601",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Misc.Rain.RainSFX",
+  "id": "5911952995",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Misc.Sounds.UltraCoin Coin Hit",
+  "id": "128126265550239",
+  "volume": 1.33
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Misc.Sounds.UltraCoin Coin Land",
+  "id": "116046502145758",
+  "volume": 1.6
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Misc.Sounds.UltraCoin Debris",
+  "id": "129838143089640",
+  "volume": 1.15
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Misc.Sounds.UltraCoin Headshot",
+  "id": "106779157030137",
+  "volume": 1.08
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Misc.Sounds.UltraCoin Hit",
+  "id": "89947566079468",
+  "volume": 0.87
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Misc.Sounds.UltraCoin Shoot",
+  "id": "106169223431878",
+  "volume": 1.56
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Misc.Sounds.UltraCoin Use",
+  "id": "88039519570613",
+  "volume": 0.64
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Misc.Train.Horn",
+  "id": "9120249206",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Misc.Train.Train",
+  "id": "9112798494",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Nanami.OvertimeAura.Music",
+  "id": "111627864602847",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Appear",
+  "id": "78389083107136",
+  "volume": 1.25
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Arm.Charge",
+  "id": "17046377464",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Arm.Charge",
+  "id": "17046377464",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Arm.Stance",
+  "id": "9118612065",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Arm.Stance",
+  "id": "9118612065",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Arm.Stance2",
+  "id": "17725419051",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Arm.Stance2",
+  "id": "17725419392",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Attachment.Clap",
+  "id": "18496842405",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Attachment.Clap",
+  "id": "7823511893",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Attachment.Slide",
+  "id": "9114657970",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Attachment.Woosh",
+  "id": "9125629906",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Attachment.Woosh",
+  "id": "9125629906",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Box.Base.Exit",
+  "id": "9116673944",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Box.Base.Reveal",
+  "id": "4757565956",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Box.Base.Shake",
+  "id": "9116529947",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.CursedInstinctsFX.Charge",
+  "id": "112958924815755",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Eat",
+  "id": "6748255118",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Equip",
+  "id": "130465956717556",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Explode",
+  "id": "87338725902357",
+  "volume": 1.25
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Laugh",
+  "id": "7610950469",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.LightEtye.Boom",
+  "id": "7147349812",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.LightEtye.Lightning",
+  "id": "6458307118",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.LightEtye.Shock",
+  "id": "6994934244",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Loop",
+  "id": "114234185689193",
+  "volume": 1.8
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Looped",
+  "id": "135085822582147",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Looped",
+  "id": "131394028346241",
+  "volume": 0.8
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "1841425177",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "16785843693",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "84361522293297",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "17177481815",
+  "volume": 5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "81817470019988",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "138547159993689",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "35930009",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "87346804108684",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "18259721717",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "35930009",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "107369244674690",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "81631848409725",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "14118577963",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "87884732366106",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "124404897191552",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "109327078849301",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "14972651879",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "14287482730",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "114824668643467",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "92954097113818",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "116614879374541",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "125515503762033",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "2069622988",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "96632806833838",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "109349834174062",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "125515503762033",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "125515503762033",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "107770724427582",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "123220395457436",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "72286441950489",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "140699225448514",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "116396034168199",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "84452858043788",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "97385800867510",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "118926813137640",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "88400590883855",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "129737857697115",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "115005628745958",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "117566485238755",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "101483827930052",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "102250653450791",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "115679073757415",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "114727349500434",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "14102284331",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "78584601751734",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "121994679724371",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "92583094543115",
+  "volume": 0.75
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "120285404662498",
+  "volume": 4
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "128679766117338",
+  "volume": 1.6
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "121510027802287",
+  "volume": 0.88
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "117559722484335",
+  "volume": 0.9
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "94085837078821",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "125641842327880",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "83052540104428",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "134412817888866",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "132082843450748",
+  "volume": 1.3
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "101535471498695",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "105855992594032",
+  "volume": 1.1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "112547732827590",
+  "volume": 1.1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "129275088368074",
+  "volume": 1.25
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "136115501720637",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "84483811524364",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "123055680862331",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "124899224299182",
+  "volume": 1.4
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "75377737918069",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "110121025121058",
+  "volume": 1.3
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "118959608598228",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "98836211894668",
+  "volume": 1.3
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "129770374016842",
+  "volume": 1.35
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "78635897460627",
+  "volume": 1.2
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "103301780173933",
+  "volume": 1.1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "129275088368074",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "84345515820740",
+  "volume": 1.4
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "119907029192308",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "124893150428974",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "94123598707949",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "104366982984499",
+  "volume": 1.4
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "129750909620420",
+  "volume": 1.35
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "104589357945333",
+  "volume": 0.8
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "80345575323834",
+  "volume": 1.4
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "91367008837492",
+  "volume": 1.4
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "82394476699727",
+  "volume": 1.3
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "107738134374009",
+  "volume": 1.4
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "129548665112670",
+  "volume": 1.35
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "99053030504031",
+  "volume": 1.2
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "103983215672036",
+  "volume": 0.8
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "130964805209824",
+  "volume": 1.4
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "73037638790878",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "93014927239264",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "130335897870262",
+  "volume": 1.3
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "72194779308047",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "82189447547853",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "107596454698844",
+  "volume": 1.1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "102561801757852",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "127378659559876",
+  "volume": 1.3
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "118377710973492",
+  "volume": 1.2
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "101299716206324",
+  "volume": 0.9
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "77926615043749",
+  "volume": 1.75
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "118555515042051",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "76163597764832",
+  "volume": 0.88
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "130232812984113",
+  "volume": 1.3
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "71395592131102",
+  "volume": 1.3
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "71215419403543",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "102295658393503",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "78835013256339",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "1835924107",
+  "volume": 0.8
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "83183205944453",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "125056538037535",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "121812282110195",
+  "volume": 1.8
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "122867747652604",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "127261491469704",
+  "volume": 7
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "77539897952282",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "91351271723088",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "126789915088947",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "90481917619268",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "86024123066499",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "82103498900206",
+  "volume": 0.75
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "75016390934428",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "92799416133901",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "115099571291945",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "84308133611594",
+  "volume": 3.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "84578239026455",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "73475383881331",
+  "volume": 0.8
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "115769659012544",
+  "volume": 0.8
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "89982422756825",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "136755795908100",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "103099072711592",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "78406775180172",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "87383396811936",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "77588672897183",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "129124824371897",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "133025326408612",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "109594895486133",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "133676956068351",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "135323209157747",
+  "volume": 1.4
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "85880216389201",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "115614129149542",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "129118070659483",
+  "volume": 1.25
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "98896822244279",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "123962738891584",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "80238490106540",
+  "volume": 0.35
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "109907667519225",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "81457288040972",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "89173019034047",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "86883942849422",
+  "volume": 0.35
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "98896822244279",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "130246216879867",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "104655669723276",
+  "volume": 0.7
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "131398887618060",
+  "volume": 1.25
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "132748879538133",
+  "volume": 8
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "84273721228058",
+  "volume": 0.7
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "125536416901279",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "131793560577084",
+  "volume": 4.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "102771138242651",
+  "volume": 1.25
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "91291604568264",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "101417463827799",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "79473933754526",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "79679056385053",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "88370046887184",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "96533023465456",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "109908890998978",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "131543027007826",
+  "volume": 1.25
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "135192403147969",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "99851449437044",
+  "volume": 2.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "105104477809762",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "103627180401844",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "135351807862615",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "138991349915093",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "94258726444736",
+  "volume": 1.3
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "76286458958431",
+  "volume": 0
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "72954922102685",
+  "volume": 0.7
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "91134694204904",
+  "volume": 0.65
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "126679843796205",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "92380604241249",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "78333235051810",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "78333235051810",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "78333235051810",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "120866810108754",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "98437925468522",
+  "volume": 8
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "89005613476842",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "138626416107318",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "79940305322684",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "111246889396425",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "73256492186976",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "134589327799181",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "92061304467964",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "133525345121123",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "88935199248526",
+  "volume": 0.85
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "115985976534258",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "1836266712",
+  "volume": 1.25
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "81089636726410",
+  "volume": 1.3
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "122197894181648",
+  "volume": 1.4
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "103830284733819",
+  "volume": 0.9
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "115679235929956",
+  "volume": 0.85
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "95685380792611",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "130098681449465",
+  "volume": 0.7
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "128078147047862",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "114297181774897",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "114766927896855",
+  "volume": 1.4
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "87133478033934",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "96573218551074",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "80642736729566",
+  "volume": 0.75
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "92387877902688",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "129475357445045",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "85843399910848",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "76669674917807",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "129883676995587",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "76068684914576",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "93102444903350",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "107202962874304",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "72507227828034",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "81170818353676",
+  "volume": 0.9
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "78835013256339",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "115167978435759",
+  "volume": 3.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "98745885042955",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "100687642626547",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "97627831894487",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "71884868651157",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "78653879681097",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "91464852003019",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "92321612574471",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "85835818182306",
+  "volume": 0.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "89737743745552",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "128885487359205",
+  "volume": 1.25
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "81036491514831",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "126044176585353",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "93850118303620",
+  "volume": 0.9
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "90738044192952",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "128783143459546",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "76863778330459",
+  "volume": 0.65
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "74417992941915",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "106190994920829",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "102445794608723",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "123927832756448",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "104659371407288",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "121991645017223",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "95492972165646",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "122461912061291",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "123220395457436",
+  "volume": 0
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "125300011181452",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "98436924749409",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "96013564403650",
+  "volume": 3.1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music",
+  "id": "136561112207139",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music1",
+  "id": "139915180316824",
+  "volume": 0.7
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Music1",
+  "id": "80105250811099",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.musicbox",
+  "id": "79392875844264",
+  "volume": 0.85
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.MusicLoop",
+  "id": "124165668690175",
+  "volume": 0.9
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Place",
+  "id": "85174370420420",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Rare",
+  "id": "92859742582879",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.sleep_loop",
+  "id": "112306928713689",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.sleep_start",
+  "id": "99665775344434",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Sound",
+  "id": "110648897947908",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Sound",
+  "id": "89295901558883",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Sound",
+  "id": "123249819582425",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Splash",
+  "id": "131201675332285",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Stance",
+  "id": "122695485344398",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Stance",
+  "id": "9114374439",
+  "volume": 8.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Stance",
+  "id": "9114374439",
+  "volume": 8.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Start",
+  "id": "111713152427785",
+  "volume": 0.8
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Start",
+  "id": "136059603290620",
+  "volume": 0.8
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Startup",
+  "id": "124472097716403",
+  "volume": 1.3
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Stretch",
+  "id": "111544897139699",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Taunt1",
+  "id": "79697598995449",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Taunt2",
+  "id": "129782771366819",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Taunt3",
+  "id": "137860860126896",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Taunt4",
+  "id": "93343548719186",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Taunt5",
+  "id": "129955439253146",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Taunt6",
+  "id": "106283822751601",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.TrueCurseFX.Charge",
+  "id": "135157861772273",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.TrueSelfFX.TrueSelfVFXMain.CardSummon",
+  "id": "107365337999490",
+  "volume": 2
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Voice",
+  "id": "82075460474433",
+  "volume": 3
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Voice",
+  "id": "102548609489454",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Voice",
+  "id": "120360356415702",
+  "volume": 1.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Voice",
+  "id": "98234483497073",
+  "volume": 2.5
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Preload.Voiceline",
+  "id": "98292559938836",
+  "volume": 1
+ },
+ {
+  "path": "ReplicatedStorage.Utils.Yuta.LoveBeam.ChargeBall.TrueLove",
+  "id": "118689694101518",
+  "volume": 0.5
+ },
+ {
+  "path": "StarterGui.Menus.Group.Shop.Talk",
+  "id": "929615246",
+  "volume": 1
+ },
+ {
+  "path": "StarterGui.Ranked.Preset.Teleport.Sound",
+  "id": "1839997916",
+  "volume": 0.5
+ },
+ {
+  "path": "Workspace.Map.Core.Part.Sound",
+  "id": "330859085",
+  "volume": 0.5
+ },
+ {
+  "path": "Workspace.Map.Core.Radio.Root.Music",
+  "id": "73396222198335",
+  "volume": 0
+ },
+ {
+  "path": "Workspace.Map.Core.Reimu.Waa",
+  "id": "86984484396202",
+  "volume": 0.5
+ },
+ {
+  "path": "Workspace.Map.Core.Reimu.Waaaaaaa",
+  "id": "18522900866",
+  "volume": 1
+ },
+ {
+  "path": "Workspace.Map.Core.the most blatant ad ever.Part.AL2_TP.AL2_UI.Sound",
+  "id": "138411591694815",
+  "volume": 0.5
+ },
+ {
+  "path": "Workspace.Map.Core.the most blatant ad ever.Part.Sound",
+  "id": "2809024273",
+  "volume": 1
+ }
+]

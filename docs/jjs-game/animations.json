@@ -1,0 +1,3542 @@
+[
+ {
+  "path": "Charles.Despair",
+  "id": "103013818601982"
+ },
+ {
+  "path": "Charles.EyeCatch",
+  "id": "72933571933445"
+ },
+ {
+  "path": "Charles.Idle",
+  "id": "82881042739459"
+ },
+ {
+  "path": "Charles.Mark",
+  "id": "86313167610953"
+ },
+ {
+  "path": "Charles.Melee.Chase",
+  "id": "140597320237985"
+ },
+ {
+  "path": "Charles.Melee.Down",
+  "id": "92966188946988"
+ },
+ {
+  "path": "Charles.Melee.Melee1",
+  "id": "125689391910002"
+ },
+ {
+  "path": "Charles.Melee.Melee2",
+  "id": "84080901810314"
+ },
+ {
+  "path": "Charles.Melee.Melee3",
+  "id": "139833047658617"
+ },
+ {
+  "path": "Charles.Melee.Melee4",
+  "id": "79271374075726"
+ },
+ {
+  "path": "Charles.Melee.Up",
+  "id": "134243365075812"
+ },
+ {
+  "path": "Charles.Sacrilegious",
+  "id": "72932825817330"
+ },
+ {
+  "path": "Charles.SacrilegiousHit",
+  "id": "93417504040395"
+ },
+ {
+  "path": "Charles.ShutUp",
+  "id": "79860101129549"
+ },
+ {
+  "path": "Charles.ShutUpVictim",
+  "id": "116462971170564"
+ },
+ {
+  "path": "Charles.Ultimate",
+  "id": "101956908324027"
+ },
+ {
+  "path": "Charles.UltimateAfter",
+  "id": "98956365812665"
+ },
+ {
+  "path": "Charles.UltimateHit",
+  "id": "123476590646783"
+ },
+ {
+  "path": "Choso.BloodEdge",
+  "id": "100446064103831"
+ },
+ {
+  "path": "Choso.BloodEdgeVictim",
+  "id": "99998493953272"
+ },
+ {
+  "path": "Choso.BloodRain",
+  "id": "117371289990421"
+ },
+ {
+  "path": "Choso.Convergence",
+  "id": "120319825505172"
+ },
+ {
+  "path": "Choso.Exorcise",
+  "id": "108374320117834"
+ },
+ {
+  "path": "Choso.Hairpin",
+  "id": "132928484483887"
+ },
+ {
+  "path": "Choso.Melee.Chase",
+  "id": "110978068388232"
+ },
+ {
+  "path": "Choso.Melee.Down",
+  "id": "92966188946988"
+ },
+ {
+  "path": "Choso.Melee.Melee1",
+  "id": "96185406489877"
+ },
+ {
+  "path": "Choso.Melee.Melee2",
+  "id": "105077924973072"
+ },
+ {
+  "path": "Choso.Melee.Melee3",
+  "id": "119042572747325"
+ },
+ {
+  "path": "Choso.Melee.Melee4",
+  "id": "105287938257399"
+ },
+ {
+  "path": "Choso.Melee.Up",
+  "id": "134243365075812"
+ },
+ {
+  "path": "Choso.PiercingBlood",
+  "id": "127171275866632"
+ },
+ {
+  "path": "Choso.PlasmaWave",
+  "id": "107067953428369"
+ },
+ {
+  "path": "Choso.QuickDraw",
+  "id": "96047028540271"
+ },
+ {
+  "path": "Choso.RedScale",
+  "id": "84039122607068"
+ },
+ {
+  "path": "Choso.RedScaleAir",
+  "id": "87805684702890"
+ },
+ {
+  "path": "Choso.RedScaleVictim",
+  "id": "129385939516650"
+ },
+ {
+  "path": "Choso.SlicingExorcism",
+  "id": "114321791577837"
+ },
+ {
+  "path": "Choso.Supernova",
+  "id": "85569553424083"
+ },
+ {
+  "path": "Choso.SupernovaCounter",
+  "id": "117045209683198"
+ },
+ {
+  "path": "Choso.Ultimate",
+  "id": "105826208784475"
+ },
+ {
+  "path": "Choso.WingKing",
+  "id": "95097480425566"
+ },
+ {
+  "path": "Choso.WingKingVictim",
+  "id": "113762948876108"
+ },
+ {
+  "path": "Gojo.DomainWarn",
+  "id": "99386103822334"
+ },
+ {
+  "path": "Gojo.DomainWarn2",
+  "id": "92855652038518"
+ },
+ {
+  "path": "Gojo.HollowPurple",
+  "id": "132748613906344"
+ },
+ {
+  "path": "Gojo.InfiniteVoid",
+  "id": "132725601768618"
+ },
+ {
+  "path": "Gojo.LapseBlue",
+  "id": "137865634124104"
+ },
+ {
+  "path": "Gojo.LapseBlueMaximum",
+  "id": "101162958113766"
+ },
+ {
+  "path": "Gojo.Melee.Chase",
+  "id": "110978068388232"
+ },
+ {
+  "path": "Gojo.Melee.Down",
+  "id": "92966188946988"
+ },
+ {
+  "path": "Gojo.Melee.Melee1",
+  "id": "127851700400958"
+ },
+ {
+  "path": "Gojo.Melee.Melee2",
+  "id": "72548435296350"
+ },
+ {
+  "path": "Gojo.Melee.Melee3",
+  "id": "84547415708554"
+ },
+ {
+  "path": "Gojo.Melee.Melee4",
+  "id": "127851700400958"
+ },
+ {
+  "path": "Gojo.Melee.Up",
+  "id": "134243365075812"
+ },
+ {
+  "path": "Gojo.RapidPunches",
+  "id": "95421145178968"
+ },
+ {
+  "path": "Gojo.ReversalRed",
+  "id": "137654778575373"
+ },
+ {
+  "path": "Gojo.ReversalRedMaximum",
+  "id": "124937162378188"
+ },
+ {
+  "path": "Gojo.ShortVoid",
+  "id": "116811846715462"
+ },
+ {
+  "path": "Gojo.Teleport",
+  "id": "99920923658527"
+ },
+ {
+  "path": "Gojo.TwofoldHit",
+  "id": "132673356426065"
+ },
+ {
+  "path": "Gojo.TwofoldKick",
+  "id": "104749346956269"
+ },
+ {
+  "path": "Gojo.Ultimate",
+  "id": "84716311536982"
+ },
+ {
+  "path": "Goku.GokuTailIdle",
+  "id": "97012197665877"
+ },
+ {
+  "path": "Goku.Kamehameha",
+  "id": "81971779090581"
+ },
+ {
+  "path": "Goku.KiSpam",
+  "id": "128537969081721"
+ },
+ {
+  "path": "Goku.M2Downslam",
+  "id": "76273288374330"
+ },
+ {
+  "path": "Goku.Melee.Chase",
+  "id": "124777463468279"
+ },
+ {
+  "path": "Goku.Melee.Down",
+  "id": "84989753395518"
+ },
+ {
+  "path": "Goku.Melee.Melee1",
+  "id": "104087365067491"
+ },
+ {
+  "path": "Goku.Melee.Melee2",
+  "id": "97215638330770"
+ },
+ {
+  "path": "Goku.Melee.Melee3",
+  "id": "100474683542881"
+ },
+ {
+  "path": "Goku.Melee.Melee4",
+  "id": "131279921755936"
+ },
+ {
+  "path": "Goku.Melee.Up",
+  "id": "96433049733325"
+ },
+ {
+  "path": "Goku.MeleeUlt.Chase",
+  "id": "86626502434817"
+ },
+ {
+  "path": "Goku.MeleeUlt.Down",
+  "id": "84989753395518"
+ },
+ {
+  "path": "Goku.MeleeUlt.Melee1",
+  "id": "123236749567737"
+ },
+ {
+  "path": "Goku.MeleeUlt.Melee2",
+  "id": "74550814125588"
+ },
+ {
+  "path": "Goku.MeleeUlt.Melee3",
+  "id": "114375152692460"
+ },
+ {
+  "path": "Goku.MeleeUlt.Melee4",
+  "id": "105878146832347"
+ },
+ {
+  "path": "Goku.MeleeUlt.Up",
+  "id": "96433049733325"
+ },
+ {
+  "path": "Goku.StaffExtend",
+  "id": "87481059409847"
+ },
+ {
+  "path": "Goku.StaffUppercut",
+  "id": "117318845383884"
+ },
+ {
+  "path": "Goku.Ultimate",
+  "id": "136161556678024"
+ },
+ {
+  "path": "Hakari.Counter",
+  "id": "92529934565092"
+ },
+ {
+  "path": "Hakari.DomainWarn",
+  "id": "108412968733387"
+ },
+ {
+  "path": "Hakari.EnergySurge",
+  "id": "91984445049000"
+ },
+ {
+  "path": "Hakari.FeverBreaker",
+  "id": "108123475959041"
+ },
+ {
+  "path": "Hakari.IdleDeath",
+  "id": "118861398234801"
+ },
+ {
+  "path": "Hakari.LuckyRushdown",
+  "id": "132281807148575"
+ },
+ {
+  "path": "Hakari.LuckyVolley",
+  "id": "95901746347992"
+ },
+ {
+  "path": "Hakari.Melee.Chase",
+  "id": "99451940496871"
+ },
+ {
+  "path": "Hakari.Melee.Down",
+  "id": "92966188946988"
+ },
+ {
+  "path": "Hakari.Melee.Melee1",
+  "id": "94588892125071"
+ },
+ {
+  "path": "Hakari.Melee.Melee2",
+  "id": "97868312130612"
+ },
+ {
+  "path": "Hakari.Melee.Melee3",
+  "id": "140588454098230"
+ },
+ {
+  "path": "Hakari.Melee.Melee4",
+  "id": "138826758216894"
+ },
+ {
+  "path": "Hakari.Melee.Up",
+  "id": "109299799610861"
+ },
+ {
+  "path": "Hakari.OverLuck",
+  "id": "120480195428173"
+ },
+ {
+  "path": "Hakari.ReserveBalls",
+  "id": "82541714192027"
+ },
+ {
+  "path": "Hakari.Rhythm",
+  "id": "136948942223547"
+ },
+ {
+  "path": "Hakari.RoughEnergy",
+  "id": "72467492674240"
+ },
+ {
+  "path": "Hakari.ShutterDoors",
+  "id": "72063002791216"
+ },
+ {
+  "path": "Hanami.Arm",
+  "id": "115525391286129"
+ },
+ {
+  "path": "Hanami.Beam",
+  "id": "131904892480473"
+ },
+ {
+  "path": "Hanami.BudShot",
+  "id": "96466374346823"
+ },
+ {
+  "path": "Hanami.CursedBuds",
+  "id": "100108404823407"
+ },
+ {
+  "path": "Hanami.CursedBudsTree",
+  "id": "89977758316911"
+ },
+ {
+  "path": "Hanami.CursedBudsTreeSmall",
+  "id": "115580881672346"
+ },
+ {
+  "path": "Hanami.DefenseResponse",
+  "id": "81953935260783"
+ },
+ {
+  "path": "Hanami.Domain",
+  "id": "105801749091005"
+ },
+ {
+  "path": "Hanami.Empower",
+  "id": "87128908378141"
+ },
+ {
+  "path": "Hanami.EvilTreeIdle",
+  "id": "105983054291551"
+ },
+ {
+  "path": "Hanami.EvilTreeThrow",
+  "id": "136338232194928"
+ },
+ {
+  "path": "Hanami.FlowerField",
+  "id": "102221764735089"
+ },
+ {
+  "path": "Hanami.Melee.Chase",
+  "id": "138169151223960"
+ },
+ {
+  "path": "Hanami.Melee.Down",
+  "id": "92966188946988"
+ },
+ {
+  "path": "Hanami.Melee.Melee1",
+  "id": "111083699259354"
+ },
+ {
+  "path": "Hanami.Melee.Melee2",
+  "id": "88849926869776"
+ },
+ {
+  "path": "Hanami.Melee.Melee3",
+  "id": "89537672683114"
+ },
+ {
+  "path": "Hanami.Melee.Melee4",
+  "id": "109598602517674"
+ },
+ {
+  "path": "Hanami.Melee.Up",
+  "id": "134243365075812"
+ },
+ {
+  "path": "Hanami.MeleeUlt.Chase",
+  "id": "138169151223960"
+ },
+ {
+  "path": "Hanami.MeleeUlt.Down",
+  "id": "92966188946988"
+ },
+ {
+  "path": "Hanami.MeleeUlt.Melee1",
+  "id": "115781423162319"
+ },
+ {
+  "path": "Hanami.MeleeUlt.Melee2",
+  "id": "106245594701442"
+ },
+ {
+  "path": "Hanami.MeleeUlt.Melee3",
+  "id": "139925289573265"
+ },
+ {
+  "path": "Hanami.MeleeUlt.Melee4",
+  "id": "128437228548370"
+ },
+ {
+  "path": "Hanami.MeleeUlt.Up",
+  "id": "134243365075812"
+ },
+ {
+  "path": "Hanami.RootRampage",
+  "id": "124427228784862"
+ },
+ {
+  "path": "Hanami.RootSurf",
+  "id": "139392154233011"
+ },
+ {
+  "path": "Hanami.RootSwarm",
+  "id": "113722638806911"
+ },
+ {
+  "path": "Hanami.SurgingThorns",
+  "id": "92595499555055"
+ },
+ {
+  "path": "Hanami.Ultimate",
+  "id": "84712031901002"
+ },
+ {
+  "path": "Hanami.UltimateOld",
+  "id": "119455868371102"
+ },
+ {
+  "path": "Haruta.Ambush",
+  "id": "120914276661831"
+ },
+ {
+  "path": "Haruta.Backstab",
+  "id": "133303451091615"
+ },
+ {
+  "path": "Haruta.BackstabFinisher",
+  "id": "118483280891531"
+ },
+ {
+  "path": "Haruta.BackstabTargetBack",
+  "id": "134821755643646"
+ },
+ {
+  "path": "Haruta.BackstabTargetFront",
+  "id": "82281135644263"
+ },
+ {
+  "path": "Haruta.CheapShot",
+  "id": "76957377224584"
+ },
+ {
+  "path": "Haruta.DirtyPlay",
+  "id": "108865650924154"
+ },
+ {
+  "path": "Haruta.Hand.AnkleCutter",
+  "id": "103960582499076"
+ },
+ {
+  "path": "Haruta.Hand.HighTime",
+  "id": "93028763593631"
+ },
+ {
+  "path": "Haruta.Hand.Jawbreaker",
+  "id": "118326207788271"
+ },
+ {
+  "path": "Haruta.Hand.JawbreakerHit",
+  "id": "94150970896972"
+ },
+ {
+  "path": "Haruta.Hand.JawbreakerVictim",
+  "id": "119918873304328"
+ },
+ {
+  "path": "Haruta.Hand.Spin",
+  "id": "78453184359132"
+ },
+ {
+  "path": "Haruta.Hand.SpinHit",
+  "id": "102580834319938"
+ },
+ {
+  "path": "Haruta.Hand.SpinMiss",
+  "id": "102580834319938"
+ },
+ {
+  "path": "Haruta.Idle",
+  "id": "131224959939598"
+ },
+ {
+  "path": "Haruta.Melee.Down",
+  "id": "100040983719699"
+ },
+ {
+  "path": "Haruta.Melee.Melee1",
+  "id": "133447840605824"
+ },
+ {
+  "path": "Haruta.Melee.Melee2",
+  "id": "113963875117859"
+ },
+ {
+  "path": "Haruta.Melee.Melee3",
+  "id": "106282708121342"
+ },
+ {
+  "path": "Haruta.Melee.Melee4",
+  "id": "101681158700275"
+ },
+ {
+  "path": "Haruta.Melee.Melee4Victim",
+  "id": "112976111828157"
+ },
+ {
+  "path": "Haruta.Melee.MeleeChase",
+  "id": "122074769949629"
+ },
+ {
+  "path": "Haruta.Melee.SwordChase",
+  "id": "134917827147266"
+ },
+ {
+  "path": "Haruta.Melee.Up",
+  "id": "119152716475706"
+ },
+ {
+  "path": "Haruta.Stinger",
+  "id": "95494223368246"
+ },
+ {
+  "path": "Haruta.SwordCatch",
+  "id": "118076716434659"
+ },
+ {
+  "path": "Haruta.SwordJump",
+  "id": "115616081167949"
+ },
+ {
+  "path": "Haruta.Taunt1",
+  "id": "87559130748823"
+ },
+ {
+  "path": "Haruta.Taunt2",
+  "id": "138967793150950"
+ },
+ {
+  "path": "Haruta.Taunt3",
+  "id": "78196072237542"
+ },
+ {
+  "path": "Haruta.Taunt4",
+  "id": "138760573388652"
+ },
+ {
+  "path": "Haruta.Trip",
+  "id": "102053631728986"
+ },
+ {
+  "path": "Heian.Arms",
+  "id": "139479927693015"
+ },
+ {
+  "path": "Heian.Chant",
+  "id": "93265997037616"
+ },
+ {
+  "path": "Heian.ChantArms",
+  "id": "129035777318346"
+ },
+ {
+  "path": "Heian.Cleave",
+  "id": "110906451704074"
+ },
+ {
+  "path": "Heian.Dismantle",
+  "id": "131826588098422"
+ },
+ {
+  "path": "Heian.DomainWarn",
+  "id": "100891305089972"
+ },
+ {
+  "path": "Heian.FlameArrow",
+  "id": "70840150456007"
+ },
+ {
+  "path": "Heian.Kamutoke",
+  "id": "137007125977081"
+ },
+ {
+  "path": "Heian.MalevolentShrine",
+  "id": "73048386765082"
+ },
+ {
+  "path": "Heian.Melee.Chase",
+  "id": "110978068388232"
+ },
+ {
+  "path": "Heian.Melee.Down",
+  "id": "92966188946988"
+ },
+ {
+  "path": "Heian.Melee.Melee1",
+  "id": "95295463826732"
+ },
+ {
+  "path": "Heian.Melee.Melee2",
+  "id": "105077924973072"
+ },
+ {
+  "path": "Heian.Melee.Melee3",
+  "id": "124862357369335"
+ },
+ {
+  "path": "Heian.Melee.Melee4",
+  "id": "81630213087988"
+ },
+ {
+  "path": "Heian.Melee.Up",
+  "id": "134243365075812"
+ },
+ {
+  "path": "Heian.WCS",
+  "id": "88215274584883"
+ },
+ {
+  "path": "Hiromi.DeadlySentence",
+  "id": "101617544363219"
+ },
+ {
+  "path": "Hiromi.Dodge.Dodge1",
+  "id": "70593304937741"
+ },
+ {
+  "path": "Hiromi.Dodge.Dodge2",
+  "id": "103513893010999"
+ },
+ {
+  "path": "Hiromi.Dodge.Dodge3",
+  "id": "140381676724931"
+ },
+ {
+  "path": "Hiromi.Dodge.Dodge4",
+  "id": "111214152450580"
+ },
+ {
+  "path": "Hiromi.Dodge.Dodge5",
+  "id": "85003123457049"
+ },
+ {
+  "path": "Hiromi.DomainWarn",
+  "id": "133503171543884"
+ },
+ {
+  "path": "Hiromi.Execution",
+  "id": "132704398648016"
+ },
+ {
+  "path": "Hiromi.ExecutionHit1",
+  "id": "132316713905598"
+ },
+ {
+  "path": "Hiromi.ExecutionHit2",
+  "id": "75178683584164"
+ },
+ {
+  "path": "Hiromi.ExecutionHit3",
+  "id": "99833231605480"
+ },
+ {
+  "path": "Hiromi.ExtendSwing",
+  "id": "89652378115594"
+ },
+ {
+  "path": "Hiromi.FinalJudgement",
+  "id": "106649604455931"
+ },
+ {
+  "path": "Hiromi.FinalJudgementHit",
+  "id": "81597967165882"
+ },
+ {
+  "path": "Hiromi.GavelThrow",
+  "id": "86362077638309"
+ },
+ {
+  "path": "Hiromi.Grapple",
+  "id": "71186534081075"
+ },
+ {
+  "path": "Hiromi.JudgeReach",
+  "id": "124759375124281"
+ },
+ {
+  "path": "Hiromi.JudgeReach2",
+  "id": "133869529005453"
+ },
+ {
+  "path": "Hiromi.JudgeReachHit",
+  "id": "131174893248941"
+ },
+ {
+  "path": "Hiromi.JudgeReachHit2",
+  "id": "93847231892553"
+ },
+ {
+  "path": "Hiromi.JusticeServed",
+  "id": "76519264603956"
+ },
+ {
+  "path": "Hiromi.JusticeServedHit",
+  "id": "128557259779846"
+ },
+ {
+  "path": "Hiromi.Melee.Chase",
+  "id": "132855702748568"
+ },
+ {
+  "path": "Hiromi.Melee.Down",
+  "id": "92966188946988"
+ },
+ {
+  "path": "Hiromi.Melee.Melee1",
+  "id": "133936641185614"
+ },
+ {
+  "path": "Hiromi.Melee.Melee2",
+  "id": "122573730331631"
+ },
+ {
+  "path": "Hiromi.Melee.Melee3",
+  "id": "82400997593751"
+ },
+ {
+  "path": "Hiromi.Melee.Melee4",
+  "id": "118634493886688"
+ },
+ {
+  "path": "Hiromi.Melee.Up",
+  "id": "115586282387431"
+ },
+ {
+  "path": "Hiromi.Melee2.Chase",
+  "id": "120951759618134"
+ },
+ {
+  "path": "Hiromi.Melee2.Down",
+  "id": "92966188946988"
+ },
+ {
+  "path": "Hiromi.Melee2.Melee1",
+  "id": "139280948741186"
+ },
+ {
+  "path": "Hiromi.Melee2.Melee2",
+  "id": "109340494549365"
+ },
+ {
+  "path": "Hiromi.Melee2.Melee3",
+  "id": "98577624776161"
+ },
+ {
+  "path": "Hiromi.Melee2.Melee4",
+  "id": "117831239064143"
+ },
+ {
+  "path": "Hiromi.Melee2.Up",
+  "id": "115586282387431"
+ },
+ {
+  "path": "Hiromi.Pancake",
+  "id": "78087255738802"
+ },
+ {
+  "path": "Hiromi.PressingCharges",
+  "id": "135411487367370"
+ },
+ {
+  "path": "Hiromi.TripleSentence",
+  "id": "124243904748268"
+ },
+ {
+  "path": "Hiromi.TripleSentenceHit",
+  "id": "100590912634893"
+ },
+ {
+  "path": "Hiromi.TwirlingStrikes",
+  "id": "124340599144108"
+ },
+ {
+  "path": "Hiromi.Ultimate",
+  "id": "80922461169812"
+ },
+ {
+  "path": "Hiromi.Verdict",
+  "id": "132754851925571"
+ },
+ {
+  "path": "Itadori.Cleave",
+  "id": "111593784328268"
+ },
+ {
+  "path": "Itadori.CrushingBlow",
+  "id": "124901309160375"
+ },
+ {
+  "path": "Itadori.CursedStrike",
+  "id": "77200218033775"
+ },
+ {
+  "path": "Itadori.CursedStrikeHit",
+  "id": "127402740019290"
+ },
+ {
+  "path": "Itadori.Dismantle",
+  "id": "131506102901134"
+ },
+ {
+  "path": "Itadori.DomainWarn",
+  "id": "104872844214684"
+ },
+ {
+  "path": "Itadori.FlameArrow",
+  "id": "137611726964398"
+ },
+ {
+  "path": "Itadori.Instincts",
+  "id": "130206074036010"
+ },
+ {
+  "path": "Itadori.MalevolentShrine",
+  "id": "121984128639453"
+ },
+ {
+  "path": "Itadori.ManjiKick",
+  "id": "82987093810211"
+ },
+ {
+  "path": "Itadori.ManjiKickHit",
+  "id": "100131148300498"
+ },
+ {
+  "path": "Itadori.Melee.Chase",
+  "id": "110978068388232"
+ },
+ {
+  "path": "Itadori.Melee.Down",
+  "id": "92966188946988"
+ },
+ {
+  "path": "Itadori.Melee.Melee1",
+  "id": "95295463826732"
+ },
+ {
+  "path": "Itadori.Melee.Melee2",
+  "id": "105077924973072"
+ },
+ {
+  "path": "Itadori.Melee.Melee3",
+  "id": "124862357369335"
+ },
+ {
+  "path": "Itadori.Melee.Melee4",
+  "id": "81630213087988"
+ },
+ {
+  "path": "Itadori.Melee.Up",
+  "id": "134243365075812"
+ },
+ {
+  "path": "Itadori.MeleeUlt.Melee1",
+  "id": "110146909061402"
+ },
+ {
+  "path": "Itadori.MeleeUlt.Melee2",
+  "id": "123414935051274"
+ },
+ {
+  "path": "Itadori.MeleeUlt.Melee3",
+  "id": "108636011034323"
+ },
+ {
+  "path": "Itadori.MeleeUlt.Melee4",
+  "id": "105376952884290"
+ },
+ {
+  "path": "Itadori.Rush",
+  "id": "107554693613496"
+ },
+ {
+  "path": "Itadori.RushHit",
+  "id": "125129631010293"
+ },
+ {
+  "path": "Itadori.SlaughterDemon",
+  "id": "121923107958102"
+ },
+ {
+  "path": "Itadori.Ultimate",
+  "id": "112577421904593"
+ },
+ {
+  "path": "Itadori.UltimateEnchain",
+  "id": "81633998750531"
+ },
+ {
+  "path": "Itadori.Variants.DivergentFist1",
+  "id": "100962226150441"
+ },
+ {
+  "path": "Itadori.Variants.DivergentFist2",
+  "id": "95852624447551"
+ },
+ {
+  "path": "Itadori.Variants.DivergentFist3",
+  "id": "74145636023952"
+ },
+ {
+  "path": "Itadori.Variants.DivergentFist4",
+  "id": "123171106092050"
+ },
+ {
+  "path": "Kurourushi.ArmsDetach.Chase",
+  "id": "76470718091246"
+ },
+ {
+  "path": "Kurourushi.ArmsDetach.Down",
+  "id": "105028055041290"
+ },
+ {
+  "path": "Kurourushi.ArmsDetach.Melee1",
+  "id": "97901397284754"
+ },
+ {
+  "path": "Kurourushi.ArmsDetach.Melee2",
+  "id": "135686778593679"
+ },
+ {
+  "path": "Kurourushi.ArmsDetach.Melee3",
+  "id": "92796867394473"
+ },
+ {
+  "path": "Kurourushi.ArmsDetach.Melee4",
+  "id": "81426568444338"
+ },
+ {
+  "path": "Kurourushi.ArmsDetach.Up",
+  "id": "90926294837924"
+ },
+ {
+  "path": "Kurourushi.ArmsMelee.Chase",
+  "id": "76470718091246"
+ },
+ {
+  "path": "Kurourushi.ArmsMelee.Down",
+  "id": "105028055041290"
+ },
+ {
+  "path": "Kurourushi.ArmsMelee.Melee2",
+  "id": "92045676155777"
+ },
+ {
+  "path": "Kurourushi.ArmsMelee.Melee3",
+  "id": "75985296743258"
+ },
+ {
+  "path": "Kurourushi.ArmsMelee.Melee4",
+  "id": "128247404669136"
+ },
+ {
+  "path": "Kurourushi.ArmsMelee.Up",
+  "id": "90926294837924"
+ },
+ {
+  "path": "Kurourushi.Chokehold",
+  "id": "85938446097801"
+ },
+ {
+  "path": "Kurourushi.ChokeholdHit",
+  "id": "90695654160865"
+ },
+ {
+  "path": "Kurourushi.ChokeholdHitArms",
+  "id": "118458355351269"
+ },
+ {
+  "path": "Kurourushi.ChokeholdHitArms_Punch",
+  "id": "138898960225788"
+ },
+ {
+  "path": "Kurourushi.ChokeholdVictim",
+  "id": "137890465172565"
+ },
+ {
+  "path": "Kurourushi.Detach",
+  "id": "78636717376287"
+ },
+ {
+  "path": "Kurourushi.EarthenTrance",
+  "id": "93751660565233"
+ },
+ {
+  "path": "Kurourushi.EarthenTranceArms",
+  "id": "135048320277030"
+ },
+ {
+  "path": "Kurourushi.EarthenTranceNPC",
+  "id": "121415876792706"
+ },
+ {
+  "path": "Kurourushi.Eat",
+  "id": "104597702149205"
+ },
+ {
+  "path": "Kurourushi.EatArms",
+  "id": "84748541392167"
+ },
+ {
+  "path": "Kurourushi.EatVictim",
+  "id": "95145258027958"
+ },
+ {
+  "path": "Kurourushi.FesteringStrikes",
+  "id": "83430571986421"
+ },
+ {
+  "path": "Kurourushi.FesteringStrikesArms",
+  "id": "118813489101356"
+ },
+ {
+  "path": "Kurourushi.Melee.Chase",
+  "id": "105571879949076"
+ },
+ {
+  "path": "Kurourushi.Melee.Down",
+  "id": "136466703751033"
+ },
+ {
+  "path": "Kurourushi.Melee.Melee1",
+  "id": "105961366724096"
+ },
+ {
+  "path": "Kurourushi.Melee.Melee2",
+  "id": "86519781516542"
+ },
+ {
+  "path": "Kurourushi.Melee.Melee3",
+  "id": "123591522021548"
+ },
+ {
+  "path": "Kurourushi.Melee.Melee4",
+  "id": "124726819047447"
+ },
+ {
+  "path": "Kurourushi.Melee.Up",
+  "id": "129583539805939"
+ },
+ {
+  "path": "Kurourushi.MeleeDetach.Chase",
+  "id": "105571879949076"
+ },
+ {
+  "path": "Kurourushi.MeleeDetach.Down",
+  "id": "136466703751033"
+ },
+ {
+  "path": "Kurourushi.MeleeDetach.Melee1",
+  "id": "93880529089759"
+ },
+ {
+  "path": "Kurourushi.MeleeDetach.Melee2",
+  "id": "131033861605339"
+ },
+ {
+  "path": "Kurourushi.MeleeDetach.Melee3",
+  "id": "118433412162663"
+ },
+ {
+  "path": "Kurourushi.MeleeDetach.Melee4",
+  "id": "110425977429691"
+ },
+ {
+  "path": "Kurourushi.MeleeDetach.Up",
+  "id": "129583539805939"
+ },
+ {
+  "path": "Kurourushi.OldEat",
+  "id": "115557996464677"
+ },
+ {
+  "path": "Kurourushi.OldEatArms",
+  "id": "81252522461415"
+ },
+ {
+  "path": "Kurourushi.OldEatVictim",
+  "id": "86653872725659"
+ },
+ {
+  "path": "Kurourushi.Parthenogenesis",
+  "id": "94093535314017"
+ },
+ {
+  "path": "Kurourushi.ParthenogenesisArms",
+  "id": "74958629631023"
+ },
+ {
+  "path": "Kurourushi.Reattach",
+  "id": "104082985552315"
+ },
+ {
+  "path": "Kurourushi.RoachSwarm",
+  "id": "116119661056362"
+ },
+ {
+  "path": "Locust.BlackMucus",
+  "id": "129132347098646"
+ },
+ {
+  "path": "Locust.BugFlight",
+  "id": "121550561336691"
+ },
+ {
+  "path": "Locust.Flight",
+  "id": "115001703805775"
+ },
+ {
+  "path": "Locust.FlightLoop",
+  "id": "112223227323175"
+ },
+ {
+  "path": "Locust.FourArmed",
+  "id": "129678103897608"
+ },
+ {
+  "path": "Locust.Melee.Chase",
+  "id": "130284226842903"
+ },
+ {
+  "path": "Locust.Melee.Down",
+  "id": "92966188946988"
+ },
+ {
+  "path": "Locust.Melee.Melee1",
+  "id": "85068785050521"
+ },
+ {
+  "path": "Locust.Melee.Melee2",
+  "id": "79086910454958"
+ },
+ {
+  "path": "Locust.Melee.Melee3",
+  "id": "108027796023968"
+ },
+ {
+  "path": "Locust.Melee.Melee4",
+  "id": "99205259396653"
+ },
+ {
+  "path": "Locust.Melee.Up",
+  "id": "134243365075812"
+ },
+ {
+  "path": "Locust.SnapChomp",
+  "id": "134777193523837"
+ },
+ {
+  "path": "Locust.SnapChompHit",
+  "id": "94771523237279"
+ },
+ {
+  "path": "Locust.Ultimate",
+  "id": "94590184881876"
+ },
+ {
+  "path": "Mahito.BodyRepel",
+  "id": "108319980293313"
+ },
+ {
+  "path": "Mahito.CrushingRushdown",
+  "id": "89888040037257"
+ },
+ {
+  "path": "Mahito.CrushingRushdownHit",
+  "id": "110351847187022"
+ },
+ {
+  "path": "Mahito.DomainWarn",
+  "id": "116972733974613"
+ },
+ {
+  "path": "Mahito.DrillSplit",
+  "id": "128779949980528"
+ },
+ {
+  "path": "Mahito.FaceBlitz",
+  "id": "105068005007692"
+ },
+ {
+  "path": "Mahito.FaceBlitzTarget",
+  "id": "139254982813267"
+ },
+ {
+  "path": "Mahito.FocusStrike",
+  "id": "72475960800126"
+ },
+ {
+  "path": "Mahito.ForceGrab",
+  "id": "72343192576784"
+ },
+ {
+  "path": "Mahito.HeadSplitter",
+  "id": "86073608599582"
+ },
+ {
+  "path": "Mahito.HeadSplitterHit",
+  "id": "88471344937304"
+ },
+ {
+  "path": "Mahito.HeartPiercer",
+  "id": "94223344057046"
+ },
+ {
+  "path": "Mahito.IdleTransfig",
+  "id": "123690534435200"
+ },
+ {
+  "path": "Mahito.Melee.Chase",
+  "id": "110978068388232"
+ },
+ {
+  "path": "Mahito.Melee.Down",
+  "id": "92966188946988"
+ },
+ {
+  "path": "Mahito.Melee.Melee1",
+  "id": "126277739156443"
+ },
+ {
+  "path": "Mahito.Melee.Melee2",
+  "id": "99710481887795"
+ },
+ {
+  "path": "Mahito.Melee.Melee3",
+  "id": "121322029260156"
+ },
+ {
+  "path": "Mahito.Melee.Melee4",
+  "id": "122655618588472"
+ },
+ {
+  "path": "Mahito.Melee.Up",
+  "id": "98845475810982"
+ },
+ {
+  "path": "Mahito.SelfPerfection",
+  "id": "75736902190737"
+ },
+ {
+  "path": "Mahito.Soulfire",
+  "id": "89092734635186"
+ },
+ {
+  "path": "Mahito.SpikeWrath",
+  "id": "127727754867974"
+ },
+ {
+  "path": "Mahito.Stockpile",
+  "id": "103493656287292"
+ },
+ {
+  "path": "Mahito.Ultimate",
+  "id": "80852442092385"
+ },
+ {
+  "path": "Mahito.Ultimate2",
+  "id": "125455197945793"
+ },
+ {
+  "path": "Mahito.Variants.Armor.Down",
+  "id": "92966188946988"
+ },
+ {
+  "path": "Mahito.Variants.Armor.Melee1",
+  "id": "71784337627181"
+ },
+ {
+  "path": "Mahito.Variants.Armor.Melee2",
+  "id": "125120382787311"
+ },
+ {
+  "path": "Mahito.Variants.Armor.Melee3",
+  "id": "119042572747325"
+ },
+ {
+  "path": "Mahito.Variants.Armor.Melee4",
+  "id": "127851700400958"
+ },
+ {
+  "path": "Mahito.Variants.Armor.Up",
+  "id": "134243365075812"
+ },
+ {
+  "path": "Mahito.Variants.ChaseArmor",
+  "id": "130013701390383"
+ },
+ {
+  "path": "Mahito.Variants.ChaseClub",
+  "id": "81786875517933"
+ },
+ {
+  "path": "Mahito.Variants.ChaseSword",
+  "id": "134461702265323"
+ },
+ {
+  "path": "Mahito.Variants.MeleeClub.Down",
+  "id": "114562626498918"
+ },
+ {
+  "path": "Mahito.Variants.MeleeClub.Melee1",
+  "id": "98365018553171"
+ },
+ {
+  "path": "Mahito.Variants.MeleeClub.Melee2",
+  "id": "80150988150906"
+ },
+ {
+  "path": "Mahito.Variants.MeleeClub.Melee3",
+  "id": "86918383671100"
+ },
+ {
+  "path": "Mahito.Variants.MeleeClub.Melee4",
+  "id": "85887300265206"
+ },
+ {
+  "path": "Mahito.Variants.MeleeClub.Up",
+  "id": "98845475810982"
+ },
+ {
+  "path": "Mahito.Variants.MeleeSword.Down",
+  "id": "92966188946988"
+ },
+ {
+  "path": "Mahito.Variants.MeleeSword.Melee1",
+  "id": "79568627671998"
+ },
+ {
+  "path": "Mahito.Variants.MeleeSword.Melee2",
+  "id": "105870773841535"
+ },
+ {
+  "path": "Mahito.Variants.MeleeSword.Melee3",
+  "id": "130659585624615"
+ },
+ {
+  "path": "Mahito.Variants.MeleeSword.Melee4",
+  "id": "138626478088332"
+ },
+ {
+  "path": "Mahito.Variants.MeleeSword.Up",
+  "id": "98845475810982"
+ },
+ {
+  "path": "Mahito.WideStrike",
+  "id": "76313364850487"
+ },
+ {
+  "path": "Mahito.WideStrikeHit",
+  "id": "80643664050281"
+ },
+ {
+  "path": "Mechamaru.Absolute.Dropkick",
+  "id": "85699847295318"
+ },
+ {
+  "path": "Mechamaru.Absolute.Eject",
+  "id": "73851146667806"
+ },
+ {
+  "path": "Mechamaru.Absolute.EjectHit",
+  "id": "128053283670915"
+ },
+ {
+  "path": "Mechamaru.Absolute.EjectTarget",
+  "id": "102143238290614"
+ },
+ {
+  "path": "Mechamaru.Absolute.GunShot",
+  "id": "118652212972529"
+ },
+ {
+  "path": "Mechamaru.Absolute.JumpCrouch",
+  "id": "84970451790939"
+ },
+ {
+  "path": "Mechamaru.Absolute.Kick",
+  "id": "112445967418621"
+ },
+ {
+  "path": "Mechamaru.Absolute.Melee.Chase",
+  "id": "110978068388232"
+ },
+ {
+  "path": "Mechamaru.Absolute.Melee.Down",
+  "id": "92966188946988"
+ },
+ {
+  "path": "Mechamaru.Absolute.Melee.Melee1",
+  "id": "80504019426174"
+ },
+ {
+  "path": "Mechamaru.Absolute.Melee.Melee2",
+  "id": "100835844904897"
+ },
+ {
+  "path": "Mechamaru.Absolute.Melee.Melee3",
+  "id": "101862938993177"
+ },
+ {
+  "path": "Mechamaru.Absolute.Melee.Melee4",
+  "id": "100919783371339"
+ },
+ {
+  "path": "Mechamaru.Absolute.Melee.Melee4ALT",
+  "id": "139899183181812"
+ },
+ {
+  "path": "Mechamaru.Absolute.Melee.Up",
+  "id": "134243365075812"
+ },
+ {
+  "path": "Mechamaru.Absolute.Spawn",
+  "id": "89041939287063"
+ },
+ {
+  "path": "Mechamaru.Absolute.Stagger",
+  "id": "134979023659909"
+ },
+ {
+  "path": "Mechamaru.Absolute.StaggerPunishMech",
+  "id": "99306590177523"
+ },
+ {
+  "path": "Mechamaru.Absolute.StaggerPunishPunisher",
+  "id": "82952123018614"
+ },
+ {
+  "path": "Mechamaru.Absolute.UltEnd",
+  "id": "133460338652190"
+ },
+ {
+  "path": "Mechamaru.AbsoluteDestruction",
+  "id": "137638103122538"
+ },
+ {
+  "path": "Mechamaru.AbsoluteDestructionAir",
+  "id": "121239701968766"
+ },
+ {
+  "path": "Mechamaru.AbsoluteDestructionOLD",
+  "id": "99731350629462"
+ },
+ {
+  "path": "Mechamaru.BoostOn",
+  "id": "87472283043607"
+ },
+ {
+  "path": "Mechamaru.BoostOnEnd",
+  "id": "76118979198026"
+ },
+ {
+  "path": "Mechamaru.BoostOnHit",
+  "id": "131064175095241"
+ },
+ {
+  "path": "Mechamaru.BoostOnStart",
+  "id": "105934922038894"
+ },
+ {
+  "path": "Mechamaru.BoostOnTarget",
+  "id": "131158776477817"
+ },
+ {
+  "path": "Mechamaru.HeatEmission",
+  "id": "114277419400774"
+ },
+ {
+  "path": "Mechamaru.Melee.Chase",
+  "id": "110978068388232"
+ },
+ {
+  "path": "Mechamaru.Melee.Down",
+  "id": "92966188946988"
+ },
+ {
+  "path": "Mechamaru.Melee.Melee1",
+  "id": "98783064085844"
+ },
+ {
+  "path": "Mechamaru.Melee.Melee2",
+  "id": "85148168523745"
+ },
+ {
+  "path": "Mechamaru.Melee.Melee3",
+  "id": "108686045412945"
+ },
+ {
+  "path": "Mechamaru.Melee.Melee4",
+  "id": "79718433989469"
+ },
+ {
+  "path": "Mechamaru.Melee.Up",
+  "id": "134243365075812"
+ },
+ {
+  "path": "Mechamaru.MiracleCannon",
+  "id": "80465501985014"
+ },
+ {
+  "path": "Mechamaru.MiracleCannonOneYear",
+  "id": "136523051723440"
+ },
+ {
+  "path": "Mechamaru.Offloads.ArmsFlyIn",
+  "id": "91633722898431"
+ },
+ {
+  "path": "Mechamaru.Offloads.BackSlide",
+  "id": "119635500264882"
+ },
+ {
+  "path": "Mechamaru.Offloads.FunnyFall",
+  "id": "139595086016682"
+ },
+ {
+  "path": "Mechamaru.Offloads.SmoothLanding1",
+  "id": "80744488373239"
+ },
+ {
+  "path": "Mechamaru.Offloads.SmoothLanding2",
+  "id": "99249148382757"
+ },
+ {
+  "path": "Mechamaru.Offloads.SupermanLanding",
+  "id": "78540995456941"
+ },
+ {
+  "path": "Mechamaru.PigeonViola",
+  "id": "89009042593684"
+ },
+ {
+  "path": "Mechamaru.PuppetBarrage.Grab",
+  "id": "73522808400163"
+ },
+ {
+  "path": "Mechamaru.PuppetBarrage.Kick",
+  "id": "130123540243667"
+ },
+ {
+  "path": "Mechamaru.PuppetBarrage.User",
+  "id": "139105275342427"
+ },
+ {
+  "path": "Mechamaru.UltraCannon",
+  "id": "93901924492394"
+ },
+ {
+  "path": "Mechamaru.UltraSpin",
+  "id": "120136894011461"
+ },
+ {
+  "path": "Mechamaru.UltraSpinHit",
+  "id": "73306716731600"
+ },
+ {
+  "path": "Megumi.DivineDog",
+  "id": "81112033595734"
+ },
+ {
+  "path": "Megumi.DomainWarn",
+  "id": "88172705383430"
+ },
+ {
+  "path": "Megumi.GreatSerpent",
+  "id": "75390215999547"
+ },
+ {
+  "path": "Megumi.Mahoraga.Adaptation",
+  "id": "139336998459583"
+ },
+ {
+  "path": "Megumi.Mahoraga.DivinePummel",
+  "id": "115683433001643"
+ },
+ {
+  "path": "Megumi.Mahoraga.Earthquake",
+  "id": "85024950165903"
+ },
+ {
+  "path": "Megumi.Mahoraga.GroundPitch",
+  "id": "138852224035589"
+ },
+ {
+  "path": "Megumi.Mahoraga.Melee.Chase",
+  "id": "110978068388232"
+ },
+ {
+  "path": "Megumi.Mahoraga.Melee.Down",
+  "id": "114797198964940"
+ },
+ {
+  "path": "Megumi.Mahoraga.Melee.Melee1",
+  "id": "109718372214725"
+ },
+ {
+  "path": "Megumi.Mahoraga.Melee.Melee2",
+  "id": "121800365664070"
+ },
+ {
+  "path": "Megumi.Mahoraga.Melee.Melee3",
+  "id": "96513213736303"
+ },
+ {
+  "path": "Megumi.Mahoraga.Melee.Melee4",
+  "id": "79037514387169"
+ },
+ {
+  "path": "Megumi.Mahoraga.Melee.Up",
+  "id": "119434039452526"
+ },
+ {
+  "path": "Megumi.Mahoraga.Parry",
+  "id": "103194057617238"
+ },
+ {
+  "path": "Megumi.Mahoraga.Takedown",
+  "id": "84870056161157"
+ },
+ {
+  "path": "Megumi.Mahoraga.WorldSlash",
+  "id": "135894053646223"
+ },
+ {
+  "path": "Megumi.MahoragaSummon",
+  "id": "110184037389280"
+ },
+ {
+  "path": "Megumi.MahoragaUse",
+  "id": "127843796051633"
+ },
+ {
+  "path": "Megumi.MaxElephant",
+  "id": "131219281339199"
+ },
+ {
+  "path": "Megumi.Melee.Chase",
+  "id": "110978068388232"
+ },
+ {
+  "path": "Megumi.Melee.Down",
+  "id": "92966188946988"
+ },
+ {
+  "path": "Megumi.Melee.Melee1",
+  "id": "75337033003776"
+ },
+ {
+  "path": "Megumi.Melee.Melee2",
+  "id": "138489871864252"
+ },
+ {
+  "path": "Megumi.Melee.Melee3",
+  "id": "96185406489877"
+ },
+ {
+  "path": "Megumi.Melee.Melee4",
+  "id": "105287938257399"
+ },
+ {
+  "path": "Megumi.Melee.Up",
+  "id": "134243365075812"
+ },
+ {
+  "path": "Megumi.Nue",
+  "id": "111077341852080"
+ },
+ {
+  "path": "Megumi.RabbitEscape",
+  "id": "132653290201368"
+ },
+ {
+  "path": "Megumi.Shadow",
+  "id": "100532748201417"
+ },
+ {
+  "path": "Megumi.ShadowSwarm",
+  "id": "72424828296871"
+ },
+ {
+  "path": "Megumi.ShadowSwarm1",
+  "id": "77826020629176"
+ },
+ {
+  "path": "Megumi.ShadowSwarm2",
+  "id": "124644660953423"
+ },
+ {
+  "path": "Megumi.ShadowSwarmHit",
+  "id": "74539388000853"
+ },
+ {
+  "path": "Megumi.ShadowSwarmRun",
+  "id": "75686211329107"
+ },
+ {
+  "path": "Megumi.Toad",
+  "id": "116432619539029"
+ },
+ {
+  "path": "Megumi.Ultimate",
+  "id": "74442134184452"
+ },
+ {
+  "path": "MeiMei.BirdCall",
+  "id": "99180695169591"
+ },
+ {
+  "path": "MeiMei.BirdHold",
+  "id": "117836779292116"
+ },
+ {
+  "path": "MeiMei.Bounding",
+  "id": "139956651661073"
+ },
+ {
+  "path": "MeiMei.BoundingVictim",
+  "id": "135327783612081"
+ },
+ {
+  "path": "MeiMei.Circling",
+  "id": "90781290293652"
+ },
+ {
+  "path": "MeiMei.CirclingVictim",
+  "id": "114723941013668"
+ },
+ {
+  "path": "MeiMei.CirclingVictimFinisher",
+  "id": "89368678158919"
+ },
+ {
+  "path": "MeiMei.Flock",
+  "id": "96397814657727"
+ },
+ {
+  "path": "MeiMei.GlidingFlight",
+  "id": "72157009600725"
+ },
+ {
+  "path": "MeiMei.GlidingFlightVictim",
+  "id": "85759204747311"
+ },
+ {
+  "path": "MeiMei.Idle",
+  "id": "78418813242411"
+ },
+ {
+  "path": "MeiMei.ImpetusNew",
+  "id": "126362899488198"
+ },
+ {
+  "path": "MeiMei.ImpetusUpdraft",
+  "id": "92081142332466"
+ },
+ {
+  "path": "MeiMei.Melee.Chase",
+  "id": "128267680345523"
+ },
+ {
+  "path": "MeiMei.Melee.Down",
+  "id": "87792276744794"
+ },
+ {
+  "path": "MeiMei.Melee.Melee1",
+  "id": "114985590391235"
+ },
+ {
+  "path": "MeiMei.Melee.Melee2",
+  "id": "108449614447004"
+ },
+ {
+  "path": "MeiMei.Melee.Melee3",
+  "id": "122170399962557"
+ },
+ {
+  "path": "MeiMei.Melee.Melee4",
+  "id": "117638619792450"
+ },
+ {
+  "path": "MeiMei.Melee.Up",
+  "id": "136978371933277"
+ },
+ {
+  "path": "MeiMei.Murmurate",
+  "id": "81007905598407"
+ },
+ {
+  "path": "MeiMei.Teleport",
+  "id": "93433910019592"
+ },
+ {
+  "path": "MeiMei.Ultimate",
+  "id": "130209038947701"
+ },
+ {
+  "path": "MeiMei.UltimateCrow",
+  "id": "122952270797174"
+ },
+ {
+  "path": "Misc.Arcade",
+  "id": "93831853738943"
+ },
+ {
+  "path": "Misc.Block.Charles",
+  "id": "112519964343154"
+ },
+ {
+  "path": "Misc.Block.Gojo",
+  "id": "104566923474227"
+ },
+ {
+  "path": "Misc.Block.Haruta",
+  "id": "75237089031145"
+ },
+ {
+  "path": "Misc.Block.Hiromi2",
+  "id": "133526727435276"
+ },
+ {
+  "path": "Misc.Block.Itadori",
+  "id": "101865783312435"
+ },
+ {
+  "path": "Misc.Block.Mahito2",
+  "id": "106012061894372"
+ },
+ {
+  "path": "Misc.Block.Mechamaru",
+  "id": "118069379726477"
+ },
+ {
+  "path": "Misc.Block.MeiMei",
+  "id": "125397194852745"
+ },
+ {
+  "path": "Misc.Block.Mokou1",
+  "id": "70645355675941"
+ },
+ {
+  "path": "Misc.Block.Mokou2",
+  "id": "128038120051282"
+ },
+ {
+  "path": "Misc.Block.Mokou3",
+  "id": "102071756827440"
+ },
+ {
+  "path": "Misc.Block.Nanami",
+  "id": "99032134144831"
+ },
+ {
+  "path": "Misc.Block.Nanami2",
+  "id": "120133391090244"
+ },
+ {
+  "path": "Misc.Block.Yuta",
+  "id": "73110085912073"
+ },
+ {
+  "path": "Misc.C.Atonement.Camera",
+  "id": "133817065124109"
+ },
+ {
+  "path": "Misc.C.Atonement.Hit",
+  "id": "108081843941348"
+ },
+ {
+  "path": "Misc.C.Atonement.Lose",
+  "id": "91558941536136"
+ },
+ {
+  "path": "Misc.C.Atonement.VictimHit",
+  "id": "108352735639539"
+ },
+ {
+  "path": "Misc.C.Atonement.VictimLose",
+  "id": "104239118139220"
+ },
+ {
+  "path": "Misc.C.Atonement.VictimWin",
+  "id": "115920970476126"
+ },
+ {
+  "path": "Misc.C.Atonement.Win",
+  "id": "79850817581722"
+ },
+ {
+  "path": "Misc.C.Atonement.Windup",
+  "id": "77624096831098"
+ },
+ {
+  "path": "Misc.C.Awaken.Awaken",
+  "id": "93874873522369"
+ },
+ {
+  "path": "Misc.C.Awaken.AwakenCam",
+  "id": "136790721924280"
+ },
+ {
+  "path": "Misc.C.BloodyMary.Finisher",
+  "id": "107870642407467"
+ },
+ {
+  "path": "Misc.C.BloodyMary.FinisherCamera",
+  "id": "88159056391133"
+ },
+ {
+  "path": "Misc.C.BloodyMary.FinisherClone",
+  "id": "93025245852127"
+ },
+ {
+  "path": "Misc.C.BloodyMary.FinisherVictim",
+  "id": "131153290242070"
+ },
+ {
+  "path": "Misc.C.BloodyMary.Hit",
+  "id": "74074876224161"
+ },
+ {
+  "path": "Misc.C.BloodyMary.Victim",
+  "id": "89971708288470"
+ },
+ {
+  "path": "Misc.C.BloodyMary.Windup",
+  "id": "123906985655392"
+ },
+ {
+  "path": "Misc.C.Check.Fail",
+  "id": "120493059608561"
+ },
+ {
+  "path": "Misc.C.Check.Loop",
+  "id": "114211569167555"
+ },
+ {
+  "path": "Misc.C.Check.Success",
+  "id": "126172156985797"
+ },
+ {
+  "path": "Misc.C.Check.Windup",
+  "id": "118417554538697"
+ },
+ {
+  "path": "Misc.C.CursedRemedy.Finisher",
+  "id": "94902423288896"
+ },
+ {
+  "path": "Misc.C.CursedRemedy.FinisherCamera",
+  "id": "77309611930191"
+ },
+ {
+  "path": "Misc.C.CursedRemedy.FinisherVictim",
+  "id": "80909211168262"
+ },
+ {
+  "path": "Misc.C.CursedRemedy.Hit",
+  "id": "124164962398345"
+ },
+ {
+  "path": "Misc.C.CursedRemedy.Victim",
+  "id": "89284369693359"
+ },
+ {
+  "path": "Misc.C.CursedRemedy.Windup",
+  "id": "139078698020363"
+ },
+ {
+  "path": "Misc.C.Dashes.Back",
+  "id": "134451575263988"
+ },
+ {
+  "path": "Misc.C.Dashes.Left",
+  "id": "102567076867813"
+ },
+ {
+  "path": "Misc.C.Dashes.Right",
+  "id": "102698645310820"
+ },
+ {
+  "path": "Misc.C.Fight.Finisher",
+  "id": "88650187820094"
+ },
+ {
+  "path": "Misc.C.Fight.FinisherCamera",
+  "id": "138152735859258"
+ },
+ {
+  "path": "Misc.C.Fight.FinisherEnd",
+  "id": "88108002199824"
+ },
+ {
+  "path": "Misc.C.Fight.FinisherVictim",
+  "id": "130524103898312"
+ },
+ {
+  "path": "Misc.C.Fight.Hit",
+  "id": "102393623540047"
+ },
+ {
+  "path": "Misc.C.Fight.Victim",
+  "id": "85623645267031"
+ },
+ {
+  "path": "Misc.C.Fight.Windup",
+  "id": "92337983867412"
+ },
+ {
+  "path": "Misc.C.LethalWound.End",
+  "id": "125522086293556"
+ },
+ {
+  "path": "Misc.C.LethalWound.Finisher",
+  "id": "87911292272963"
+ },
+ {
+  "path": "Misc.C.LethalWound.FinisherEnd",
+  "id": "75159710730432"
+ },
+ {
+  "path": "Misc.C.LethalWound.FinisherVictim",
+  "id": "76145527101112"
+ },
+ {
+  "path": "Misc.C.LethalWound.Hit",
+  "id": "127030870361370"
+ },
+ {
+  "path": "Misc.C.LethalWound.Victim",
+  "id": "125681117566040"
+ },
+ {
+  "path": "Misc.C.LethalWound.Windup",
+  "id": "135190329919676"
+ },
+ {
+  "path": "Misc.C.Melee.Chase",
+  "id": "129392532939530"
+ },
+ {
+  "path": "Misc.C.Melee.Down",
+  "id": "92424708306981"
+ },
+ {
+  "path": "Misc.C.Melee.Melee1",
+  "id": "115220151812065"
+ },
+ {
+  "path": "Misc.C.Melee.Melee2",
+  "id": "114648729358082"
+ },
+ {
+  "path": "Misc.C.Melee.Melee3",
+  "id": "95002584969527"
+ },
+ {
+  "path": "Misc.C.Melee.Melee4",
+  "id": "90981055255583"
+ },
+ {
+  "path": "Misc.C.Melee.Up",
+  "id": "83843118463884"
+ },
+ {
+  "path": "Misc.C.Onslaught.AerialHit",
+  "id": "88567984577880"
+ },
+ {
+  "path": "Misc.C.Onslaught.AerialVictim",
+  "id": "107045479762883"
+ },
+ {
+  "path": "Misc.C.Onslaught.AerialWindup",
+  "id": "84413496769668"
+ },
+ {
+  "path": "Misc.C.Onslaught.GroundHit",
+  "id": "80693236746123"
+ },
+ {
+  "path": "Misc.C.Onslaught.GroundVictim",
+  "id": "117893189380468"
+ },
+ {
+  "path": "Misc.C.Onslaught.GroundWindup",
+  "id": "128524425761051"
+ },
+ {
+  "path": "Misc.C.Onslaught.NormalHit",
+  "id": "111874385594682"
+ },
+ {
+  "path": "Misc.C.Onslaught.NormalWindup",
+  "id": "124812814978068"
+ },
+ {
+  "path": "Misc.C.PossessEnd.Heart",
+  "id": "109399366692128"
+ },
+ {
+  "path": "Misc.C.PossessEnd.User",
+  "id": "97301607167934"
+ },
+ {
+  "path": "Misc.C.Push",
+  "id": "88914702281555"
+ },
+ {
+  "path": "Misc.C.Reset.Camera",
+  "id": "118214787309666"
+ },
+ {
+  "path": "Misc.C.Reset.Start",
+  "id": "131522534497146"
+ },
+ {
+  "path": "Misc.C.Reset.Windup",
+  "id": "92144658193162"
+ },
+ {
+  "path": "Misc.C.SevenSouls.FirstQTEMiss",
+  "id": "110091274288634"
+ },
+ {
+  "path": "Misc.C.SevenSouls.FirstQTEMiss_Clone",
+  "id": "122668028303086"
+ },
+ {
+  "path": "Misc.C.SevenSouls.Full",
+  "id": "115143699528259"
+ },
+ {
+  "path": "Misc.C.SevenSouls.Full_Camera",
+  "id": "130734745635770"
+ },
+ {
+  "path": "Misc.C.SevenSouls.Full_Clone",
+  "id": "102974518260928"
+ },
+ {
+  "path": "Misc.C.SevenSouls.Victim",
+  "id": "95665250095092"
+ },
+ {
+  "path": "Misc.C.SevenSouls.Windup",
+  "id": "73686261221181"
+ },
+ {
+  "path": "Misc.C.SevenSouls.Windup_Clone",
+  "id": "126525655772712"
+ },
+ {
+  "path": "Misc.C.Switch",
+  "id": "110054710991977"
+ },
+ {
+  "path": "Misc.Crow",
+  "id": "103089653892048"
+ },
+ {
+  "path": "Misc.Custom",
+  "id": "85697841784099"
+ },
+ {
+  "path": "Misc.Haba",
+  "id": "130849966126845"
+ },
+ {
+  "path": "Misc.HalloweenPortalEnter",
+  "id": "96009088188267"
+ },
+ {
+  "path": "Misc.Hits.Block.Hit1",
+  "id": "91112672019920"
+ },
+ {
+  "path": "Misc.Hits.Block.Hit2",
+  "id": "134615422384108"
+ },
+ {
+  "path": "Misc.Hits.Block.Hit3",
+  "id": "116115332971765"
+ },
+ {
+  "path": "Misc.Hits.Deflect.Hit1",
+  "id": "80843134889167"
+ },
+ {
+  "path": "Misc.Hits.Deflect.Hit2",
+  "id": "85382723645632"
+ },
+ {
+  "path": "Misc.Hits.Deflect.Hit3",
+  "id": "111902759344637"
+ },
+ {
+  "path": "Misc.Hits.Deflect.Hit4",
+  "id": "90226048419187"
+ },
+ {
+  "path": "Misc.Hits.HarutaDeflect.Hit1",
+  "id": "98027093292827"
+ },
+ {
+  "path": "Misc.Hits.HarutaDeflect.Hit2",
+  "id": "117271139432736"
+ },
+ {
+  "path": "Misc.Hits.HarutaDeflect.Hit3",
+  "id": "115524211915796"
+ },
+ {
+  "path": "Misc.Hits.MeiMeiDeflect.Hit1",
+  "id": "76525573792763"
+ },
+ {
+  "path": "Misc.Hits.MeiMeiDeflect.Hit2",
+  "id": "123165146640835"
+ },
+ {
+  "path": "Misc.Hits.MeiMeiDeflect.Hit3",
+  "id": "120191548931281"
+ },
+ {
+  "path": "Misc.Hits.NanamiDeflect.Hit1",
+  "id": "130942029466301"
+ },
+ {
+  "path": "Misc.Hits.NanamiDeflect.Hit2",
+  "id": "107640070051222"
+ },
+ {
+  "path": "Misc.Hits.NanamiDeflect.Hit3",
+  "id": "109935060510272"
+ },
+ {
+  "path": "Misc.Hits.Normal.Hit1",
+  "id": "121752268008113"
+ },
+ {
+  "path": "Misc.Hits.Normal.Hit2",
+  "id": "134795274895344"
+ },
+ {
+  "path": "Misc.Hits.Normal.Hit3",
+  "id": "125442768208685"
+ },
+ {
+  "path": "Misc.Hits.Normal.Hit4",
+  "id": "78066422571986"
+ },
+ {
+  "path": "Misc.Knockback2",
+  "id": "91352432059227"
+ },
+ {
+  "path": "Misc.M.Melee.Chase",
+  "id": "104148378077935"
+ },
+ {
+  "path": "Misc.M.Melee.Down",
+  "id": "92966188946988"
+ },
+ {
+  "path": "Misc.M.Melee.Melee1",
+  "id": "75425383606016"
+ },
+ {
+  "path": "Misc.M.Melee.Melee2",
+  "id": "75961842881209"
+ },
+ {
+  "path": "Misc.M.Melee.Melee3",
+  "id": "140487289646129"
+ },
+ {
+  "path": "Misc.M.Melee.Melee4",
+  "id": "72211631197834"
+ },
+ {
+  "path": "Misc.M.Melee.Up",
+  "id": "134243365075812"
+ },
+ {
+  "path": "Misc.M.Mokou1",
+  "id": "104951711387356"
+ },
+ {
+  "path": "Misc.M.Mokou2",
+  "id": "131092994606135"
+ },
+ {
+  "path": "Misc.M.Mokou3",
+  "id": "109547804780499"
+ },
+ {
+  "path": "Misc.M.Mokou4",
+  "id": "98369133797604"
+ },
+ {
+  "path": "Misc.M.MokouSpec",
+  "id": "86921355180233"
+ },
+ {
+  "path": "Misc.M.Ultimate",
+  "id": "136676738644802"
+ },
+ {
+  "path": "Misc.Movement.DashBack",
+  "id": "134581973800784"
+ },
+ {
+  "path": "Misc.Movement.DashFront",
+  "id": "9443519528"
+ },
+ {
+  "path": "Misc.Movement.DashLeft",
+  "id": "117223862448096"
+ },
+ {
+  "path": "Misc.Movement.DashRight",
+  "id": "75203303352791"
+ },
+ {
+  "path": "Misc.Movement.Land",
+  "id": "97446412066176"
+ },
+ {
+  "path": "Misc.Movement.Parkour",
+  "id": "94327920127463"
+ },
+ {
+  "path": "Misc.Movement.Roll",
+  "id": "115543520504167"
+ },
+ {
+  "path": "Misc.Movement.Sprint",
+  "id": "104161264894672"
+ },
+ {
+  "path": "Misc.Piano",
+  "id": "106470922517724"
+ },
+ {
+  "path": "Misc.Ragdoll.WakeupBack",
+  "id": "117527646691356"
+ },
+ {
+  "path": "Misc.Ragdoll.WakeupFront",
+  "id": "104408538049330"
+ },
+ {
+  "path": "Misc.Roulette.GetoSummon",
+  "id": "93003043261424"
+ },
+ {
+  "path": "Misc.Roulette.GojoSummon",
+  "id": "128897355180605"
+ },
+ {
+  "path": "Misc.S.Form",
+  "id": "91496614952968"
+ },
+ {
+  "path": "Misc.S.Idle",
+  "id": "91428863336534"
+ },
+ {
+  "path": "Misc.ShopOpen",
+  "id": "16938511900"
+ },
+ {
+  "path": "Misc.Soda",
+  "id": "70877906471573"
+ },
+ {
+  "path": "Misc.SpawnAnim",
+  "id": "98369133797604"
+ },
+ {
+  "path": "Misc.Throwable",
+  "id": "124982438761606"
+ },
+ {
+  "path": "Nanami.BluntCut",
+  "id": "100811576955331"
+ },
+ {
+  "path": "Nanami.CleavingWhirlwind",
+  "id": "81210313723714"
+ },
+ {
+  "path": "Nanami.Collapse",
+  "id": "122015481201264"
+ },
+ {
+  "path": "Nanami.Interrogate",
+  "id": "89891294371787"
+ },
+ {
+  "path": "Nanami.InterrogateFinalHit",
+  "id": "112843155753457"
+ },
+ {
+  "path": "Nanami.InterrogateHit",
+  "id": "71077954560899"
+ },
+ {
+  "path": "Nanami.Melee.Chase",
+  "id": "81708642912019"
+ },
+ {
+  "path": "Nanami.Melee.Down",
+  "id": "92966188946988"
+ },
+ {
+  "path": "Nanami.Melee.Melee1",
+  "id": "84359513001979"
+ },
+ {
+  "path": "Nanami.Melee.Melee2",
+  "id": "79436586236026"
+ },
+ {
+  "path": "Nanami.Melee.Melee3",
+  "id": "102285403332509"
+ },
+ {
+  "path": "Nanami.Melee.Melee4",
+  "id": "104137631480391"
+ },
+ {
+  "path": "Nanami.Melee.Up",
+  "id": "78540777177847"
+ },
+ {
+  "path": "Nanami.MeleeUlt.Chase",
+  "id": "81708642912019"
+ },
+ {
+  "path": "Nanami.MeleeUlt.Down",
+  "id": "94781366396051"
+ },
+ {
+  "path": "Nanami.MeleeUlt.Melee1",
+  "id": "114913455544468"
+ },
+ {
+  "path": "Nanami.MeleeUlt.Melee2",
+  "id": "84602523265622"
+ },
+ {
+  "path": "Nanami.MeleeUlt.Melee3",
+  "id": "102085681670810"
+ },
+ {
+  "path": "Nanami.MeleeUlt.Melee4",
+  "id": "115446267797335"
+ },
+ {
+  "path": "Nanami.MeleeUlt.Up",
+  "id": "89394375446962"
+ },
+ {
+  "path": "Nanami.RatioBreaker.RatioBreak1",
+  "id": "78578012001859"
+ },
+ {
+  "path": "Nanami.RatioBreaker.RatioBreak2",
+  "id": "137451357351000"
+ },
+ {
+  "path": "Nanami.RatioBreaker.RatioBreak3",
+  "id": "86618245908620"
+ },
+ {
+  "path": "Nanami.RatioBreaker.RatioBreak4",
+  "id": "131948591638044"
+ },
+ {
+  "path": "Nanami.RatioBreakStun",
+  "id": "125307894046906"
+ },
+ {
+  "path": "Nanami.SeveranceKick",
+  "id": "130957217409359"
+ },
+ {
+  "path": "Nanami.Sharpen",
+  "id": "134622628645994"
+ },
+ {
+  "path": "Nanami.Stabilize",
+  "id": "113359849246757"
+ },
+ {
+  "path": "Nanami.StabilizeTarget",
+  "id": "139138600357187"
+ },
+ {
+  "path": "Nanami.StabilizeTargetShort",
+  "id": "100525306083424"
+ },
+ {
+  "path": "Nanami.Ultimate",
+  "id": "108695775669287"
+ },
+ {
+  "path": "Nanami.UltimateOld",
+  "id": "99013808819856"
+ },
+ {
+  "path": "Nanami.UltimateVariant",
+  "id": "97972100634587"
+ },
+ {
+  "path": "Naoya.Acceleration",
+  "id": "129944486689528"
+ },
+ {
+  "path": "Naoya.Bleedout",
+  "id": "118607369830566"
+ },
+ {
+  "path": "Naoya.BleedoutHit",
+  "id": "118284338553929"
+ },
+ {
+  "path": "Naoya.CursoryImpact",
+  "id": "119211164876773"
+ },
+ {
+  "path": "Naoya.DecisiveStrike",
+  "id": "86045680364061"
+ },
+ {
+  "path": "Naoya.DecisiveStrikeHit",
+  "id": "70383415079592"
+ },
+ {
+  "path": "Naoya.DomainWarn",
+  "id": "77439982937753"
+ },
+ {
+  "path": "Naoya.FlashFreezing",
+  "id": "115589615022077"
+ },
+ {
+  "path": "Naoya.Flicker",
+  "id": "122607727974119"
+ },
+ {
+  "path": "Naoya.Melee.Down",
+  "id": "92966188946988"
+ },
+ {
+  "path": "Naoya.Melee.Melee1",
+  "id": "101283990868172"
+ },
+ {
+  "path": "Naoya.Melee.Melee2",
+  "id": "108708446862011"
+ },
+ {
+  "path": "Naoya.Melee.Melee3",
+  "id": "77583711129628"
+ },
+ {
+  "path": "Naoya.Melee.Melee4",
+  "id": "116910683335467"
+ },
+ {
+  "path": "Naoya.Melee.Melee4Frame",
+  "id": "97207871642820"
+ },
+ {
+  "path": "Naoya.Melee.Up",
+  "id": "134243365075812"
+ },
+ {
+  "path": "Naoya.Melee2.Down",
+  "id": "86109053396974"
+ },
+ {
+  "path": "Naoya.Melee2.Melee1",
+  "id": "77284264481284"
+ },
+ {
+  "path": "Naoya.Melee2.Melee2",
+  "id": "108376755316792"
+ },
+ {
+  "path": "Naoya.Melee2.Melee3",
+  "id": "74580112757879"
+ },
+ {
+  "path": "Naoya.Melee2.Melee4",
+  "id": "101107501526373"
+ },
+ {
+  "path": "Naoya.Melee2.Up",
+  "id": "91853462087608"
+ },
+ {
+  "path": "Naoya.MoonPalace",
+  "id": "115561023870463"
+ },
+ {
+  "path": "Naoya.OldProjectionBreaker",
+  "id": "105121164520635"
+ },
+ {
+  "path": "Naoya.ProjectionBreaker",
+  "id": "101079657277587"
+ },
+ {
+  "path": "Naoya.TendrilGrab",
+  "id": "82149987460883"
+ },
+ {
+  "path": "Naoya.TopSpeed",
+  "id": "70890372338556"
+ },
+ {
+  "path": "Naoya.Ultimate",
+  "id": "94616006376147"
+ },
+ {
+  "path": "Naoya.UltimateHit",
+  "id": "115816549559515"
+ },
+ {
+  "path": "Reggie.132SquareFootTwoStoryHouse",
+  "id": "100778093235310"
+ },
+ {
+  "path": "Reggie.Arson",
+  "id": "98816967040955"
+ },
+ {
+  "path": "Reggie.BigMoves",
+  "id": "132307745371357"
+ },
+ {
+  "path": "Reggie.BluntTrauma",
+  "id": "103659500760745"
+ },
+ {
+  "path": "Reggie.BluntTraumaHit",
+  "id": "118544637360490"
+ },
+ {
+  "path": "Reggie.Coupon",
+  "id": "77161050579175"
+ },
+ {
+  "path": "Reggie.Discard",
+  "id": "100515557795491"
+ },
+ {
+  "path": "Reggie.Drone.Drone1",
+  "id": "92971045548861"
+ },
+ {
+  "path": "Reggie.Drone.Drone2",
+  "id": "119713012645788"
+ },
+ {
+  "path": "Reggie.Drone.Drone3",
+  "id": "92971045548861"
+ },
+ {
+  "path": "Reggie.Drone.DroneStrikeStart",
+  "id": "70619893542373"
+ },
+ {
+  "path": "Reggie.Fleche",
+  "id": "84063127664904"
+ },
+ {
+  "path": "Reggie.GarageSale",
+  "id": "108407413391495"
+ },
+ {
+  "path": "Reggie.GushingWound",
+  "id": "106478217686775"
+ },
+ {
+  "path": "Reggie.Homerun",
+  "id": "80552926761100"
+ },
+ {
+  "path": "Reggie.Littering",
+  "id": "132615896981226"
+ },
+ {
+  "path": "Reggie.Mayhem",
+  "id": "90157434123044"
+ },
+ {
+  "path": "Reggie.Melee.Chase",
+  "id": "110978068388232"
+ },
+ {
+  "path": "Reggie.Melee.Down",
+  "id": "92966188946988"
+ },
+ {
+  "path": "Reggie.Melee.Melee1",
+  "id": "106892235857467"
+ },
+ {
+  "path": "Reggie.Melee.Melee2",
+  "id": "93623649598782"
+ },
+ {
+  "path": "Reggie.Melee.Melee3",
+  "id": "128057999506702"
+ },
+ {
+  "path": "Reggie.Melee.Melee4",
+  "id": "76372421343979"
+ },
+ {
+  "path": "Reggie.Melee.Up",
+  "id": "134243365075812"
+ },
+ {
+  "path": "Reggie.PassengerCars",
+  "id": "109787638891072"
+ },
+ {
+  "path": "Reggie.PianoDrop",
+  "id": "86293749971049"
+ },
+ {
+  "path": "Reggie.PoleVault",
+  "id": "72249315151281"
+ },
+ {
+  "path": "Reggie.SpeedCrash",
+  "id": "133042937840159"
+ },
+ {
+  "path": "Reggie.SpeedCrashHit",
+  "id": "114604121055247"
+ },
+ {
+  "path": "Reggie.Ultimate",
+  "id": "84458677375099"
+ },
+ {
+  "path": "Ryu.Appetizer",
+  "id": "70394890117813"
+ },
+ {
+  "path": "Ryu.GraniteBlast",
+  "id": "73243807139765"
+ },
+ {
+  "path": "Ryu.HadNoIdea",
+  "id": "99818212174021"
+ },
+ {
+  "path": "Ryu.HadNoIdeaHit",
+  "id": "80896689369384"
+ },
+ {
+  "path": "Ryu.Melee.Chase",
+  "id": "83782195794718"
+ },
+ {
+  "path": "Ryu.Melee.Down",
+  "id": "92966188946988"
+ },
+ {
+  "path": "Ryu.Melee.Melee1",
+  "id": "105077924973072"
+ },
+ {
+  "path": "Ryu.Melee.Melee2",
+  "id": "116910683335467"
+ },
+ {
+  "path": "Ryu.Melee.Melee3",
+  "id": "121322029260156"
+ },
+ {
+  "path": "Ryu.Melee.Melee3_2",
+  "id": "92698956945928"
+ },
+ {
+  "path": "Ryu.Melee.Up",
+  "id": "134243365075812"
+ },
+ {
+  "path": "Ryu.Recovery",
+  "id": "135300554211825"
+ },
+ {
+  "path": "Ryu.Recovery2",
+  "id": "135915491872296"
+ },
+ {
+  "path": "Ryu.Recovery3",
+  "id": "91450617822876"
+ },
+ {
+  "path": "Ryu.SecondHelping",
+  "id": "138826705245289"
+ },
+ {
+  "path": "Ryu.ThisDessert",
+  "id": "131917532383382"
+ },
+ {
+  "path": "Ryu.ThisDessertHit",
+  "id": "86743305257266"
+ },
+ {
+  "path": "Ryu.Ultimate",
+  "id": "113479860283691"
+ },
+ {
+  "path": "Ryu.Unsatisfied",
+  "id": "114822879878184"
+ },
+ {
+  "path": "Ryu.WerentInvited",
+  "id": "86463226245064"
+ },
+ {
+  "path": "Ryu.WhatAreYouAfter",
+  "id": "86568794583359"
+ },
+ {
+  "path": "Ryu.WhatAreYouAfterHit",
+  "id": "110163656525929"
+ },
+ {
+  "path": "Todo.Brothers",
+  "id": "72828071138653"
+ },
+ {
+  "path": "Todo.BruteForce",
+  "id": "136536827155962"
+ },
+ {
+  "path": "Todo.BruteForceTarget",
+  "id": "95565644999250"
+ },
+ {
+  "path": "Todo.Clap.Clap1",
+  "id": "131358603583212"
+ },
+ {
+  "path": "Todo.Clap.Clap2",
+  "id": "91074768993486"
+ },
+ {
+  "path": "Todo.Clap.Clap3",
+  "id": "116040503139675"
+ },
+ {
+  "path": "Todo.ClimaxJump",
+  "id": "84448423136678"
+ },
+ {
+  "path": "Todo.ClimaxJumpHit",
+  "id": "127715649911604"
+ },
+ {
+  "path": "Todo.Dreams",
+  "id": "89677028738408"
+ },
+ {
+  "path": "Todo.ElbowDrop",
+  "id": "115042679536959"
+ },
+ {
+  "path": "Todo.IdolDebut",
+  "id": "121572833341748"
+ },
+ {
+  "path": "Todo.Melee.Chase",
+  "id": "110978068388232"
+ },
+ {
+  "path": "Todo.Melee.Down",
+  "id": "92966188946988"
+ },
+ {
+  "path": "Todo.Melee.Melee1",
+  "id": "96327114254575"
+ },
+ {
+  "path": "Todo.Melee.Melee2",
+  "id": "107029561762376"
+ },
+ {
+  "path": "Todo.Melee.Melee3",
+  "id": "117831239064143"
+ },
+ {
+  "path": "Todo.Melee.Melee4",
+  "id": "127851700400958"
+ },
+ {
+  "path": "Todo.Melee.Up",
+  "id": "134243365075812"
+ },
+ {
+  "path": "Todo.PebbleThrow",
+  "id": "111720035828971"
+ },
+ {
+  "path": "Todo.PebbleThrowHit",
+  "id": "71785780090087"
+ },
+ {
+  "path": "Todo.SlideKickHit",
+  "id": "102714274983077"
+ },
+ {
+  "path": "Todo.SlidePose",
+  "id": "100081544058065"
+ },
+ {
+  "path": "Todo.Summon",
+  "id": "79903190966176"
+ },
+ {
+  "path": "Todo.SwiftKick",
+  "id": "84737448668938"
+ },
+ {
+  "path": "Todo.SwiftKickHit",
+  "id": "124120330557927"
+ },
+ {
+  "path": "Todo.TakadaJoint.Emote",
+  "id": "140557689031802"
+ },
+ {
+  "path": "Todo.TakadaJoint.JumpEnd",
+  "id": "112868588878225"
+ },
+ {
+  "path": "Todo.TakadaJoint.JumpStart",
+  "id": "92313325989822"
+ },
+ {
+  "path": "Todo.TakadaJoint.TakadaIdle",
+  "id": "102765720260431"
+ },
+ {
+  "path": "Todo.Ultimate",
+  "id": "77323960817460"
+ },
+ {
+  "path": "Todo.UltimateSummon",
+  "id": "84527203471730"
+ },
+ {
+  "path": "Uro.BlindRage",
+  "id": "84784070267976"
+ },
+ {
+  "path": "Uro.BlindRageHit",
+  "id": "80563719529224"
+ },
+ {
+  "path": "Uro.Melee.Chase",
+  "id": "106224500692893"
+ },
+ {
+  "path": "Uro.Melee.Down",
+  "id": "92966188946988"
+ },
+ {
+  "path": "Uro.Melee.Melee1",
+  "id": "107852433150124"
+ },
+ {
+  "path": "Uro.Melee.Melee2",
+  "id": "80809423999548"
+ },
+ {
+  "path": "Uro.Melee.Melee3",
+  "id": "135805825263494"
+ },
+ {
+  "path": "Uro.Melee.Melee4",
+  "id": "110958607174992"
+ },
+ {
+  "path": "Uro.Melee.Up",
+  "id": "134243365075812"
+ },
+ {
+  "path": "Uro.Melee2.Melee1",
+  "id": "134622175293378"
+ },
+ {
+  "path": "Uro.Melee2.Melee2",
+  "id": "95738371652260"
+ },
+ {
+  "path": "Uro.Melee2.Melee3",
+  "id": "139549374008097"
+ },
+ {
+  "path": "Uro.Melee2.Melee4",
+  "id": "89465788843211"
+ },
+ {
+  "path": "Uro.SkyDistortion",
+  "id": "105191773344078"
+ },
+ {
+  "path": "Uro.ThinIceBreaker",
+  "id": "127457641316758"
+ },
+ {
+  "path": "Uro.ThinIceBreaker2",
+  "id": "71262912144187"
+ },
+ {
+  "path": "Uro.ThinIceBreaker2Sky",
+  "id": "136658834297626"
+ },
+ {
+  "path": "Uro.ThinIceBreakerHit",
+  "id": "122609306365578"
+ },
+ {
+  "path": "Uro.Ultimate",
+  "id": "124099249547203"
+ },
+ {
+  "path": "Yuki.GarudaRebound",
+  "id": "115097960689033"
+ },
+ {
+  "path": "Yuki.GarudaStab",
+  "id": "77833820443705"
+ },
+ {
+  "path": "Yuki.GarudaStabHit",
+  "id": "100538903104836"
+ },
+ {
+  "path": "Yuki.MassBreaker",
+  "id": "104793932628579"
+ },
+ {
+  "path": "Yuki.Melee.Chase",
+  "id": "130284226842903"
+ },
+ {
+  "path": "Yuki.Melee.Down",
+  "id": "92966188946988"
+ },
+ {
+  "path": "Yuki.Melee.Melee1",
+  "id": "131909724908049"
+ },
+ {
+  "path": "Yuki.Melee.Melee2",
+  "id": "72575786212990"
+ },
+ {
+  "path": "Yuki.Melee.Melee3",
+  "id": "119248903710146"
+ },
+ {
+  "path": "Yuki.Melee.Melee4",
+  "id": "123168328205349"
+ },
+ {
+  "path": "Yuki.Melee.Up",
+  "id": "115586282387431"
+ },
+ {
+  "path": "Yuki.MeleeOld.Melee1",
+  "id": "106474043944206"
+ },
+ {
+  "path": "Yuki.MeleeOld.Melee2",
+  "id": "91990544700842"
+ },
+ {
+  "path": "Yuki.MeleeOld.Melee3",
+  "id": "107825127494342"
+ },
+ {
+  "path": "Yuki.MeleeOld.Melee4",
+  "id": "97504088532041"
+ },
+ {
+  "path": "Yuki.RisingStar",
+  "id": "94347210073500"
+ },
+ {
+  "path": "Yuki.Ultimate",
+  "id": "79717812541463"
+ },
+ {
+  "path": "Yuta.CursedSpeech",
+  "id": "88005970155216"
+ },
+ {
+  "path": "Yuta.Dodges.Dodge1",
+  "id": "136807071694451"
+ },
+ {
+  "path": "Yuta.Dodges.Dodge2",
+  "id": "99026585086806"
+ },
+ {
+  "path": "Yuta.Dodges.Dodge3",
+  "id": "97396408415659"
+ },
+ {
+  "path": "Yuta.Dodges.Dodge4",
+  "id": "97803359940506"
+ },
+ {
+  "path": "Yuta.Dodges.Dodge5",
+  "id": "127453446770583"
+ },
+ {
+  "path": "Yuta.Domain1",
+  "id": "125335594549446"
+ },
+ {
+  "path": "Yuta.Domain2",
+  "id": "83241775239139"
+ },
+ {
+  "path": "Yuta.DomainWarn1",
+  "id": "101265858770098"
+ },
+ {
+  "path": "Yuta.DomainWarn2",
+  "id": "122829994504570"
+ },
+ {
+  "path": "Yuta.ElbowBeatdown",
+  "id": "93796567192197"
+ },
+ {
+  "path": "Yuta.ElbowBeatdownTarget",
+  "id": "113432456707949"
+ },
+ {
+  "path": "Yuta.EnergyRipple",
+  "id": "131031842057158"
+ },
+ {
+  "path": "Yuta.Grab",
+  "id": "127731068580260"
+ },
+ {
+  "path": "Yuta.JacobLadder",
+  "id": "73482562876920"
+ },
+ {
+  "path": "Yuta.JacobLadderTarget",
+  "id": "76058065825374"
+ },
+ {
+  "path": "Yuta.Launch",
+  "id": "115912582567240"
+ },
+ {
+  "path": "Yuta.LaunchGround",
+  "id": "129876493950288"
+ },
+ {
+  "path": "Yuta.LaunchGroundMelee",
+  "id": "99942519870898"
+ },
+ {
+  "path": "Yuta.Melee.Chase",
+  "id": "130135202362252"
+ },
+ {
+  "path": "Yuta.Melee.Down",
+  "id": "111750364977569"
+ },
+ {
+  "path": "Yuta.Melee.Melee1",
+  "id": "133240987753043"
+ },
+ {
+  "path": "Yuta.Melee.Melee2",
+  "id": "130806585141471"
+ },
+ {
+  "path": "Yuta.Melee.Melee3",
+  "id": "131967150738931"
+ },
+ {
+  "path": "Yuta.Melee.Melee4",
+  "id": "84442064935420"
+ },
+ {
+  "path": "Yuta.Melee.Up",
+  "id": "73456086297777"
+ },
+ {
+  "path": "Yuta.MeleeUlt.Chase",
+  "id": "110978068388232"
+ },
+ {
+  "path": "Yuta.MeleeUlt.Down",
+  "id": "92966188946988"
+ },
+ {
+  "path": "Yuta.MeleeUlt.Melee1",
+  "id": "109432265703187"
+ },
+ {
+  "path": "Yuta.MeleeUlt.Melee2",
+  "id": "137919635923292"
+ },
+ {
+  "path": "Yuta.MeleeUlt.Melee3",
+  "id": "135256592475167"
+ },
+ {
+  "path": "Yuta.MeleeUlt.Melee4",
+  "id": "121403322067812"
+ },
+ {
+  "path": "Yuta.MeleeUlt.Up",
+  "id": "134243365075812"
+ },
+ {
+  "path": "Yuta.Outburst",
+  "id": "95077220586856"
+ },
+ {
+  "path": "Yuta.QuickdrawAerial",
+  "id": "109069266611522"
+ },
+ {
+  "path": "Yuta.ResoluteSlash",
+  "id": "89582140026963"
+ },
+ {
+  "path": "Yuta.ResoluteSlashTarget",
+  "id": "73717793648274"
+ },
+ {
+  "path": "Yuta.Revolve",
+  "id": "88911658010897"
+ },
+ {
+  "path": "Yuta.RevolveReaction",
+  "id": "139280845242450"
+ },
+ {
+  "path": "Yuta.Rika.Downslam",
+  "id": "110326542726854"
+ },
+ {
+  "path": "Yuta.Rika.DownslamFinisher",
+  "id": "121158593063065"
+ },
+ {
+  "path": "Yuta.Rika.DownslamNew",
+  "id": "117465720955224"
+ },
+ {
+  "path": "Yuta.Rika.DownslamTarget",
+  "id": "119438066502737"
+ },
+ {
+  "path": "Yuta.Rika.DownslamUser",
+  "id": "123778544771528"
+ },
+ {
+  "path": "Yuta.Rika.ElbowRushRika",
+  "id": "93429614171877"
+ },
+ {
+  "path": "Yuta.Rika.Grab",
+  "id": "104658430064842"
+ },
+ {
+  "path": "Yuta.Rika.Haymaker",
+  "id": "99516000246972"
+ },
+ {
+  "path": "Yuta.Rika.Launch",
+  "id": "85177207486680"
+ },
+ {
+  "path": "Yuta.Rika.LaunchGround",
+  "id": "76270924601362"
+ },
+ {
+  "path": "Yuta.Rika.LoveBeam",
+  "id": "116737527523542"
+ },
+ {
+  "path": "Yuta.Rika.MiniRikaFly",
+  "id": "124301431492121"
+ },
+ {
+  "path": "Yuta.Rika.Punch",
+  "id": "137844586546509"
+ },
+ {
+  "path": "Yuta.Rika.RikaEmote",
+  "id": "94503127884527"
+ },
+ {
+  "path": "Yuta.Rika.Slam",
+  "id": "74676954665401"
+ },
+ {
+  "path": "Yuta.Rika.Smash",
+  "id": "140288981168553"
+ },
+ {
+  "path": "Yuta.Rika.ThirdWheelRika",
+  "id": "91916094481547"
+ },
+ {
+  "path": "Yuta.Rika.Throw",
+  "id": "95169958463123"
+ },
+ {
+  "path": "Yuta.Rika.Ultimate",
+  "id": "138397779795066"
+ },
+ {
+  "path": "Yuta.Rika.Ultimate2",
+  "id": "84089621542495"
+ },
+ {
+  "path": "Yuta.RunPierce",
+  "id": "120355051037295"
+ },
+ {
+  "path": "Yuta.RunSlash",
+  "id": "72914783159396"
+ },
+ {
+  "path": "Yuta.SecondWind",
+  "id": "108418554887656"
+ },
+ {
+  "path": "Yuta.SeveringPath",
+  "id": "104824728032437"
+ },
+ {
+  "path": "Yuta.SeveringPathAir",
+  "id": "140595869234331"
+ },
+ {
+  "path": "Yuta.SeveringPathSwordAir",
+  "id": "130834106305514"
+ },
+ {
+  "path": "Yuta.SeveringSwing",
+  "id": "125904281673524"
+ },
+ {
+  "path": "Yuta.Sheath",
+  "id": "126213385043407"
+ },
+ {
+  "path": "Yuta.ThirdWheel",
+  "id": "102532077942921"
+ },
+ {
+  "path": "Yuta.Throw",
+  "id": "117844331774372"
+ },
+ {
+  "path": "Yuta.Ultimate",
+  "id": "111952952886712"
+ },
+ {
+  "path": "Yuta.Ultimate2",
+  "id": "139556003259624"
+ },
+ {
+  "path": "Yuta.Veilstep",
+  "id": "117178057848472"
+ },
+ {
+  "path": "Yuta.VeilstepDive",
+  "id": "115432081398704"
+ },
+ {
+  "path": "Yuta.YutaBeam",
+  "id": "71783955283661"
+ }
+]
