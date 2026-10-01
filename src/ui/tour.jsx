@@ -1,7 +1,9 @@
 // The quick start (src/onboarding.js). The welcome asks, on the first
 // launch, whether to take the tour; the tour then walks the real window: a
 // spotlight glides from editor to editor while a card beside it says what
-// each one is for, and the last card says where the user manual is.
+// each one is for, through the Skill Builder and then the Meter Maker (a
+// step's `workspace` switches to it), and the last card says where the user
+// manual is.
 import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import * as S from '../store.js';
 import { Icon } from '../icons.jsx';
@@ -65,6 +67,9 @@ export function WelcomeDialog() {
           <li>
             <Icon name="copy" size={14} /> Getting the code back into the game
           </li>
+          <li>
+            <Icon name="battery" size={14} /> The Meter Maker, for bars that fill
+          </li>
         </ul>
         <div class="tw-actions">
           <button type="button" class="btn btn-primary tw-go" onClick={go} autoFocus>
@@ -127,7 +132,7 @@ const STEPS = [
     body: () => (
       <p>
         <strong>Skills</strong> is the moveset editor you’re in. <strong>Meter Maker</strong> draws a meter (a progress
-        bar), uploads it to Roblox and makes the skill that shows it.
+        bar), uploads it to Roblox and makes the skill that shows it. The tour visits it after the Skill Builder.
       </p>
     ),
   },
@@ -210,6 +215,67 @@ const STEPS = [
     ),
   },
   {
+    workspace: 'bars',
+    target: '.pb-view',
+    icon: 'battery',
+    title: 'This is the Meter Maker',
+    body: () => (
+      <p>
+        Draw a meter that fills, the way JJS shows a bar: the picture in the middle is one step of it, from empty to
+        full. Layers stack bars and rings, text, shapes, pictures and brush strokes.
+      </p>
+    ),
+  },
+  {
+    workspace: 'bars',
+    target: '.pb-rail',
+    icon: 'brush',
+    title: 'Tools',
+    body: () => (
+      <p>
+        <strong>Move</strong> (V), <strong>Brush</strong> (B), <strong>Eraser</strong> (E), <strong>Shapes and
+        meters</strong> (U) and <strong>Text</strong> (T), and a picture of your own. The strip above the picture holds
+        the options of the tool in hand.
+      </p>
+    ),
+  },
+  {
+    workspace: 'bars',
+    target: '.pb-steps',
+    icon: 'clock',
+    title: 'Steps',
+    body: () => (
+      <p>
+        Every picture the meter goes through, empty to full. Play runs them; drag the slider or click a step to see it.
+        A text layer’s <code>{'{percent}'}</code> counts up with them.
+      </p>
+    ),
+  },
+  {
+    workspace: 'bars',
+    target: '.pb-dock',
+    icon: 'layers',
+    title: 'Properties and layers',
+    body: () => (
+      <p>
+        The picked layer’s settings (fill, effects, clipping to the layer below) above, every layer below: drag to
+        reorder, the eye hides one.
+      </p>
+    ),
+  },
+  {
+    workspace: 'bars',
+    target: '.topbar-right .export-btn',
+    icon: 'upload',
+    title: 'Into the game',
+    body: () => (
+      <p>
+        <strong>Export</strong> saves the pictures, or uploads every step to Roblox as your account and makes the skill
+        that shows them, ready to go into your moveset.
+      </p>
+    ),
+  },
+  {
     icon: 'command',
     title: 'Worth remembering',
     body: () => (
@@ -280,18 +346,26 @@ export function Tour() {
   const [cardH, setCardH] = useState(220);
   const [size, setSize] = useState({ W: innerWidth, H: innerHeight });
 
-  // The steps whose element is on screen (the account button is desktop
-  // only; a panel may be hidden), once the editors have rendered.
+  // The Skill Builder's steps whose element is on screen (the account
+  // button is desktop only; a panel may be hidden), once the editors have
+  // rendered. The Meter Maker's aren't on screen yet: they all stay.
   useEffect(() => {
     const id = requestAnimationFrame(() =>
       requestAnimationFrame(() =>
-        setSteps(STEPS.filter((s) => !s.target || visible(document.querySelector(s.target)))),
+        setSteps(STEPS.filter((s) => !s.target || s.workspace || visible(document.querySelector(s.target)))),
       ),
     );
     return () => cancelAnimationFrame(id);
   }, []);
 
   const step = steps?.[at];
+  // Each step shows its workspace (the Skill Builder unless it says).
+  useEffect(() => {
+    if (!step) return;
+    const want = step.workspace ?? 'skills';
+    if (S.workspace.peek() !== want) S.workspace.value = want;
+    if (S.showStart.peek()) S.showStart.value = false;
+  }, [step]);
   const end = () => close();
   const next = () => steps && (at < steps.length - 1 ? setAt(at + 1) : end());
   const back = () => at > 0 && setAt(at - 1);

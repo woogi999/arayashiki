@@ -5,7 +5,10 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { Matrix4, Vector3, Quaternion } from 'three';
 import {
+  animationNodes,
+  cameraLegs,
   chainNodes,
+  FPS,
   insertAt,
   keyMatrix,
   lineTimes,
@@ -13,6 +16,7 @@ import {
   poseAt,
   removeChain,
   samples,
+  separateCameras,
   writeChain,
 } from '../src/animator.js';
 import { cfOrient, cfPos } from '../src/fx/roblox.js';
@@ -185,4 +189,122 @@ test('an animation kept with the old single shake gets it on its keys', () => {
     a.keys.map((x) => x.shake),
     [0.3, 0.175, 0],
   );
+});
+
+// ─── Cameras as JJS runs them ───────────────────────────────────────────
+// BuilderFX: the newest Camera block moves the view, and ANY block whose
+// TIME runs out hands the view back to the player. So a camera chain must be
+// back to back, in whole frames, with no overlaps and no gaps.
+
+const camLine = [{ K_NAME: 'ANIM' }, { K_NAME: 'WAIT', TIME: 0.5 }, { K_NAME: 'HITBOX' }, { K_NAME: 'WAIT', TIME: 1 }];
+const windows = (line) => {
+  const times = lineTimes(line);
+  return line.map((n, i) => [n, times[i]]).filter(([n]) => n.K_NAME === 'VISUAL' && n.EFFECT === 'Camera');
+};
+const onFrame = (t) => Math.abs(t * FPS - Math.round(t * FPS)) < 0.06;
+
+for (const [name, extra] of [
+  ['straight', { smooth: false }],
+  ['smoothed', { smooth: true }],
+  [
+    'smoothed and shaken',
+    {
+      smooth: true,
+      shakeFreq: 14,
+      keys: keys.map((k, i) => ({ ...k, shake: i === 1 ? 0.3 : 0, turn: i === 1 ? 1 : 0 })),
+    },
+  ],
+]) {
+  test(`a ${name} camera is back to back in whole frames: no overlaps, no gaps, no piece under three frames`, () => {
+    const a = { ...base, effect: 'Camera', hold: 0.3, ...extra };
+    const { line } = writeChain(camLine, a, animationNodes(a), { index: 1, time: 0 });
+    const cams = windows(line);
+    cams.forEach(([n, t], i) => {
+      assert.ok(onFrame(t), `starts on a frame (${t})`);
+      assert.ok(n.TIME >= 3 / FPS - 0.001, `at least three frames (${n.TIME})`);
+      const next = cams[i + 1];
+      if (next)
+        assert.ok(
+          Math.abs(t + n.TIME - next[1]) <= 0.0011,
+          `ends where the next begins (${t} + ${n.TIME} vs ${next[1]})`,
+        );
+    });
+    // The HITBOX still runs at 0.5 s.
+    assert.ok(Math.abs(lineTimes(line)[line.findIndex((n) => n.K_NAME === 'HITBOX')] - 0.5) < 1e-9);
+  });
+}
+
+test('a straight stretch is one Camera block with its key’s own easing', () => {
+  const eased = keys.map((k, i) => ({ ...k, ease: i === 0 ? 'Quad Out' : 'Back InOut' }));
+  const nodes = chainNodes({ ...base, keys: eased, effect: 'Camera', smooth: true });
+  assert.equal(cameraLegs({ ...base, keys: eased, effect: 'Camera' }).length, 2);
+  assert.deepEqual(
+    chainNodes({ ...base, keys: eased, effect: 'Camera' }).map(
+      ({ node }) => `${node['EASING STYLE']} ${node['EASING DIRECTION']}`,
+    ),
+    ['Quad Out', 'Back InOut'],
+  );
+  // A curve through three keys needs a few more blocks, far fewer than a piece every 0.05 s.
+  assert.ok(nodes.length >= 2 && nodes.length <= 10, `${nodes.length} blocks`);
+});
+
+test('a camera puts a DirectionLock on you for its whole length, and it comes out with the chain', () => {
+  const a = { ...base, effect: 'Camera', hold: 0.3 };
+  const nodes = animationNodes(a);
+  const lock = nodes[0].node;
+  assert.equal(lock.K_NAME, 'STATE');
+  assert.equal(lock.STATE, 'DirectionLock');
+  assert.equal(lock['STATE TAG'], 'anim1');
+  assert.equal(lock.TIME, 1.5); // 1.2 s of keys and 0.3 s of hold
+  const { line } = writeChain(camLine, a, nodes, { index: 1, time: 0 });
+  assert.equal(line.filter((n) => n.K_NAME === 'STATE').length, 1);
+  assert.deepEqual(removeChain(line, a).line, camLine);
+  // Off, there's no state.
+  assert.ok(animationNodes({ ...a, lock: false }).every(({ node }) => node.K_NAME === 'VISUAL'));
+});
+
+test('weaving puts each piece between the nodes already there, at its moment', () => {
+  const a = { ...base, effect: 'Mesh' };
+  const { line, start } = writeChain(camLine, a, chainNodes(a), { time: 0.3, weave: true });
+  assert.equal(start, 0.3);
+  const times = lineTimes(line);
+  const pieces = line.map((n, i) => [n, times[i]]).filter(([n]) => n['VISUAL TAG'] === 'anim1');
+  assert.deepEqual(
+    pieces.map(([, t]) => t),
+    [0.3, 0.8],
+  );
+  // The first piece is before the HITBOX (0.5 s), the second after it.
+  const hit = line.findIndex((n) => n.K_NAME === 'HITBOX');
+  assert.ok(line.indexOf(pieces[0][0]) < hit && line.indexOf(pieces[1][0]) > hit);
+  assert.equal(times[hit], 0.5);
+  assert.deepEqual(removeChain(line, a).line, camLine);
+  // At a moment that has nodes already, a woven piece goes after them.
+  const atZero = writeChain(camLine, a, chainNodes(a), { time: 0, weave: true }).line;
+  assert.equal(atZero[0].K_NAME, 'ANIM');
+  assert.equal(atZero[1]['VISUAL TAG'], 'anim1');
+});
+
+test('a Camera block still running when the next starts is cut to end there, at the pose it had reached', () => {
+  const cam = (extra) => ({
+    K_NAME: 'VISUAL',
+    EFFECT: 'Camera',
+    'EASING STYLE': 'Linear',
+    'EASING DIRECTION': 'In',
+    ...extra,
+  });
+  const line = [
+    cam({ TIME: 2, POSITION: '0, 0, 0', ROTATION: '0, 0, 0', 'ALT POSITION': '0, 0, 10', 'ALT ROTATION': '0, 90, 0' }),
+    { K_NAME: 'WAIT', TIME: 0.5 },
+    cam({ TIME: 1, POSITION: '0, 5, 0', 'ALT POSITION': '0, 0, 0' }),
+    cam({ TIME: 1, 'LAST HIT': 2 }), // on the one hit's screen: a different camera
+  ];
+  const { line: out, trimmed } = separateCameras(line);
+  assert.equal(trimmed, 1);
+  assert.equal(out[0].TIME, 0.5);
+  assert.equal(out[0]['ALT POSITION'], '0, 0, 2.5');
+  assert.deepEqual(
+    v3(out[0]['ALT ROTATION']).map((v) => Math.round(v * 10) / 10),
+    [0, 22.5, 0],
+  );
+  assert.deepEqual(out.slice(1), line.slice(1));
 });

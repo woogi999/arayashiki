@@ -236,6 +236,12 @@ body.is-moving * {
   width: 100%;
 }
 
+.anim-start {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .key-toolbar,
 .key-look,
 .key-shake,

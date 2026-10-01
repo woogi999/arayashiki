@@ -788,6 +788,22 @@
   color: var(--hit);
 }
 
+/* ─── What's new (CHANGELOG.md) ────────────────────────────────────── */
+
+.modal-changelog {
+  width: min(720px, calc(100vw - 48px));
+}
+
+.changelog-now {
+  margin: 12px 18px 0;
+}
+
+.changelog-body {
+  max-width: none;
+  max-height: min(68vh, 720px);
+  padding: 4px 18px 18px;
+}
+
 /* ─── The manual (F1) ───────────────────────────────────────────────── */
 
 .modal-manual {

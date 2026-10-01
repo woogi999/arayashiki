@@ -477,6 +477,9 @@ export function mountSkillScene(host, { textureUrl = async () => null, meshData 
   let pathKeys = [];
   let pathOptions = { smooth: true, shake: null };
   let skillCamera = true;
+  // Whether the skill is playing: stopped, a Camera block doesn't take the
+  // Free camera's view, so you can fly around a moment that has one.
+  let playing = false;
   let track = null; // the auto camera's track for this run, made when first needed
   // A camera to look through while editing one (the animator's preview):
   // t → { position, quaternion, fov } or null. It comes before any mode.
@@ -963,9 +966,10 @@ export function mountSkillScene(host, { textureUrl = async () => null, meshData 
   }
 
   // Puts `cam` where the skill's screen effects say: a Camera block's view,
-  // the field of view, the shakes.
-  function applyScreen(cam, screen, baseFov) {
-    if (skillCamera && screen.camera) {
+  // the field of view, the shakes. `own`: the view stays yours (a Camera
+  // block and the shakes leave it alone; the field of view still changes).
+  function applyScreen(cam, screen, baseFov, own = false) {
+    if (skillCamera && !own && screen.camera) {
       const p = new Vector3();
       const q = new Quaternion();
       screen.camera.decompose(p, q, new Vector3());
@@ -975,7 +979,7 @@ export function mountSkillScene(host, { textureUrl = async () => null, meshData 
     cam.fov = baseFov + (skillCamera ? screen.fov - 69 : 0);
     cam.updateProjectionMatrix();
     cam.updateMatrixWorld();
-    if (skillCamera && screen.shake.lengthSq() > 0) {
+    if (skillCamera && !own && screen.shake.lengthSq() > 0) {
       const right = new Vector3().setFromMatrixColumn(cam.matrixWorld, 0);
       const up = new Vector3().setFromMatrixColumn(cam.matrixWorld, 1);
       cam.position.addScaledVector(right, screen.shake.x).addScaledVector(up, screen.shake.y);
@@ -985,14 +989,14 @@ export function mountSkillScene(host, { textureUrl = async () => null, meshData 
 
   // Poses everything at t and aims `cam` (the view's or an export's):
   // the mode's camera, then the skill's. Returns the screen effects.
-  function stage(t, cam, base) {
+  function stage(t, cam, base, own = false) {
     if (camMode === 'auto' || base === 'auto') trackNow();
     place(t);
     visibility(t);
     const screen = screenAt(run.events, t, 'user', frameAt, cancelledAt);
     wall.visible = run.room?.wall !== null && run.room?.wall !== undefined;
     if (wall.visible) wall.position.set(0, 20, run.room.wall + 0.5);
-    applyScreen(cam, screen, cam.userData.baseFov ?? BASE_FOV);
+    applyScreen(cam, screen, cam.userData.baseFov ?? BASE_FOV, own);
     drawingFor = cam;
     effects(t);
     drawingFor = camera;
@@ -1029,7 +1033,9 @@ export function mountSkillScene(host, { textureUrl = async () => null, meshData 
       camera.quaternion.copy(from.quaternion);
       camera.userData.baseFov = from.fov ?? BASE_FOV;
     }
-    const screen = stage(t, camera);
+    // Stopped, in the Free camera, the view is yours to fly even where a
+    // Camera block runs; playing, the block takes it as it does in JJS.
+    const screen = stage(t, camera, undefined, !playing && !from);
     grade = skillCamera ? screen.grade : null;
     overlaysOn = drawOverlays(skillCamera ? screen.overlays : []);
     render();
@@ -1424,6 +1430,12 @@ export function mountSkillScene(host, { textureUrl = async () => null, meshData 
       pathKeys = keys ?? [];
       skillCamera = skill;
       followFrom = null;
+      show(time);
+    },
+    /** Whether the skill is playing (stopped, the Free camera stays yours where a Camera block runs). */
+    setPlaying(on) {
+      if (playing === Boolean(on)) return;
+      playing = Boolean(on);
       show(time);
     },
     /** Looks through `fn(t)` → { position, quaternion, fov } (null: your own camera). */

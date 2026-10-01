@@ -466,6 +466,24 @@ export function pickNode(index, { toggle = false, range = false } = {}) {
     nodeIndex.value = nodeSelection.value.includes(index) ? index : nodeSelection.value.at(-1);
   });
 }
+/**
+ * Picks every node of the open branch (Ctrl+A), or with the Outliner the
+ * area last clicked, every skill of the category.
+ */
+export function selectAll() {
+  if (activeArea.peek() === 'outliner') {
+    skillSelection.value = skillRows.peek().map((r) => r.uid);
+    status.value = `${skillSelection.value.length} skills picked.`;
+    return;
+  }
+  const n = line.peek().length;
+  if (!n) return;
+  batch(() => {
+    nodeSelection.value = Array.from({ length: n }, (_, i) => i);
+    nodeIndex.value = clamp(nodeIndex.peek(), 0, n - 1);
+  });
+  status.value = `All ${n} nodes picked.`;
+}
 const selectedIndices = () => {
   const n = line.value.length;
   const list = [...new Set([...nodeSelection.value, nodeIndex.value])].filter((i) => i >= 0 && i < n);
@@ -877,6 +895,7 @@ export function attachScene(next) {
   if (import.meta.env?.DEV) window.__arayashikiScene = next; // for poking at it in dev tools
   if (scene) {
     scene.setFollow(follow.value);
+    scene.setPlaying(playing.peek());
     scene.setCamera({ mode: camMode.peek(), auto: autoCam.peek(), keys: camKeys.peek(), path: camPath.peek(), skillCamera: skillCamera.peek() });
     scene.setShowHitboxes(showHitboxes.peek());
     scene.setBackground(appearance.peek().viewportBg);
@@ -999,6 +1018,10 @@ effect(() => {
 effect(() => {
   const on = follow.value;
   scene?.setFollow(on);
+});
+effect(() => {
+  const on = playing.value;
+  scene?.setPlaying(on);
 });
 effect(() => {
   const camera = { mode: camMode.value, auto: autoCam.value, keys: camKeys.value, path: camPath.value, skillCamera: skillCamera.value };

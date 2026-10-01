@@ -130,6 +130,7 @@ function nodeItems(index) {
     animatable && item(`Animate (keyframes)…`, 'wand', () => command('animate').run(), { keys: bindingOf('animate') }),
     animatable && sep,
     cmd('duplicate'),
+    cmd('selectAll'),
     cmd('moveUp'),
     cmd('moveDown'),
     sep,
@@ -271,7 +272,13 @@ function generalItems() {
 
 // A right-click on an editor's empty space: what it's for.
 function nodesAreaItems() {
-  return [...addNodeItems(), cmd('addBranch'), sep, item('Panel layout', 'layout', null, { items: layoutItems() })];
+  return [
+    ...addNodeItems(),
+    cmd('addBranch'),
+    cmd('selectAll'),
+    sep,
+    item('Panel layout', 'layout', null, { items: layoutItems() }),
+  ];
 }
 function outlinerAreaItems() {
   return [

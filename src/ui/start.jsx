@@ -264,6 +264,9 @@ export function StartScreen() {
             <button type="button" class="link" onClick={startTour}>
               Quick tour
             </button>
+            <button type="button" class="link" onClick={() => (S.dialog.value = 'changelog')}>
+              What’s new
+            </button>
             <button type="button" class="link" onClick={() => openSearch()}>
               Search everything <kbd>{bindingOf('search')}</kbd>
             </button>

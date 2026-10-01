@@ -277,31 +277,207 @@ export function samples(anim) {
   return out;
 }
 
+// ─── A camera's pieces ──────────────────────────────────────────────────
+//
+// BuilderFX runs each Camera block on RenderStepped: the newest one moves
+// the view, and when ANY block's TIME runs out it sets the camera back to
+// Custom (the player's), even while a newer block is still running. So a
+// camera chain must hand over exactly: no two blocks' times overlapping and
+// no gap between them, or the view snaps to the player for a frame (the
+// jitter). JJS can't wait less than a frame either (60 a second), so a WAIT
+// of 0.007 s lasts a whole frame and the chain drifts off its own TIMEs.
+//
+// So a camera is written in whole frames, never a piece under three, each
+// ending on the frame the next begins. And each piece leans on JJS's own
+// easing: a stretch between keys is one block with the key's easing when a
+// straight move covers it (it always does, without a curve or a shake), and
+// is only cut in pieces where a curve bends away from a straight line, each
+// piece taking whichever of JJS's easings follows the curve best.
+
+export const FPS = 60;
+const MIN_PIECE = 3 / FPS;
+const POS_TOL = 0.2; // studs a piece may stray from the curve
+const ROT_TOL = 1.5; // degrees
+const REL_TOL = 0.06; // or this share of the piece's own move, if more
+const frames = (t) => r3(Math.round(t * FPS) / FPS);
+const CANDIDATES = EASINGS.flatMap((s) =>
+  s === 'Linear' ? [['Linear', 'In']] : ['In', 'Out', 'InOut'].map((d) => [s, d]),
+);
+
+/** A straight move from pose A to pose B, `k` of the way (as CFrame:Lerp: position straight, turn slerped). */
+function lerpPose(A, B, k) {
+  return {
+    pos: A.pos.map((v, i) => v + (B.pos[i] - v) * k),
+    rot: rotOf(quatOf(A.rot).slerp(quatOf(B.rot), k)),
+  };
+}
+
+/** How far apart two poses are: [studs, degrees]. */
+function poseError(P, Q) {
+  const d = Math.hypot(P.pos[0] - Q.pos[0], P.pos[1] - Q.pos[1], P.pos[2] - Q.pos[2]);
+  const dot = Math.min(1, Math.abs(quatOf(P.rot).dot(quatOf(Q.rot))));
+  return [d, (2 * Math.acos(dot)) / RAD];
+}
+
+/**
+ * The easing that best makes one straight piece from t0 to t1 follow
+ * `pose(t)`: { ease, ok }. `prefer` (the key's own easing) wins whenever it
+ * follows well enough.
+ */
+function fitPiece(pose, t0, t1, from, to, prefer = null) {
+  const n = 8;
+  const span = t1 - t0;
+  const truth = Array.from({ length: n - 1 }, (_, j) => pose(t0 + (span * (j + 1)) / n));
+  // A small miss doesn't show on a big, fast move: the tolerance grows with the piece's own move.
+  const [moved, turned] = poseError(from, to);
+  const posTol = Math.max(POS_TOL, moved * REL_TOL);
+  const rotTol = Math.max(ROT_TOL, turned * REL_TOL);
+  const judge = (style, direction) => {
+    let pos = 0;
+    let rot = 0;
+    for (let j = 0; j < n - 1; j++) {
+      const k = tweenAt((span * (j + 1)) / n, span, style, direction);
+      const [dp, dr] = poseError(lerpPose(from, to, k), truth[j]);
+      pos = Math.max(pos, dp);
+      rot = Math.max(rot, dr);
+    }
+    return { ease: `${style} ${direction}`, score: pos / posTol + rot / rotTol, ok: pos <= posTol && rot <= rotTol };
+  };
+  if (prefer) {
+    const [style, direction] = prefer.split(' ');
+    const own = judge(style || 'Linear', direction || 'In');
+    if (own.ok) return own;
+  }
+  let best = null;
+  for (const [style, direction] of CANDIDATES) {
+    const j = judge(style, direction);
+    if (!best || j.score < best.score - 1e-9) best = j;
+  }
+  return best;
+}
+
+const legsCache = new WeakMap();
+
+/**
+ * A camera animation as the blocks JJS will run: [{ from, to, ease }], from
+ * and to poses at whole frames (t in seconds from the start), back to back.
+ */
+export function cameraLegs(anim) {
+  if (legsCache.has(anim)) return legsCache.get(anim);
+  const a = normalize(anim);
+  const keys = a.keys.map((k) => ({ ...k, t: frames(k.t) }));
+  const at = { ...a, keys };
+  const freq = a.shakeFreq ?? 14;
+  const pose = (t) => jitter(at, poseAt(at, t));
+  const legs = [];
+  const leg = (from, to, ease) =>
+    legs.push({
+      from: { ...from, pos: from.pos.map(r3), rot: from.rot.map(r3) },
+      to: { ...to, pos: to.pos.map(r3), rot: to.rot.map(r3) },
+      ease,
+    });
+  for (let i = 0; i < keys.length - 1; i++) {
+    const K = keys[i];
+    const N = keys[i + 1];
+    const span = N.t - K.t;
+    if (span < 1 / FPS - EPS) continue;
+    const start = jitter(at, { ...K });
+    // A jump cut: hold the key before until the cut, then the next piece starts at the cut key.
+    if (N.cut) {
+      leg({ ...start, t: K.t }, { ...start, t: N.t }, 'Linear In');
+      continue;
+    }
+    const most = Math.max(1, Math.floor(span / MIN_PIECE + EPS));
+    const plan = (n) => {
+      const ts = [...new Set(Array.from({ length: n + 1 }, (_, j) => frames(K.t + (span * j) / n)))];
+      ts[0] = K.t;
+      ts[ts.length - 1] = N.t;
+      return ts.slice(0, -1).map((t0, j) => {
+        const t1 = ts[j + 1];
+        const from = j === 0 ? { ...start, t: t0 } : { ...pose(t0), t: t0 };
+        const to = j === ts.length - 2 ? { ...jitter(at, { ...N }), t: t1 } : { ...pose(t1), t: t1 };
+        // A whole stretch eases as its key says when that follows (exact, in JJS itself).
+        return { from, to, fit: fitPiece(pose, t0, t1, from, to, ts.length === 2 ? (K.ease ?? 'Linear In') : null) };
+      });
+    };
+    let pieces;
+    if (shaky(K) || shaky(N)) {
+      // A shake is jitter at `freq` a second: a piece per half shake, never under three frames.
+      const step = Math.max(MIN_PIECE, 1 / Math.max(2, freq * 2));
+      pieces = plan(Math.min(most, Math.max(1, Math.round(span / step))));
+    } else {
+      // The fewest pieces that follow the curve: 1, 2, 3, 4, 6, 8, 12…
+      for (let n = 1; ; n = n < 4 ? n + 1 : Math.ceil(n * 1.5)) {
+        const m = Math.min(n, most);
+        pieces = plan(m);
+        if (m >= most || pieces.every((p) => p.fit.ok)) break;
+      }
+    }
+    for (const p of pieces) leg(p.from, p.to, p.fit.ease);
+  }
+  const last = keys.at(-1);
+  const hold = frames(a.hold ?? 0);
+  if (hold > 0) {
+    const end = jitter(at, { ...last });
+    leg({ ...end, t: last.t }, { ...end, t: last.t + hold }, 'Linear In');
+  }
+  // One key, or keys all on one frame: one still block.
+  if (!legs.length) {
+    const only = jitter(at, { ...keys[0] });
+    leg({ ...only, t: keys[0].t }, { ...only, t: keys[0].t + MIN_PIECE }, 'Linear In');
+  }
+  legsCache.set(anim, legs);
+  return legs;
+}
+
+/** Where a camera animation's blocks have the view at t (what JJS shows): { pos, rot } or null outside it. */
+export function cameraAt(anim, t) {
+  const legs = cameraLegs(anim);
+  if (!legs.length || t < legs[0].from.t - EPS || t > legs.at(-1).to.t + EPS) return null;
+  const L = legs.find((l) => t <= l.to.t + EPS) ?? legs.at(-1);
+  const [style, direction] = L.ease.split(' ');
+  const span = Math.max(EPS, L.to.t - L.from.t);
+  return lerpPose(L.from, L.to, tweenAt(Math.max(0, t - L.from.t), span, style, direction));
+}
+
+/** How long a camera animation runs, its hold included (whole frames). */
+export const cameraLength = (anim) => {
+  const legs = cameraLegs(anim);
+  return legs.length ? r3(legs.at(-1).to.t - legs[0].from.t) : 0;
+};
+
 // ─── Writing the chain ──────────────────────────────────────────────────
 
 /**
  * The VISUAL nodes for an animation: one per stretch between samples (plus a
  * hold), each { at: seconds after the start, node }. `frameAt(t)` is the
  * body part's CFrame at t seconds after the start (the 3D view's); without
- * it the part is taken as standing still.
+ * it the part is taken as standing still. A camera's are its legs
+ * (cameraLegs): whole frames, back to back, eased by JJS.
  */
 export function chainNodes(a, frameAt = null) {
-  const pts = samples(a);
   const out = [];
   const camera = a.effect === 'Camera';
-  // Only key to key: each piece eases as its key says, in JJS itself.
-  // Otherwise the pieces are short and Linear, and the easing is in where
-  // they're sampled.
-  const plain = pts.every((p) => p.key);
+  let legs;
+  let plain = false;
+  if (camera) {
+    legs = cameraLegs(a).map((l) => [l.from, l.to, l.ease]);
+  } else {
+    const pts = samples(a);
+    // Only key to key: each piece eases as its key says, in JJS itself.
+    // Otherwise the pieces are short and Linear, and the easing is in where
+    // they're sampled.
+    plain = pts.every((p) => p.key);
+    // A jump cut's two poses share a moment: no piece between them, the next
+    // piece simply starts at the cut key.
+    legs = pts
+      .slice(0, -1)
+      .map((p, i) => [p, pts[i + 1]])
+      .filter(([from, to]) => to.t - from.t > 0.0005);
+    if (a.hold > 0) legs.push([pts.at(-1), { ...pts.at(-1), t: pts.at(-1).t + a.hold }]);
+  }
   const F = (t) => (frameAt ? frameAt(t) : new Matrix4());
-  // A jump cut's two poses share a moment: no piece between them, the next
-  // piece simply starts at the cut key.
-  const legs = pts
-    .slice(0, -1)
-    .map((p, i) => [p, pts[i + 1]])
-    .filter(([from, to]) => to.t - from.t > 0.0005);
-  if (a.hold > 0) legs.push([pts.at(-1), { ...pts.at(-1), t: pts.at(-1).t + a.hold }]);
-  for (const [from, to] of legs) {
+  for (const [from, to, legEase] of legs) {
     const time = Math.max(0.001, to.t - from.t);
     let alt;
     let altRot;
@@ -324,6 +500,7 @@ export function chainNodes(a, frameAt = null) {
     }
     // A move of exactly zero would weld it to the part (and freeze its turn).
     if (alt.every((c) => Math.abs(c) < 0.0005)) alt = [0, 0.001, 0]; // as the dash's wind streaks do
+    const ease = String(legEase ?? (plain ? (from.ease ?? 'Linear In') : 'Linear In')).split(' ');
     const node = {
       ...a.template,
       K_NAME: 'VISUAL',
@@ -339,12 +516,82 @@ export function chainNodes(a, frameAt = null) {
       'ALT SIZE': from.size ? Math.round((to.size / from.size) * 10000) / 10000 : 1,
       OPACITY: r3(from.opacity),
       'ALT OPACITY': r3(to.opacity),
-      'EASING STYLE': plain ? String(from.ease ?? 'Linear In').split(' ')[0] || 'Linear' : 'Linear',
-      'EASING DIRECTION': plain ? String(from.ease ?? 'Linear In').split(' ')[1] || 'In' : 'In',
+      'EASING STYLE': ease[0] || 'Linear',
+      'EASING DIRECTION': ease[1] || 'In',
     };
     out.push({ at: from.t, node });
   }
   return out;
+}
+
+/**
+ * Everything an animation puts in the line: its VISUALs and, for a camera
+ * (unless `lock` is off), a DirectionLock on you for the whole of it, so you
+ * don't turn while the shot plays. The state carries the animation's tag as
+ * its STATE TAG, so it comes out with the chain.
+ */
+export function animationNodes(a, frameAt = null) {
+  const nodes = chainNodes(a, frameAt);
+  if (a.effect !== 'Camera' || a.lock === false || !nodes.length) return nodes;
+  const length = r3(nodes.at(-1).at + Number(nodes.at(-1).node.TIME) - nodes[0].at);
+  const lock = {
+    K_NAME: 'STATE',
+    STATE: 'DirectionLock',
+    VALUE: 1,
+    TIME: length,
+    'CANCEL ON END': false,
+    'DISABLE BURST': false,
+    'LAST HIT': -1,
+    CHECK: false,
+    'STATE TAG': a.tag,
+  };
+  return [{ at: nodes[0].at, node: lock }, ...nodes];
+}
+
+/** Whether a node is an animation's DirectionLock (its STATE TAG is the animation's tag). */
+const isLock = (n, a) =>
+  a.effect === 'Camera' && n?.K_NAME === 'STATE' && n.STATE === 'DirectionLock' && n['STATE TAG'] === a.tag;
+
+/**
+ * Camera blocks that run into the next one (on the same screen): BuilderFX
+ * gives the view back to the player when a block's TIME runs out, even mid
+ * way through a newer block, so each is cut to end where the next begins.
+ * A moving one is cut at the pose it had reached then. Returns { line,
+ * trimmed: how many were cut }.
+ */
+export function separateCameras(line) {
+  const times = lineTimes(line);
+  const screen = (n) => (Number(withDefaults(n)['LAST HIT']) > 0 ? 'hit' : 'you');
+  const cams = line
+    .map((n, i) => ({ n, i, t: times[i] }))
+    .filter(({ n }) => n?.K_NAME === 'VISUAL' && n.EFFECT === 'Camera');
+  const out = [...line];
+  let trimmed = 0;
+  for (const who of ['you', 'hit']) {
+    const list = cams.filter((c) => screen(c.n) === who);
+    list.forEach((c, k) => {
+      const next = list[k + 1];
+      if (!next) return;
+      const n = withDefaults(c.n);
+      const time = Math.max(0, Number(n.TIME) || 0);
+      const gap = r3(next.t - c.t);
+      if (c.t + time <= next.t + 0.0005 || gap <= 0) return;
+      const patch = { TIME: gap };
+      const alt = vec(n['ALT POSITION']);
+      if (alt.some((v) => Math.abs(v) > EPS)) {
+        // Where it had got to by then: k of the way, as its easing has it.
+        const k = tweenAt(gap, Math.max(EPS, time), n['EASING STYLE'] || 'Linear', n['EASING DIRECTION'] || 'In');
+        const rot = vec(n.ROTATION);
+        const altRot = n['ALT ROTATION'] != null && n['ALT ROTATION'] !== '' ? vec(n['ALT ROTATION']) : rot;
+        const cut = alt.map((v) => v * k);
+        patch['ALT POSITION'] = str(cut.every((v) => Math.abs(v) < 0.0005) ? [0, 0.001, 0] : cut);
+        patch['ALT ROTATION'] = str(rotOf(quatOf(rot).slerp(quatOf(altRot), k)));
+      }
+      out[c.i] = { ...c.n, ...patch };
+      trimmed++;
+    });
+  }
+  return { line: out, trimmed };
 }
 
 // ─── Into the line ──────────────────────────────────────────────────────
@@ -362,8 +609,9 @@ export function lineTimes(line) {
   });
 }
 
-/** Whether a node belongs to the animation `tag` (a VISUAL of that effect with that tag). */
-export const inChain = (n, a) => n?.K_NAME === 'VISUAL' && n['VISUAL TAG'] === a.tag && n.EFFECT === a.effect;
+/** Whether a node belongs to the animation `tag` (a VISUAL of that effect with that tag, or a camera's DirectionLock). */
+export const inChain = (n, a) =>
+  (n?.K_NAME === 'VISUAL' && n['VISUAL TAG'] === a.tag && n.EFFECT === a.effect) || isLock(n, a);
 
 /**
  * Takes an animation's nodes out of a line, joining the WAITs that were
@@ -389,12 +637,16 @@ export function removeChain(line, a) {
   return { line: out, index: first, time: times[first] };
 }
 
-/** Puts `node` into a line at `t` seconds, splitting the WAIT it falls in (or waiting at the end). */
-export function insertAt(line, t, node, from = 0) {
+/**
+ * Puts `node` into a line at `t` seconds, splitting the WAIT it falls in (or
+ * waiting at the end). `after`: at a moment that already has nodes, it goes
+ * after them (just before the next WAIT) instead of before them.
+ */
+export function insertAt(line, t, node, from = 0, { after = false } = {}) {
   const out = [...line];
   let acc = 0;
   for (let i = 0; i < out.length; i++) {
-    if (i >= from && acc >= t - EPS) {
+    if (i >= from && acc >= t - EPS && !(after && acc <= t + EPS && !isWait(out[i]))) {
       out.splice(i, 0, node);
       return out;
     }
@@ -415,20 +667,40 @@ export function insertAt(line, t, node, from = 0) {
 /**
  * The line with the animation written in: the old chain out, the new one in,
  * starting where the old one started (or at `index`, `time` for a new one).
- * Returns { line, start, extended } (extended: seconds of WAIT added at the end).
+ * `weave`: start at `time` seconds into the line instead, wherever that falls
+ * among the nodes already there, every piece going in between them at its
+ * moment. Camera blocks are kept from running into each other
+ * (separateCameras). Returns { line, start, extended, trimmed } (extended:
+ * seconds of WAIT added at the end; trimmed: other camera blocks cut short).
  */
-export function writeChain(line, a, nodes, { index, time } = {}) {
+export function writeChain(line, a, nodes, { index, time, weave = false } = {}) {
   const removed = removeChain(line, a);
   let base = removed?.line ?? [...line];
-  const start = removed?.time ?? time ?? 0;
-  const at = removed?.index ?? index ?? base.length;
+  const start = weave ? Math.max(0, time ?? 0) : (removed?.time ?? time ?? 0);
   const endBefore = lineTimes(base).at(-1) ?? 0;
   const lastWait = base.length && isWait(base.at(-1)) ? waitTime(base.at(-1)) : 0;
-  // The first piece goes where the old one was; the rest by their time.
-  base.splice(Math.min(at, base.length), 0, nodes[0].node);
-  for (const { at: t, node } of nodes.slice(1)) base = insertAt(base, start + t, node, at + 1);
+  let next;
+  if (weave) {
+    // Each piece at its moment, after the nodes already there and the piece before it.
+    next = 0;
+    for (const { at: t, node } of nodes) {
+      base = insertAt(base, start + t, node, next, { after: true });
+      next = base.indexOf(node) + 1;
+    }
+  } else {
+    // The first piece goes where the old one was; the rest by their time.
+    const at = removed?.index ?? index ?? base.length;
+    base.splice(Math.min(at, base.length), 0, nodes[0].node);
+    next = Math.min(at, base.length - 1) + 1;
+    for (const { at: t, node } of nodes.slice(1)) {
+      base = insertAt(base, start + t, node, next);
+      next = base.indexOf(node) + 1;
+    }
+  }
+  let trimmed = 0;
+  if (a.effect === 'Camera') ({ line: base, trimmed } = separateCameras(base));
   const endAfter = (lineTimes(base).at(-1) ?? 0) + (base.length && isWait(base.at(-1)) ? waitTime(base.at(-1)) : 0);
-  return { line: base, start, extended: Math.max(0, r3(endAfter - endBefore - lastWait)) };
+  return { line: base, start, extended: Math.max(0, r3(endAfter - endBefore - lastWait)), trimmed };
 }
 
 /** A tag for a new animation that the line doesn't use yet. */

@@ -20,9 +20,13 @@ import {
   ANIMATABLE,
   anim,
   animKey,
-  chainNodes,
+  animationNodes,
+  cameraAt,
+  cameraLegs,
+  cameraLength,
   freshTag,
   fromNode,
+  inChain,
   keyFrom,
   keyMatrix,
   lineTimes,
@@ -37,8 +41,9 @@ import { Button, IconButton, Segmented, Switch } from './controls.jsx';
 import { EaseSelect, FloatingPanel, Num, Vec } from './keys-ui.jsx';
 
 // Where the animation sits: the skill, branch and when its first node runs
-// (`draft`: not in the skill yet; `index` is where it will go).
-const where = signal(null); // { uid, branch, index, start, draft }
+// (`draft`: not in the skill yet; `index` is where it will go; `weave`: it
+// goes in at `start` seconds, its pieces between the nodes already there).
+const where = signal(null); // { uid, branch, index, start, draft, weave }
 const gizmoMode = signal('translate');
 const lookThrough = signal(false);
 const previewing = signal(false); // Play: looking through it while the skill plays
@@ -95,8 +100,10 @@ export function openAnimator() {
     tag = freshTag(S.program.peek(), S.branch.peek());
     S.setNodeField('VISUAL TAG', tag);
   }
-  const w = { uid: S.skillUid.peek(), branch: S.branch.peek(), index, start: startOf(index), draft: false };
+  const w = { uid: S.skillUid.peek(), branch: S.branch.peek(), index, start: startOf(index), draft: false, weave: false };
   const saved = S.animSpecs.peek()[specKey(w, { tag })];
+  // A woven animation goes on being woven, from where its first piece runs.
+  if (saved?.weave != null) Object.assign(w, { weave: true, start: lineTimes(S.line.peek())[index] ?? saved.weave });
   where.value = w;
   anim.value = normalize(saved ?? fromNode({ ...node, 'VISUAL TAG': tag }, tag));
   animKey.value = 0;
@@ -126,7 +133,7 @@ function startDraft(fields) {
   const index = line.length ? Math.min(S.nodeIndex.peek() + 1, line.length) : 0;
   const tag = freshTag(S.program.peek(), S.branch.peek());
   const node = { K_NAME: 'VISUAL', ...fields, 'VISUAL TAG': tag };
-  where.value = { uid: S.skillUid.peek(), branch: S.branch.peek(), index, start: timeAt(index), draft: true };
+  where.value = { uid: S.skillUid.peek(), branch: S.branch.peek(), index, start: timeAt(index), draft: true, weave: false };
   anim.value = fromNode(node, tag);
   animKey.value = 0;
   lookThrough.value = false;
@@ -141,7 +148,8 @@ export function newCameraAnimation() {
   S.camMode.value = 'free';
   if (!startDraft({ EFFECT: 'Camera', TIME: 1, 'BODY PART': 'HumanoidRootPart' })) return;
   const a = anim.peek();
-  anim.value = { ...a, keys: a.keys.map((k, i) => ({ ...k, t: i, ease: 'Sine InOut' })) };
+  // Straight key to key: each stretch one Camera block, eased by JJS (Smooth curve adds blocks).
+  anim.value = { ...a, smooth: false, keys: a.keys.map((k, i) => ({ ...k, t: i, ease: 'Sine InOut' })) };
   setKeyToView(0);
   setKeyToView(1);
   S.seek(where.peek().start);
@@ -251,6 +259,25 @@ function setLook(patch) {
   if (!where.peek()?.draft) apply();
 }
 
+/**
+ * Where it goes in the line: after a node (`weave` off: the chain starts at
+ * that node), or woven in (`weave` on): starting `start` seconds into the
+ * skill, each piece going in between the nodes already there, at its moment.
+ */
+function setPlacement(weave) {
+  const w = where.peek();
+  if (!w || Boolean(w.weave) === weave) return;
+  where.value = { ...w, weave };
+  if (!w.draft) apply();
+}
+function setStart(t) {
+  const w = where.peek();
+  if (!w) return;
+  where.value = { ...w, weave: true, start: Math.max(0, r3(t)) };
+  if (!w.draft) applySoon();
+  else anim.value = { ...anim.peek() }; // the path follows the new start
+}
+
 let timer = 0;
 function applySoon() {
   clearTimeout(timer);
@@ -267,17 +294,29 @@ function apply() {
     note.value = 'This animation is in another skill or branch: open that one to change it.';
     return;
   }
-  const nodes = chainNodes(a, frameAt);
+  const nodes = animationNodes(a, frameAt);
   const lineStart = lineTimes([...S.line.peek(), {}])[w.index] ?? 0;
-  const { line, extended } = writeChain(S.line.peek(), a, nodes, { index: w.index, time: lineStart });
+  const { line, extended, trimmed } = writeChain(
+    S.line.peek(),
+    a,
+    nodes,
+    w.weave ? { time: w.start, weave: true } : { index: w.index, time: lineStart },
+  );
   S.replaceLine(line, `anim:${a.tag}`);
-  S.animSpecs.value = { ...S.animSpecs.peek(), [specKey(w, a)]: a };
-  const first = line.findIndex((n) => n?.K_NAME === 'VISUAL' && n['VISUAL TAG'] === a.tag && n.EFFECT === a.effect);
+  S.animSpecs.value = { ...S.animSpecs.peek(), [specKey(w, a)]: { ...a, weave: w.weave ? w.start : undefined } };
+  const first = line.findIndex((n) => inChain(n, a));
   if (first >= 0) {
     S.nodeIndex.value = first;
     where.value = { ...w, index: first, draft: false };
   }
-  note.value = `${nodes.length} VISUAL node${nodes.length === 1 ? '' : 's'} in the skill${extended ? `; the line now waits ${extended}s longer at the end to fit it` : ''}. Changes are written as you make them now.`;
+  const visuals = nodes.filter((n) => n.node.K_NAME === 'VISUAL').length;
+  const parts = [
+    `${visuals} VISUAL node${visuals === 1 ? '' : 's'} in the skill${w.weave ? `, woven in from ${r3(w.start)}s` : ''}`,
+    a.effect === 'Camera' && a.lock !== false ? `a DirectionLock for ${r3(cameraLength(a))}s` : '',
+    trimmed ? `${trimmed} other Camera block${trimmed === 1 ? '' : 's'} cut to end where the next begins (overlapping, JJS hands the view back to the player mid-shot)` : '',
+    extended ? `the line now waits ${extended}s longer at the end to fit it` : '',
+  ].filter(Boolean);
+  note.value = `${parts.join('; ')}. Changes are written as you make them now.`;
 }
 
 function removeAnimation() {
@@ -308,7 +347,11 @@ effect(() => {
   }
   const world = (k) => frameAt(k.t).multiply(keyMatrix(k));
   const keys = a.keys.map(world);
-  const path = samples(a).map((p) => new Vector3().setFromMatrixPosition(world(p)));
+  // A camera's path is the blocks JJS will run; a part's, its samples.
+  const along = a.effect === 'Camera'
+    ? cameraLegs(a).flatMap((l) => [0, 0.25, 0.5, 0.75].map((k) => l.from.t + (l.to.t - l.from.t) * k)).concat(a.keys.at(-1).t).map((t) => ({ t, ...cameraAt(a, t) }))
+    : samples(a);
+  const path = along.map((p) => new Vector3().setFromMatrixPosition(world(p)));
   scene.setAnimOverlay({
     keys,
     path,
@@ -352,7 +395,8 @@ effect(() => {
   scene.setPreviewCamera((t) => {
     const local = t - w.start;
     if (local < -1e-6 || local > end + 1e-6) return null;
-    const pose = shakenAt(a, Math.min(local, a.keys.at(-1).t));
+    // The blocks as JJS runs them (whole frames, its easings), else the keys.
+    const pose = cameraAt(a, local) ?? shakenAt(a, Math.min(local, a.keys.at(-1).t));
     const m = frameAt(local).multiply(keyMatrix(pose));
     const position = new Vector3();
     const quaternion = new Quaternion();
@@ -526,19 +570,68 @@ export function AnimatorPanel() {
 
       <div class="key-options">
         <label class="prop-row">
-          <span title="A curve through the keys (the chain gets more, shorter pieces); off, straight lines key to key">Smooth curve through the keys</span>
+          <span
+            title={
+              camera
+                ? 'A curve through the keys: more Camera blocks, only where the curve bends away from a straight line. Off, each stretch between keys is one block, eased by JJS'
+                : 'A curve through the keys (the chain gets more, shorter pieces); off, straight lines key to key'
+            }
+          >
+            Smooth curve through the keys
+          </span>
           <Switch checked={a.smooth} label="Smooth curve" onChange={(on) => setAnim({ smooth: on })} />
         </label>
-        {a.smooth && (
+        {a.smooth && !camera && (
           <label class="prop-row">
             <span>Pieces a second</span>
             <Num label="Pieces a second" step={1} min={2} max={60} value={a.rate} onChange={(v) => setAnim({ rate: Math.max(2, Math.min(60, Math.round(v))) })} />
           </label>
         )}
+        {camera && (
+          <p class="hint">
+            {(() => {
+              const n = cameraLegs(a).length;
+              return `${n} Camera block${n === 1 ? '' : 's'}, back to back in whole frames, each eased by JJS. A stretch between keys is one block with its key’s easing unless a curve or a shake needs more.`;
+            })()}
+          </p>
+        )}
         <label class="prop-row">
           <span>Hold at the end (s)</span>
           <Num label="Hold at the end" step={0.1} min={0} value={a.hold} onChange={(v) => setAnim({ hold: Math.max(0, v) })} />
         </label>
+        <div class="prop-row">
+          <span title="After a node: the chain starts at that node. Weave in: it starts at a time in the skill, each piece going in between the nodes already there, at its moment">
+            Placement
+          </span>
+          <Segmented
+            label="Placement"
+            value={w.weave ? 'weave' : 'after'}
+            onChange={(m) => setPlacement(m === 'weave')}
+            options={[
+              { id: 'after', label: w.draft ? `After node ${Math.min(w.index, S.line.value.length)}` : 'Where it is' },
+              { id: 'weave', label: 'Weave in' },
+            ]}
+          />
+        </div>
+        {w.weave && (
+          <div class="prop-row">
+            <span>Starts at (s into the skill)</span>
+            <span class="anim-start">
+              <Num label="Starts at (s)" step={0.05} min={0} value={r3(w.start)} onChange={setStart} />
+              <Button variant="ghost" icon="locate-fixed" title="Start it at the playhead" onClick={() => setStart(S.time.peek())}>
+                Playhead
+              </Button>
+            </span>
+          </div>
+        )}
+        {camera && (
+          <label class="prop-row">
+            <span title="A STATE DirectionLock on you for the whole animation (its hold too), so you don't turn while the shot plays">
+              Lock your direction while it plays
+            </span>
+            <Switch checked={a.lock !== false} label="DirectionLock while it plays" onChange={(on) => setAnim({ lock: on }, { now: true })} />
+          </label>
+        )}
         {camera && (
           <>
             <h4 class="section-title">Shake</h4>
@@ -589,9 +682,11 @@ export function AnimatorPanel() {
 
 /**
  * The AI tool's way in (app_animate): animates node `node` of the open
- * branch with the keys given, and writes it into the skill.
+ * branch with the keys given, and writes it into the skill. `weave` (seconds
+ * into the skill) weaves it in from then; `lock: false` leaves a camera
+ * without its DirectionLock.
  */
-export async function runAnimation({ node, keys, smooth = true, easing = 'Linear', hold = 0, shake, shakeFreq }) {
+export async function runAnimation({ node, keys, smooth = true, easing = 'Linear', hold = 0, shake, shakeFreq, weave, lock }) {
   const line = S.line.peek();
   if (!line[node]) throw new Error(`The open branch has no node ${node} (it has ${line.length}).`);
   S.pickNode(node);
@@ -619,7 +714,9 @@ export async function runAnimation({ node, keys, smooth = true, easing = 'Linear
       .sort((x, y) => x.t - y.t),
     shakeFreq: shakeFreq ?? shake?.freq ?? a.shakeFreq ?? 14,
     ...(shake ? { shake: { amount: 0, turn: 0, freq: 14, from: 0, to: keys.at(-1).t, decay: true, ...shake } } : {}),
+    ...(lock === false ? { lock: false } : {}),
   });
+  if (Number.isFinite(weave)) where.value = { ...where.peek(), weave: true, start: Math.max(0, weave) };
   apply();
   return { tag: anim.peek().tag, keys: anim.peek().keys.length, note: note.peek() };
 }

@@ -24,13 +24,19 @@ only (no administrator needed) and adds Arayashiki to the Start menu. Windows
 The first time you open Arayashiki, it asks whether you'd like a quick tour.
 The tour lights up each part of the window in turn (the menus, the
 workspaces, the Outliner, Nodes, the Viewport, the Timeline, Properties,
-Export and signing in) and says what it's for. Use <kbd>→</kbd> and
+Export and signing in) and says what it's for, then goes on to the Meter
+Maker (its canvas, tools, steps, properties and layers, and exporting). Use <kbd>→</kbd> and
 <kbd>←</kbd> (or Next and Back) to move through it, and <kbd>Esc</kbd> to
 leave. It ends by pointing you here.
 
 To take it again, pick **Quick tour** at the bottom of the start screen,
 search for "tour" with <kbd>Ctrl+Space</kbd>, or use the button in Settings →
 Updates.
+
+### What's new
+
+**What's new** lists what changed in each version: pick it at the bottom of
+the start screen, in Settings → Updates, or search for "changelog".
 
 ### Updates
 
@@ -153,9 +159,11 @@ unchanged except for what you edited.
 - Branches are the tabs along the top of the Nodes panel. Their conditions
   (Req) are in Properties → Branch. Renaming a branch keeps every BRANCH,
   BRANCH TARGET and RANDOM that pointed at it.
-- <kbd>Ctrl+Z</kbd> undoes, <kbd>Ctrl+Y</kbd> redoes. <kbd>Ctrl+D</kbd>
-  duplicates the picked nodes, <kbd>Delete</kbd> deletes them,
-  <kbd>Alt+↑</kbd> / <kbd>Alt+↓</kbd> move them.
+- <kbd>Ctrl+Z</kbd> undoes, <kbd>Ctrl+Y</kbd> redoes. <kbd>Ctrl+A</kbd>
+  picks every node (with the Outliner last clicked, every skill in the
+  category), <kbd>Ctrl+D</kbd> duplicates the picked nodes,
+  <kbd>Delete</kbd> deletes them, <kbd>Alt+↑</kbd> / <kbd>Alt+↓</kbd> move
+  them.
 
 ### Playing a skill
 
@@ -184,7 +192,7 @@ moveset's passive skills running alongside.
 
 | Do this | To |
 |---|---|
-| Right-drag | Look around from where the camera is |
+| Right-drag | Look around from where the camera is (the cursor stays where it was) |
 | Middle-drag | Pan |
 | Wheel | Move toward what's under the cursor |
 | <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd>, <kbd>Q</kbd> <kbd>E</kbd> (pointer over the view) | Fly forward, left, back, right, down, up (Shift: slower) |
@@ -210,7 +218,10 @@ The viewport's header has three cameras:
 
 **The skill's own camera** (in **Camera…**) decides whether the skill's Camera
 blocks, Field of View changes and shakes take over the view while they run,
-as they would on the player's screen in JJS.
+as they would on the player's screen in JJS. With the Free camera they take
+it only while the skill plays: stopped, the view stays yours, so you can fly
+around a moment where a Camera block runs. The Auto and Recorded cameras,
+and video exports, always show them.
 
 **Reset camera settings** (at the bottom of **Camera…**, or in the viewport's
 right-click menu) puts the cameras back as they start: the Free camera,
@@ -375,6 +386,15 @@ pieces to follow it: set how many a second; the easing still applies). With
 it off and only key to key, each piece uses JJS's own easing. **Hold at the
 end** keeps the effect where it stopped for a while.
 
+**Placement** says where the chain goes in the skill:
+
+- **After node N** (or **Where it is**, once it's in): the chain starts at
+  that node, as a new animation always has.
+- **Weave in**: it starts at a time in the skill (**Starts at**, or
+  **Playhead** for where the playhead is), and each of its pieces goes in
+  between the nodes already there, at its moment, splitting the WAITs it
+  falls in. Use it to lay a camera over a skill you've already built.
+
 ### Animating a camera
 
 1. **Animate → New camera animation** starts a draft for a Camera VISUAL
@@ -392,6 +412,25 @@ end** keeps the effect where it stopped for a while.
 Camera keys are stored relative to your character, so the shot follows the
 character as JJS's Camera blocks do. Rotation `0, 0, 0` looks the way you
 face; `0, 180, 0` looks back at you.
+
+How a camera is written, so it plays smoothly in JJS:
+
+- **As few blocks as it can, eased by JJS.** A stretch between two keys is
+  one Camera block with that key's easing. A smooth curve only adds blocks
+  where it bends away from a straight line, each with whichever of JJS's
+  easings follows it best; a shake needs short blocks (never under three
+  frames). The panel says how many blocks it makes.
+- **Back to back, in whole frames.** In JJS, when any Camera block's time
+  runs out the game gives the view back to the player, even while a newer
+  block is running. So the blocks never overlap and never leave a gap: each
+  ends on the frame the next begins. Writing it also cuts any other Camera
+  block in the line that would still be running when the next one starts.
+- **Your direction is locked while it plays.** A `STATE DirectionLock` goes
+  on you for the whole animation (its hold too), so you don't turn mid-shot.
+  Turn off **Lock your direction while it plays** to leave it out.
+
+The preview (**Play**, **Look through it**) shows the blocks as JJS will run
+them.
 
 ### Camera shake
 
@@ -564,7 +603,7 @@ Settings (search for it) has five tabs:
   there when Roblox already downloaded them), and deleting what Arayashiki
   downloaded.
 - **Updates**: the version you have, checking for a newer one (and whether
-  to check at launch), and taking the quick tour again.
+  to check at launch), taking the quick tour again, and what's new.
 
 ## Keyboard shortcuts
 
@@ -579,6 +618,7 @@ These are the defaults; change any of them in Settings → Keybinds.
 | <kbd>←</kbd> <kbd>→</kbd> | Back / forward a frame (Shift: ten) |
 | <kbd>↑</kbd> <kbd>↓</kbd> | Previous / next node |
 | <kbd>Alt+↑</kbd> <kbd>Alt+↓</kbd> | Move the node up / down |
+| <kbd>Ctrl+A</kbd> | Select all nodes (or skills, in the Outliner) |
 | <kbd>Ctrl+D</kbd> | Duplicate node |
 | <kbd>Delete</kbd> | Delete (in the panel you last clicked) |
 | <kbd>Ctrl+Z</kbd> / <kbd>Ctrl+Y</kbd> | Undo / redo |

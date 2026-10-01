@@ -455,6 +455,29 @@ function checkAgainstGame(node, at, add) {
 }
 
 /**
+ * Camera VISUALs that are still running when the next one on the same
+ * screen starts. BuilderFX hands the view back to the player when ANY
+ * Camera block's TIME runs out, even while a newer one is running, so an
+ * overlap shows as the view snapping to the player for a frame (a jitter).
+ */
+function cameraOverlaps(events) {
+  const cams = events.filter((e) => e.kind === 'VISUAL' && e.node?.EFFECT === 'Camera').sort((a, b) => a.t - b.t);
+  const out = [];
+  for (const who of new Set(cams.map((e) => e.who))) {
+    const list = cams.filter((e) => e.who === who);
+    list.forEach((e, i) => {
+      const next = list[i + 1];
+      const end = e.t + (Number(e.node.TIME) || 1);
+      if (next && end > next.t + 0.002)
+        out.push(
+          `Camera VISUAL at ${e.t.toFixed(2)}s runs until ${end.toFixed(2)}s, past the next one (${next.t.toFixed(2)}s): when its TIME runs out JJS gives the view back to the player mid-shot (a jitter). End it where the next begins.`,
+        );
+    });
+  }
+  return out.slice(0, 5);
+}
+
+/**
  * Checks skills the way JJS would read them: unreadable programs, branch
  * references that go nowhere (and look like typos), fields of the wrong
  * type, unknown kinds, and that the code round-trips losslessly. Each issue
@@ -481,6 +504,8 @@ export async function validate({ simulate: runSim = true, ...input }) {
           skill: `${skill.K_NAME}:${skill.NAME}`,
           message: `Simulator: ${w}`,
         });
+      for (const message of cameraOverlaps(run.events))
+        issues.push({ level: 'warning', skill: `${skill.K_NAME}:${skill.NAME}`, message });
     }
   const count = (level) => issues.filter((i) => i.level === level).length;
   return {

@@ -30,6 +30,7 @@ function Redirect({ to }) {
   return null;
 }
 const ManualDialog = lazy(() => import('./manual.jsx'), 'ManualDialog');
+const ChangelogDialog = lazy(() => import('./changelog.jsx'), 'ChangelogDialog');
 const ConnectDialog = lazy(() => import('../ai/connect.jsx'), 'ConnectDialog');
 const UpdatesDialog = lazy(() => import('./updates.jsx'), 'UpdatesDialog');
 const WelcomeDialog = lazy(() => import('./tour.jsx'), 'WelcomeDialog');
@@ -392,6 +393,9 @@ function UpdatesSettings() {
         <Button icon="sparkles" variant="ghost" onClick={startTour}>
           Take the quick tour again
         </Button>
+        <Button icon="file-text" variant="ghost" onClick={() => (S.dialog.value = 'changelog')}>
+          What’s new
+        </Button>
         <span class="spacer" />
         <Button icon="refresh" onClick={openUpdates}>
           Check for updates now
@@ -471,6 +475,8 @@ export function Dialogs() {
       return <TemplatesDialog />;
     case 'manual':
       return <ManualDialog />;
+    case 'changelog':
+      return <ChangelogDialog />;
     case 'connect-ai':
       return <ConnectDialog />;
     case 'updates':

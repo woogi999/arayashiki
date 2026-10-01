@@ -39,6 +39,7 @@ export const COMMANDS = [
   // Edit
   { id: 'undo', title: 'Undo', group: 'Edit', icon: 'undo', keywords: 'undo back', run: () => (S.workspace.peek() === 'bars' ? B.undo() : S.undo()) },
   { id: 'redo', title: 'Redo', group: 'Edit', icon: 'redo', keywords: 'redo again', run: () => (S.workspace.peek() === 'bars' ? B.redo() : S.redo()) },
+  { id: 'selectAll', title: 'Select all nodes', group: 'Nodes', icon: 'list', keywords: 'select all pick every node ctrl a', when: hasSkill, run: () => S.selectAll() },
   { id: 'duplicate', title: 'Duplicate node', group: 'Nodes', icon: 'copy', keywords: 'copy clone node', when: hasNode, run: () => S.duplicateNode() },
   { id: 'delete', title: 'Delete', group: 'Nodes', icon: 'trash-2', keywords: 'remove delete node skill', when: hasSkill, run: () => (S.activeArea.peek() === 'outliner' ? S.deleteOutlined() : S.deleteNode()) },
   { id: 'moveUp', title: 'Move node up', group: 'Nodes', icon: 'arrow-up', keywords: 'reorder', when: hasNode, run: () => S.moveNode(-1) },
@@ -91,6 +92,7 @@ export const COMMANDS = [
   { id: 'connectAi', title: 'Connect an AI app (MCP)', group: 'AI', icon: 'plug', keywords: 'mcp claude desktop cursor vscode codex connect', run: dialog('connect-ai') },
   { id: 'tour', title: 'Quick tour (where everything is)', group: 'Help', icon: 'sparkles', keywords: 'onboarding quick start guide tour welcome intro tutorial walkthrough basics', run: startTour },
   { id: 'checkUpdates', title: 'Check for updates', group: 'Help', icon: 'refresh', keywords: 'update upgrade new version release github download install', run: openUpdates },
+  { id: 'changelog', title: 'What’s new (changelog)', group: 'Help', icon: 'file-text', keywords: 'changelog changes release notes version history new', run: dialog('changelog') },
   { id: 'manual', title: 'User manual', group: 'Help', icon: 'help', keywords: 'help manual guide how docs', run: dialog('manual') },
   { id: 'settings', title: 'Settings', group: 'Settings', icon: 'settings', keywords: 'preferences options', run: dialog('settings') },
   { id: 'keybinds', title: 'Keyboard shortcuts', group: 'Settings', icon: 'keyboard', keywords: 'keys hotkeys shortcuts bindings', run: () => ((S.settingsTab.value = 'keys'), (S.dialog.value = 'settings')) },

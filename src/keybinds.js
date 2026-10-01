@@ -14,6 +14,7 @@ export const ACTIONS = [
   { id: 'frameNext', label: 'Forward a frame', def: 'ArrowRight' },
   { id: 'delete', label: 'Delete (in the area you last clicked)', def: 'Delete' },
   { id: 'duplicate', label: 'Duplicate node', def: 'Ctrl+D' },
+  { id: 'selectAll', label: 'Select all (the nodes, or the skills in the Outliner)', def: 'Ctrl+A' },
   { id: 'undo', label: 'Undo', def: 'Ctrl+Z' },
   { id: 'redo', label: 'Redo', def: 'Ctrl+Y' },
   { id: 'save', label: 'Save', def: 'Ctrl+S' },

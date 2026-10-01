@@ -439,7 +439,15 @@ marked, and they agree with what the owner found in-game:
   - **Shake Light / Medium / Heavy**: `AMOUNT` is how many of that shake
     start at once.
   - **Camera**: the view is fixed to the body part at `POSITION`/`ROTATION`,
-    easing to the ALT ones, for `TIME`.
+    easing to the ALT ones, for `TIME`. From BuilderFX's code: each block
+    runs on RenderStepped and stamps `CameraStart`, so **the newest block
+    moves the view**; but **any** block whose `TIME` runs out sets the camera
+    back to `Custom` (the player's), even while a newer one is running. So
+    Camera blocks that overlap, or leave a gap, snap the view to the player
+    for a frame (a jitter). Chain them back to back: each `TIME` ending where
+    the next block starts, in whole frames (a WAIT lasts at least one frame,
+    1/60 s). The tween is `CFrame:Lerp` by `TweenService:GetValue` with
+    `EASING STYLE`/`EASING DIRECTION`, so one block can ease a whole move.
 - **Blood**: `AMOUNT` drops, each a random size between `SIZE / 2` and
   `SIZE` (code).
 - From the guides: **Dismantle** only shows with an `ALT POSITION` (even

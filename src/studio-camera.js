@@ -1,6 +1,7 @@
 // The 3D Viewport's camera, driven the way Roblox Studio's is:
 //
-//   right-drag            turn the camera where it stands (look around)
+//   right-drag            turn the camera where it stands (look around); the
+//                         pointer is locked, so the cursor stays where it was
 //   middle-drag           pan
 //   wheel                 move toward (or away from) what's under the cursor
 //   W A S D, Q E          fly: forward, left, back, right, down, up
@@ -140,6 +141,25 @@ export class StudioCamera {
     };
     for (const [name, fn] of Object.entries(this.handlers))
       dom.addEventListener(name, fn, name === 'wheel' ? { passive: false } : undefined);
+    // Locked, the buttons' up may not come to the view: end the drag on
+    // any release, and if the lock is lost (Esc, the window losing focus).
+    this.release = (e) => this.drag && !(e.buttons & (this.drag.mode === 'look' ? 2 : 4)) && this.up(e);
+    this.lockChange = () => {
+      if (document.pointerLockElement !== this.dom && this.drag?.mode === 'look' && this.drag.moved > 3)
+        this.up({ pointerId: this.drag.id });
+    };
+    // The cursor doesn't move while locked, so the menu can't tell a look
+    // from a click by distance: the right-click that ends a look is no click.
+    this.noMenu = (e) => {
+      if (performance.now() - this.lookedAt < 200) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      }
+    };
+    this.lookedAt = 0;
+    addEventListener('pointerup', this.release);
+    addEventListener('contextmenu', this.noMenu, true);
+    document.addEventListener('pointerlockchange', this.lockChange);
     this.keydown = (e) => this.key(e, true);
     this.keyup = (e) => this.key(e, false);
     this.blur = () => this.held.clear();
@@ -156,17 +176,38 @@ export class StudioCamera {
     } catch {
       // a pointer the browser no longer knows; the drag works without capture
     }
-    this.drag = { mode: e.button === 2 ? 'look' : 'pan', x: e.clientX, y: e.clientY };
+    this.drag = { mode: e.button === 2 ? 'look' : 'pan', x: e.clientX, y: e.clientY, id: e.pointerId, moved: 0 };
     this.dom.style.cursor = e.button === 2 ? 'none' : 'move';
+  }
+
+  // Looking locks the pointer (as Studio does): the cursor stays where the
+  // drag began instead of wandering off, and comes back there on release.
+  // Only once it really drags, so a plain right-click still opens the menu.
+  lock() {
+    if (document.pointerLockElement === this.dom || !this.dom.requestPointerLock) return;
+    try {
+      const p = this.dom.requestPointerLock({ unadjustedMovement: true });
+      // Without raw input on this system, a plain lock.
+      p?.catch?.(() => this.drag && this.dom.requestPointerLock()?.catch?.(() => {}));
+    } catch {
+      // no pointer lock here: the drag goes on with the cursor moving
+    }
+  }
+
+  unlock() {
+    if (document.pointerLockElement === this.dom) document.exitPointerLock();
   }
 
   move(e) {
     if (!this.drag) return;
-    const dx = e.clientX - this.drag.x;
-    const dy = e.clientY - this.drag.y;
+    const locked = document.pointerLockElement === this.dom;
+    const dx = locked ? e.movementX : e.clientX - this.drag.x;
+    const dy = locked ? e.movementY : e.clientY - this.drag.y;
     this.drag.x = e.clientX;
     this.drag.y = e.clientY;
     if (this.drag.mode === 'look') {
+      this.drag.moved += Math.abs(dx) + Math.abs(dy);
+      if (!locked && this.drag.moved > 3) this.lock();
       this.yaw -= dx * LOOK;
       this.pitch = Math.max(-LIMIT, Math.min(LIMIT, this.pitch - dy * LOOK));
       this.apply();
@@ -188,7 +229,9 @@ export class StudioCamera {
     } catch {
       // already released
     }
+    if (this.drag.mode === 'look' && this.drag.moved > 3) this.lookedAt = performance.now();
     this.drag = null;
+    this.unlock();
     this.dom.style.cursor = '';
   }
 
@@ -263,6 +306,10 @@ export class StudioCamera {
     removeEventListener('keydown', this.keydown);
     removeEventListener('keyup', this.keyup);
     removeEventListener('blur', this.blur);
+    removeEventListener('pointerup', this.release);
+    removeEventListener('contextmenu', this.noMenu, true);
+    document.removeEventListener('pointerlockchange', this.lockChange);
+    this.unlock();
     cancelAnimationFrame(this.frame);
   }
 }

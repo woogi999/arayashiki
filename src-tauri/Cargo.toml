@@ -1,6 +1,6 @@
 [package]
 name = "arayashiki"
-version = "1.0.0"
+version = "1.0.1"
 description = "Jujutsu Shenanigans' Skill Builder as a desktop app, with a simulator."
 edition = "2021"
 publish = false
