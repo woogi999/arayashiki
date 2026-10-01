@@ -950,3 +950,122 @@
   color: var(--text-2);
   font-size: var(--text-xs);
 }
+
+/* ─── The font picker (src/barmaker/font-picker.jsx) ───────────────── */
+
+.fp-current {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  min-width: 0;
+  cursor: pointer;
+  text-align: left;
+}
+
+.fp-current span {
+  overflow: hidden;
+  font-size: var(--text-md);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.modal-fonts {
+  width: min(760px, calc(100vw - 48px));
+}
+
+.fp-bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 220px;
+  gap: 6px;
+  margin: 8px 0;
+}
+
+.fp-body {
+  display: grid;
+  gap: 8px;
+  max-height: 58vh;
+  overflow: hidden auto;
+  align-content: start;
+}
+
+.fp-cats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.fp-cats .chip[aria-pressed='true'] {
+  border-color: var(--sel-line);
+  background: var(--row-selected);
+  color: var(--text);
+}
+
+.fp-list {
+  display: grid;
+  gap: 1px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fp-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 26px;
+  gap: 4px;
+  align-items: center;
+  border-radius: var(--radius);
+}
+
+.fp-row:hover {
+  background: var(--row-hover);
+}
+
+.fp-row.is-current {
+  background: var(--row-selected);
+}
+
+.fp-use {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  min-width: 0;
+  padding: 6px 8px;
+  border: 0;
+  background: none;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.fp-name {
+  display: grid;
+  overflow: hidden;
+  font-size: var(--text-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fp-name small {
+  color: var(--text-3);
+  font-size: var(--text-xs);
+}
+
+.fp-sample {
+  overflow: hidden;
+  font-size: 22px;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fp-sample.is-loading {
+  color: var(--text-3);
+}
+
+.fp-have {
+  display: grid;
+  place-items: center;
+  color: var(--text-2);
+}

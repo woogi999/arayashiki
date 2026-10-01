@@ -1,6 +1,6 @@
 {
   "name": "arayashiki",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "private": true,
   "description": "Jujutsu Shenanigans' Skill Builder as a desktop app: open a moveset's code, edit it node by node, simulate skills on a 3D character, copy the code back. Its engine also answers AI agents through a CLI and an MCP server.",
   "license": "MIT",

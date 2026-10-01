@@ -450,6 +450,11 @@ export const newJjs = () => ({
   // Complex Separate's other pictures: the container's image ID, one trail
   // image ID per step, how long a trail takes to fade, and their uploads
   // ({ fingerprint, items: { "container:0" | "meter:N" | "trail:N": { decalId, imageId } } }).
+  // What moves the bar: 'tag' (your skills set it) or 'health' (your own
+  // health, read by a passive: a health bar), and that one's settings.
+  source: 'tag',
+  healthMax: 100,
+  healthEvery: 0.05,
   containerId: '',
   trailIds: '',
   trailTime: 0.4,

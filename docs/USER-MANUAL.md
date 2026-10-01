@@ -25,7 +25,10 @@ setup installs it too. After that, Arayashiki updates itself (see
 
 ### The quick tour
 
-The first time you open Arayashiki, it asks whether you'd like a quick tour.
+The first time you open Arayashiki, it asks which keyboard you use (QWERTY,
+AZERTY, QWERTZ, Dvorak or Colemak; the one it detects is picked), so the
+shortcuts' defaults sit where your fingers expect them, then whether you'd
+like a quick tour.
 The tour lights up each part of the window in turn (the menus, the
 workspaces, the Outliner, Nodes, the Viewport, the Timeline, Properties,
 Export and signing in) and says what it's for, then goes on to the Meter
@@ -510,6 +513,42 @@ and the shake hits and dies away. The **Light**, **Medium** and **Heavy**
 buttons set the picked key's shake; **Shakes a second** sets how fast it
 jitters.
 
+## Impact frames
+
+An impact frame is the moment of a hit that anime draws as a few frames of
+stark silhouettes, ink and lines. **Insert impact frame…** makes one from the
+moment itself. It's in the viewport's right-click menu (at the playhead), a
+skill's, and a node's (at that node), or press <kbd>Ctrl+Shift+I</kbd>.
+
+The characters are drawn as they'll be on screen then, through the skill's
+camera, and styled by a **look**:
+
+- **Presets**: Basic (black on white), Negative, Flicker (strobing), Anime
+  (speed lines and a burst), Halftone, Manga ink, Red flash, Colourful,
+  Spider-Verse (comic dots, misprinted colour, glitches), Cursed, Glitch,
+  Shatter, Sketch.
+- **Who's in it**: both of you, only you, only the enemy, or nobody.
+- **Frames** and **Each for**: several frames one after another make it hit
+  harder (Flicker and Red flash invert every other one).
+- **Screen shape**: the shape of the screen it's drawn for (16:9 for most).
+- **Shuffle** draws another take; **Flash it** previews it at speed.
+- **Edit the look**: the colours (and a gradient out from the hit), an
+  outline, speed lines, screentone, silhouettes in dots, cracks, a colour
+  split, glitch slices, scanlines, grain, a vignette, a starburst, inverting
+  every other frame, fading out the last.
+
+**Upload and insert** (signed in with Roblox) uploads the frames and puts
+them in the open branch at that moment, after the nodes already there: an
+**Overlay** VISUAL each, for its frame's time, splitting WAITs to fit. Or
+**Save pictures**, upload them yourself, paste their image IDs and **Insert
+with these IDs**.
+
+> An overlay is a picture over the screen, not in the world, so the
+> silhouettes only line up while a **Camera block** holds the view: without
+> one, every player's camera is somewhere else. The dialog says whether the
+> moment has one. Use impact frames on skills with a camera scene (Animate →
+> New camera animation).
+
 ### Removing an animation
 
 **Remove animation** takes the whole chain out of the skill and joins the
@@ -539,6 +578,14 @@ account, and makes the JJS skill that shows the right picture for the value.
 Designs are saved inside the app (**Save**), or as `.meter.json` files to
 share (**Save As**). **Settings** is in the Meter Maker's top bar too.
 
+**Fonts.** A text layer's (or text bar's) **Font** opens the font browser:
+**Built in and added**, **On this PC** (every font installed here), and
+**Google Fonts** (search, a category, most popular first). Each is previewed
+in its own letters; type your own preview text beside the search. Picking a
+Google font adds it to your list: it's downloaded once and kept, so it works
+offline, and the × takes it off the list. A PC font only looks right on PCs
+that have it, but the pictures you export look the same everywhere.
+
 **A picture as the bar.** A meter's **Picture** shape (Shape tab) makes a
 whole picture the bar, not one segment's shape: the fill sweeps across the
 picture's own outline, the way it fills a text bar. **Filled with** is the
@@ -567,6 +614,17 @@ step.
   upload makes and fills in all of them.
 - **Legacy**: each step shown again and again, every wait. Simple, but it can
   lag.
+
+**Moved by** says what moves the bar: **A tag** (your skills set it) or **Your
+health**, a health bar. A passive finds which step your health is on with Has
+Health checks, the way the Percentage damage template does (a binary search:
+five checks for twenty steps), and puts the bar on it, every **Check health
+every** seconds; step N is up to N/steps of **Max health**. A health bar has no
+regen or debug skills.
+
+Rendered in layers, the catch-up trail is each step's own, the same as the
+meter: it only flashes when the meter goes down, so it shows where the meter
+was (the trail's **Ahead by** is for single pictures).
 
 The 3D preview shows where the billboard sits on you, placed the way JJS
 places it (for Complex Separate, its layers stacked).
@@ -598,12 +656,13 @@ With nothing typed, it shows your favourites and what you ran lately.
 
 ## Right-click menus
 
-Right-click shows a menu for what you clicked:
+Right-click shows a menu for what you clicked (a window, once open, stays
+open when you click outside it: Esc or its × closes it):
 
-- a **node**: animate it (VISUALs), duplicate, move, copy and paste nodes as
+- a **node**: animate it (VISUALs), insert an impact frame there, duplicate, move, copy and paste nodes as
   JSON, play from it, **Add node ▸** and **Add visual effect ▸** (after it),
   delete;
-- a **skill** in the Outliner: play, **Add node ▸** and **Add visual effect
+- a **skill** in the Outliner: play, insert an impact frame, **Add node ▸** and **Add visual effect
   ▸**, add, duplicate, move, copy its code for JJS, delete;
 - a **branch**: add nodes to it, add a branch, play from it, delete;
 - an empty spot in the **Nodes** or **Outliner** panel: add nodes (or a
@@ -667,8 +726,11 @@ and nothing leaves your PC:
 
 The model loads when you send the first message (a few seconds, longer for
 big models) and stays loaded until Arayashiki closes; **Stop** frees its
-memory sooner. **Context** is how much of the conversation it keeps in mind
-(more needs more memory), and **Use the graphics card** off runs it on the
+memory sooner. **Context** is how much of the conversation it keeps in mind,
+from 8K to 1M tokens. More needs much more memory: past 32K the settings show
+roughly how much, and past 128K they warn that it's beyond what most PCs and
+graphics cards have (the engine may not start, or the PC may slow to a crawl)
+and what most models are trained for. **Use the graphics card** off runs it on the
 processor only. Any other model from Hugging Face works too: paste the link
 to its `.gguf` file under **Another model from Hugging Face** (a Q4_K_M file
 of a model that supports tool calling).
@@ -695,10 +757,11 @@ command (`arayashiki.exe --mcp`) and a JSON snippet.
 
 Settings (search for it) has five tabs:
 
-- **Keybinds** (<kbd>Ctrl+/</kbd>): every command has a shortcut, grouped as
-  in this manual. Click one and press the new keys, or clear it (×); the
-  undo arrow puts its default back. Two shortcuts heard in the same place are
-  marked as a clash.
+- **Keybinds** (<kbd>Ctrl+/</kbd>): your **keyboard layout** (the defaults
+  follow it: flying is ZQSD on AZERTY, `, A O E` on Dvorak), and every
+  command's shortcut, grouped as in this manual. Click one and press the new
+  keys, or clear it (×); the undo arrow puts its default back. Two shortcuts
+  heard in the same place are marked as a clash.
 - **Appearance**: the start screen on launch, the interface size, the
   viewport's background, hitboxes.
 - **AI**: the assistant, the free models on this PC (download and pick one
@@ -754,6 +817,7 @@ cleared) in Settings → Keybinds (<kbd>Ctrl+/</kbd>).
 | <kbd>Alt+K</kbd> / <kbd>Alt+Shift+K</kbd> / <kbd>Alt+P</kbd> | Record a camera take / clear camera keys / edit the camera path |
 | <kbd>Ctrl+K</kbd> | Animate the picked VISUAL |
 | <kbd>Ctrl+Shift+K</kbd> / <kbd>Ctrl+Alt+K</kbd> | New camera animation / new visual animation |
+| <kbd>Ctrl+Shift+I</kbd> | Insert an impact frame at the playhead |
 | <kbd>G</kbd> / <kbd>R</kbd> / <kbd>Tab</kbd> | In the animator: move / turn the picked key; keys or graph |
 | <kbd>F12</kbd> / <kbd>Shift+F12</kbd> | Export a picture / quick screenshot to Pictures |
 | <kbd>Ctrl+F12</kbd> | Export a video |

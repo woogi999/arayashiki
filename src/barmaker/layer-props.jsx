@@ -1,6 +1,7 @@
 // The settings for whichever layer is picked in the Progress Bar Maker, one
 // tab at a time.
-import { BLENDS, FONTS } from './draw.js';
+import { BLENDS } from './draw.js';
+import { FontPicker } from './font-picker.jsx';
 import { layerField, matchSteps, setLayer } from './state.js';
 import { Check, Chips, ColourAlpha, ColourField, Fx, Group, ImagePick, Num, PaintField, Picks, Slider } from './fields.jsx';
 
@@ -153,18 +154,7 @@ function Blend({ value, path }) {
 }
 
 function FontPick({ value, path }) {
-  return (
-    <label class="pb-row">
-      <span class="pb-row-label">Font</span>
-      <select class="input" value={value} onChange={f(path)}>
-        {FONTS.map((name) => (
-          <option key={name} value={name}>
-            {name}
-          </option>
-        ))}
-      </select>
-    </label>
-  );
+  return <FontPicker value={value} onPick={set(path)} />;
 }
 
 // A switchable effect whose colour and opacity live at `${base}.color/alpha`.
@@ -443,7 +433,7 @@ function BarFill({ layer }) {
         title="Catch-up trail"
         on={layer.trail.on}
         onToggle={set('trail.on')}
-        hint="A second, paler fill running a little ahead of the real one."
+        hint="A second, paler fill running a little ahead of the real one. Rendered in layers (Complex Separate), the trail is the step’s own, the same as the meter (Ahead by doesn’t apply): it only flashes when the meter goes down, so it shows where it was."
       >
         {colourOf(layer, 'trail', 'Trail')}
         <Slider label="Ahead by" unit="%" min="1" max="50" value={layer.trail.amount} onInput={f('trail.amount')} />

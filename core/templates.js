@@ -17,7 +17,7 @@
 // Stuff; the Templates dialog, src/ui/templates.jsx, shows them, and the
 // MCP server and CLI build them.)
 
-import { buildSkill, parseIds } from './barskill.js';
+import { buildSkill, HAS_HEALTH, hasHealth, parseIds } from './barskill.js';
 
 const FOREVER = 1e38;
 
@@ -1037,12 +1037,9 @@ function accurateDash(v) {
 // `HP` (the owner's export), which JJS wrote bare, with its defaults left
 // out; its value is assumed to be AMOUNT and FLIP, like BAR's.
 
-export const HAS_HEALTH = 'HP';
-const hasHealth = (above) => ({
-  K_NAME: HAS_HEALTH,
-  AMOUNT: above,
-  FLIP: false,
-});
+// Has Health lives with the meter's health bar (core/barskill.js), which
+// searches health the same way.
+export { HAS_HEALTH };
 const hundredths = (n) => Math.round(n * 100) / 100;
 
 /** Percentages from "20, 50%": each once, in order. */

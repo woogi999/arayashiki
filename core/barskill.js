@@ -204,10 +204,87 @@ const nudge = (tag, value) => ({
  * regen        { amount, every }: add `amount` to the tag every `every`
  *              seconds, in a passive skill of its own; null for none
  *
- * Two debug skills always come last: key 1 adds one step, key 2 takes one
- * away, for trying the bar out in the builder.
+ * health       { max, every }: a health bar. Your health sets the tag (a
+ *              passive checks it every `every` seconds; see healthWatch), in
+ *              place of the regen and the debug skills
+ *
+ * Two debug skills come last (not for a health bar): key 1 adds one step,
+ * key 2 takes one away, for trying the bar out in the builder.
  */
-export function buildSkill({
+export function buildSkill(options) {
+  const { health = null } = options;
+  if (!health) return buildBar(options);
+  // A health bar: the bar as it is, without its regen, plus a passive that
+  // keeps the tag on your health's step (the debug skills would only fight it).
+  const bar = buildBar({ ...options, regen: null }).filter((s) => !s.NAME.startsWith('Debug: '));
+  const top = (options.textures?.length ?? 1) - 1;
+  return [...bar, healthWatch({ name: options.name ?? 'Bar', tag: options.tag ?? 'Bar', steps: top, max: health.max, every: health.every })];
+}
+
+// ─── A health bar ─────────────────────────────────────────────────────────
+// JJS has no "set the tag to my health", but a branch can need Has Health
+// above a value (the Percentage damage template's ladder, core/templates.js).
+// So a passive finds which step your health is on by a binary search of Has
+// Health checks (20 steps: 5 hops) and puts the bar's tag on it, then waits
+// and looks again; a step already on show isn't set again. Step k is health
+// in (max·(k−1)/n, max·k/n]; none at all is step 0, anything over max is n.
+
+/** JJS's Has Health condition: passes while the runner has more than `above`. */
+export const HAS_HEALTH = 'HP';
+export const hasHealth = (above) => ({ K_NAME: HAS_HEALTH, AMOUNT: above, FLIP: false });
+
+/**
+ * The branches of a binary search over health: `leaf(k)` is the line for
+ * step k (0…steps), where health is in (highs[k-1], highs[k]]; returns
+ * { branches, entry }. `prefix` names them.
+ */
+export function healthSearch({ highs, leaf, prefix }) {
+  const branches = {};
+  const low = (i) => (i === 0 ? null : highs[i - 1]);
+  const lineOf = (Line, Req = []) => ({ Line, Req });
+  function steps(i, j, Req = []) {
+    const name = `${prefix} ${i}-${j}`;
+    if (i === j) {
+      branches[name] = lineOf(leaf(i), Req);
+      return name;
+    }
+    const mid = Math.floor((i + j) / 2);
+    const upper = steps(mid + 1, j, [hasHealth(low(mid + 1))]);
+    const lower = steps(i, mid);
+    // The upper half only runs with the health for it; else on to the lower.
+    branches[name] = lineOf([branch(upper), branch(lower)], Req);
+    return name;
+  }
+  return { branches, entry: steps(0, highs.length) };
+}
+
+const round2 = (n) => Math.round(n * 100) / 100;
+
+/** The passive that keeps `tag` on your health's step, 0 to `steps`. */
+export function healthWatch({ name = 'Bar', tag = 'Bar', steps, max = 100, every = 0.05 }) {
+  const top = Math.max(1, steps);
+  const highs = Array.from({ length: top }, (_, k) => round2((Math.max(1, Number(max) || 100) * k) / top)).slice(1);
+  // highs[k-1] is the bottom of step k (k ≥ 1); step 0 is health up to the first.
+  const thresholds = [0, ...highs];
+  const hold = `${name} HP hold`;
+  const leaf = (k) => [
+    check(tag, String(k), hold),
+    set(tag, String(k), 0),
+    set(tag, String(k), FOREVER),
+    branch(hold),
+  ];
+  const { branches, entry } = healthSearch({ highs: thresholds, leaf, prefix: 'HP' });
+  branches[hold] = { Line: [{ TIME: Math.max(0.01, Number(every) || 0.05), K_NAME: 'WAIT' }, branch('Watch')], Req: [] };
+  branches.Watch = { Line: [branch(entry)], Req: [] };
+  return skillOf(`${name} Health`, 99, {
+    Req: [],
+    Line: [branch('Watch')],
+    Prop: { USE: true, REP2: true, NOSTUN: true, AWK2: true, AWK: true, NOCANCEL: true },
+    Branch: branches,
+  });
+}
+
+function buildBar({
   textures,
   name = 'Bar',
   tag = 'Bar',

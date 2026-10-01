@@ -1161,6 +1161,66 @@ export function mountSkillScene(host, { textureUrl = async () => null, meshData 
     return { pixels, width: w, height: h };
   }
 
+  // ─── Impact frames (src/impact.js) ────────────────────────────────────
+
+  /**
+   * The characters at t as JJS's screen will show them, for an impact
+   * frame drawn over it: through the skill's camera when a Camera block runs
+   * then (else the view's), a white silhouette of each on black, `width` ×
+   * `height`. { masks: { user, target } (Uint8ClampedArray, one byte a pixel,
+   * top row first), point: [x, y] where the dummy (or you) is on screen,
+   * camera: whether a Camera block had the view }.
+   */
+  async function silhouettes(t, { width = 1024, height = 576 } = {}) {
+    const w = Math.max(16, Math.round(width));
+    const h = Math.max(16, Math.round(height));
+    const target = new WebGLRenderTarget(w, h);
+    const keep = { background: scene.background, fog: scene.fog, skillCamera, override: scene.overrideMaterial };
+    skillCamera = true;
+    // Where the camera is: the view's, as capture() does, then the skill's
+    // Camera block over it (stage applies it).
+    const from = modeCamera(camMode, t);
+    shot.userData.baseFov = from?.fov ?? BASE_FOV;
+    shot.position.copy(from?.position ?? camera.position);
+    shot.quaternion.copy(from?.quaternion ?? camera.quaternion);
+    shot.aspect = w / h;
+    shot.updateProjectionMatrix();
+    const screen = run ? stage(t, shot) : null;
+    scene.background = new Color('#000000');
+    scene.fog = null;
+    scene.overrideMaterial = new MeshBasicMaterial({ color: '#ffffff' });
+    const shown = scene.children.map((c) => [c, c.visible]);
+    const masks = {};
+    for (const who of ['user', 'target']) {
+      const mine = new Set([people[who].root, people[who].ragdoll.group]);
+      for (const [c] of shown) c.visible = mine.has(c) && (who === 'user' || dummyShown);
+      renderer.setRenderTarget(target);
+      renderer.setClearColor(0x000000, 1);
+      renderer.clear();
+      renderer.render(scene, shot);
+      const px = new Uint8Array(w * h * 4);
+      await renderer.readRenderTargetPixelsAsync(target, 0, 0, w, h, px);
+      // WebGL reads bottom row first.
+      const m = new Uint8ClampedArray(w * h);
+      for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) m[(h - 1 - y) * w + x] = px[(y * w + x) * 4];
+      masks[who] = m;
+    }
+    for (const [c, v] of shown) c.visible = v;
+    renderer.setRenderTarget(null);
+    scene.overrideMaterial.dispose();
+    Object.assign(scene, { background: keep.background, fog: keep.fog, overrideMaterial: keep.override });
+    skillCamera = keep.skillCamera;
+    target.dispose();
+    // Where the hit lands on screen: the dummy's chest, else yours, else the middle.
+    const on = (who) => {
+      const p = people[who].root.position.clone().add(new Vector3(0, 1.5, 0)).project(shot);
+      return p.z < 1 && Math.abs(p.x) <= 1.2 && Math.abs(p.y) <= 1.2 ? [((p.x + 1) / 2) * w, ((1 - p.y) / 2) * h] : null;
+    };
+    const point = (dummyShown && on('target')) || on('user') || [w / 2, h / 2];
+    show(time);
+    return { masks, point, width: w, height: h, camera: Boolean(screen?.camera) };
+  }
+
   function endCapture() {
     shotTarget?.dispose();
     shotOut?.dispose();
@@ -1694,6 +1754,7 @@ export function mountSkillScene(host, { textureUrl = async () => null, meshData 
     partFrame: (who, part, t) => frameAt(who, part || 'HumanoidRootPart', t),
     capture,
     endCapture,
+    silhouettes,
     setAnimOverlay,
     setEditTool,
     /** Whether a right-drag (look) or middle-drag (pan) is going on. */

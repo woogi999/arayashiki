@@ -89,6 +89,7 @@ export const COMMANDS = [
   { id: 'cameraPath', title: 'Edit the camera path for video…', group: 'Camera', icon: 'route', keywords: 'camera path keys video export recorded fly', when: editing, run: () => import('./ui/campath.jsx').then((m) => m.openCameraPath()) },
   { id: 'animateVisual', title: 'New visual animation', group: 'Animate', icon: 'wand', keywords: 'animate keyframe mesh block sphere part motion path blender', when: hasSkill, run: () => animator().then((m) => m.newVisualAnimation()) },
   { id: 'animate', title: 'Animate the picked VISUAL (keyframes)', group: 'Animate', icon: 'wand', keywords: 'animate keyframe mesh motion path blender move', when: hasNode, run: () => animator().then((m) => m.openAnimator()) },
+  { id: 'impactFrame', title: 'Insert impact frame…', group: 'Animate', icon: 'zap', keywords: 'impact frame anime flash silhouette halftone manga spiderverse overlay hit freeze', when: hasSkill, run: () => import('./ui/impact.jsx').then((m) => m.openImpactFrame()) },
   { id: 'animateCamera', title: 'New camera animation', group: 'Animate', icon: 'camera', keywords: 'camera animation keyframes shot fly path shake', when: hasSkill, run: () => animator().then((m) => m.newCameraAnimation()) },
 
   // Workspaces and windows

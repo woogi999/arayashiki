@@ -129,6 +129,7 @@ function nodeItems(index) {
   return [
     animatable && item(`Animate (keyframes)…`, 'wand', () => command('animate').run(), { keys: bindingOf('animate') }),
     node?.K_NAME === 'VISUAL' && cmd('continueVisual', 'Continue from ALT POSITION'),
+    item('Insert impact frame at this node…', 'zap', () => import('./impact.jsx').then((m) => m.openImpactFrame({ index }))),
     animatable && sep,
     cmd('duplicate'),
     cmd('selectAll'),
@@ -170,6 +171,7 @@ function skillItems(uid) {
   }
   return [
     cmd('play', 'Play this skill'),
+    cmd('impactFrame', 'Insert impact frame…'),
     sep,
     ...addNodeItems(),
     sep,
@@ -236,6 +238,7 @@ function viewportItems() {
     cmd('exportVideo'),
     sep,
     cmd('animateCamera'),
+    cmd('impactFrame', 'Insert impact frame here…'),
   ];
 }
 

@@ -1020,6 +1020,15 @@ there are no Drop branches: it's Complex with the container apart. The Meter
 Maker renders the three picture sets (`render(doc, step, { part })` in
 `src/barmaker/draw.js`: `container`, `meterLead`, `trail`) and uploads them.
 
+**A health bar** (any style, "Moved by: Your health"). The tag is set from
+the runner's own health by a passive, `<name> Health`, which searches it with
+`HP` (Has Health) conditions on branches, as the Percentage damage template
+does: `Watch` → a binary ladder (a BRANCH line tries the upper half, whose
+Req needs health above its bottom, then the lower) → a leaf per step that
+skips if the tag is already that step (TAG CHECK → hold), else clears and
+sets it → `WAIT`, back to `Watch`. Step k is health in (max·(k−1)/n,
+max·k/n]; 0 is none. No regen or debug skills (they'd fight it).
+
 **Legacy** (the first version). Each step is shown briefly and the dispatcher
 runs again, which draws it again, for ever:
 

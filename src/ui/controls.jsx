@@ -83,7 +83,8 @@ export function Modal({ title, onClose, children, class: className = '', actions
         e.preventDefault();
         onClose();
       }}
-      onClick={(e) => e.target === ref.current && onClose()}
+      // A click outside the dialog doesn't close it (it's easy to lose work
+      // that way): Esc and the × do.
     >
       <header class="modal-head">
         <h2>{title}</h2>

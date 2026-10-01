@@ -385,6 +385,25 @@ module('Unit | JJS skill export', function () {
     assert.deepEqual(await decodeSkill(await encodeSkill(skill)), skill, 'the code decodes back to it');
   });
 
+  test('a health bar: your health puts the tag on its step', function (assert) {
+    const skills = buildSkill({ textures: [0, 1, 2, 3, 4], health: { max: 100, every: 0.05 } });
+    assert.deepEqual(skills.map((s) => s.NAME), ['Bar', 'Bar Health'], 'the bar and its watcher, no regen or debug');
+    const { Branch } = JSON.parse(skills[1].DATA);
+    // Walk the search for some health: the step it lands on.
+    const stepFor = (hp) => {
+      let name = Branch.Watch.Line[0].BRANCH;
+      for (;;) {
+        const b = Branch[name];
+        const next = b.Line.find((n) => n.K_NAME === 'BRANCH' && (Branch[n.BRANCH]?.Req ?? []).every((r) => hp > r.AMOUNT));
+        const set = b.Line.find((n) => n.K_NAME === 'TAG' && n.SET);
+        if (set) return Number(set.VALUE);
+        name = next.BRANCH;
+      }
+    };
+    assert.deepEqual([0, 1, 25, 26, 50, 51, 75, 76, 100, 140].map(stepFor), [0, 1, 1, 2, 2, 3, 3, 4, 4, 4]);
+    assert.strictEqual(Branch['Bar HP hold'].Line[0].TIME, 0.05, 'and looks again');
+  });
+
   test('IDs are read however they are typed', function (assert) {
     assert.deepEqual(parseIds('123, 456\n 789 abc 10'), [
       '123',

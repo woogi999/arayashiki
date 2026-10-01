@@ -24,8 +24,32 @@ const CONTEXTS = [
   [8192, '8K (least memory)'],
   [16384, '16K'],
   [32768, '32K (suggested)'],
-  [65536, '64K (most memory)'],
+  [65536, '64K'],
+  [131072, '128K (a lot of memory)'],
+  [262144, '256K (risky)'],
+  [524288, '512K (unsafe on most PCs)'],
+  [1048576, '1M (unsafe on most PCs)'],
 ];
+
+// What the context costs on top of the model, roughly: the attention cache
+// grows with every token it keeps (about 40 KB a token per GB of model, at
+// the engine's usual 16-bit cache; models differ a lot).
+const cacheBytes = (modelBytes, ctx) => 4e-5 * modelBytes * ctx;
+
+/** A warning for a context this big with this model, or null. */
+function contextWarning(ctx, modelBytes) {
+  if (ctx <= 32768) return null;
+  const extra = modelBytes ? cacheBytes(modelBytes, ctx) : null;
+  const need = extra ? `About ${gb(extra + modelBytes)} of memory in all (the model, and ${gb(extra)} for the context)` : 'Much more memory';
+  const ram = navigator.deviceMemory ? ` This PC reports at least ${navigator.deviceMemory} GB.` : '';
+  if (ctx <= 65536) return { level: 'note', text: `${need}, and slower first replies.${ram}` };
+  if (ctx <= 131072)
+    return { level: 'warn', text: `${need}. Many small models are trained to 32K–128K, and lose the thread past it.${ram}` };
+  return {
+    level: 'danger',
+    text: `${need}: past what most PCs and graphics cards have. The engine may refuse to start, or the PC may slow to a crawl while it swaps to disk, and few models are trained this far (they ramble or forget). Only with a model built for long context, and the memory for it.${ram}`,
+  };
+}
 
 function Bar({ p }) {
   const pct = p.total ? Math.min(100, (p.got / p.total) * 100) : 0;
@@ -241,6 +265,16 @@ export function LocalModels({ model, ctx, gpu, onModel, onOptions }) {
           ))}
         </select>
       </label>
+      {(() => {
+        const w = contextWarning(ctx, have.get(model)?.size ?? CATALOG.find((c) => c.file === model)?.size);
+        return (
+          w && (
+            <p class={`local-ctx-warn is-${w.level}`} role={w.level === 'danger' ? 'alert' : undefined}>
+              <Icon name="warning" size={13} /> {w.text}
+            </p>
+          )
+        );
+      })()}
       <div class="prop-row">
         <span title="Off runs it on the processor only: slower, but works anywhere">Use the graphics card</span>
         <Switch checked={gpu} label="Use the graphics card" onChange={(on) => onOptions({ localGpu: on })} />

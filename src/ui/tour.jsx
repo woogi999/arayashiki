@@ -7,7 +7,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import * as S from '../store.js';
 import { Icon } from '../icons.jsx';
-import { bindingOf } from '../keybinds.js';
+import { LAYOUTS, bindingOf, detectLayout, layoutChosen, setLayout } from '../keybinds.js';
 import { markOnboarded, startTour } from '../onboarding.js';
 import markUrl from '../assets/arayashiki-mark.png';
 
@@ -15,13 +15,75 @@ const close = () => (S.dialog.value = null);
 
 // ─── The welcome ─────────────────────────────────────────────────────────
 
+// First of all: which keyboard, so the shortcuts' defaults sit where the
+// user's fingers expect them (src/keybinds.js).
+function KeyboardPage({ onDone }) {
+  const [pick, setPick] = useState('qwerty');
+  const [found, setFound] = useState(null);
+  useEffect(() => {
+    detectLayout().then((id) => {
+      if (!id) return;
+      setFound(id);
+      setPick(id);
+    });
+  }, []);
+  const fly = { qwerty: 'W A S D', azerty: 'Z Q S D', qwertz: 'W A S D', dvorak: ', A O E', colemak: 'W A R S' };
+  return (
+    <div class="tw-text">
+      <p class="tw-kicker">Welcome · 1 of 2</p>
+      <h2 id="tw-title" class="tw-title">
+        Which keyboard do you use?
+      </h2>
+      <p class="tw-line">
+        The shortcuts follow it: flying the camera, for one, stays on the keys under your left hand. You can change it
+        later in Settings → Keyboard shortcuts.
+      </p>
+      <div class="tw-layouts" role="radiogroup" aria-label="Keyboard layout">
+        {LAYOUTS.map((l) => (
+          <button
+            type="button"
+            role="radio"
+            key={l.id}
+            class="tw-layout"
+            aria-checked={pick === l.id}
+            onClick={() => setPick(l.id)}
+          >
+            <strong>{l.label}</strong>
+            <span>{l.hint}</span>
+            <kbd>{fly[l.id]}</kbd>
+            {found === l.id && <em>This keyboard</em>}
+          </button>
+        ))}
+      </div>
+      <div class="tw-actions">
+        <button
+          type="button"
+          class="btn btn-primary tw-go"
+          autoFocus
+          onClick={() => {
+            setLayout(pick);
+            onDone();
+          }}
+        >
+          <span>Continue</span>
+          <Icon name="arrow-right" size={15} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function WelcomeDialog() {
   const ref = useRef(null);
+  const [asking, setAsking] = useState(!layoutChosen.peek());
+  const [asked] = useState(!layoutChosen.peek());
   useEffect(() => {
     ref.current.showModal();
     return () => ref.current?.open && ref.current.close();
   }, []);
   const skip = () => {
+    // Leaving straight away still keeps a layout: the one it looks like.
+    if (!layoutChosen.peek()) detectLayout().then((id) => setLayout(id ?? 'qwerty'));
     markOnboarded('skipped');
     close();
   };
@@ -48,8 +110,11 @@ export function WelcomeDialog() {
         <img class="tw-mark" src={markUrl} alt="" width="132" height="132" />
         <div class="tw-floor" />
       </div>
+      {asking ? (
+        <KeyboardPage onDone={() => setAsking(false)} />
+      ) : (
       <div class="tw-text">
-        <p class="tw-kicker">Welcome</p>
+        <p class="tw-kicker">{asked ? 'Welcome · 2 of 2' : 'Welcome'}</p>
         <h2 id="tw-title" class="tw-title">
           First time in Arayashiki?
         </h2>
@@ -85,6 +150,7 @@ export function WelcomeDialog() {
           <kbd>{bindingOf('search')}</kbd> and search “tour”.
         </p>
       </div>
+      )}
     </dialog>
   );
 }

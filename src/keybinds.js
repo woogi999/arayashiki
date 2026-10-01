@@ -105,6 +105,7 @@ export const ACTIONS = [
   { id: 'animate', group: 'Animate', label: 'Animate the picked VISUAL (keyframes)', def: 'Ctrl+K' },
   { id: 'animateCamera', group: 'Animate', label: 'New camera animation', def: 'Ctrl+Shift+K' },
   { id: 'animateVisual', group: 'Animate', label: 'New visual animation', def: 'Ctrl+Alt+K' },
+  { id: 'impactFrame', group: 'Animate', label: 'Insert an impact frame at the playhead', def: 'Ctrl+Shift+I' },
   { id: 'animMove', group: 'Animate', label: 'Animator gizmo: move the key', def: 'G', scope: 'animator' },
   { id: 'animTurn', group: 'Animate', label: 'Animator gizmo: turn the key', def: 'R', scope: 'animator' },
   { id: 'animGraph', group: 'Animate', label: 'Animator: keys / easing graph', def: 'Tab', scope: 'animator' },
@@ -132,6 +133,97 @@ export const ACTIONS = [
 
 export const GROUPS = [...new Set(ACTIONS.map((a) => a.group))];
 
+// ─── Keyboard layouts ───────────────────────────────────────────────────
+// Shortcuts are written by the letter a key types, so on another layout the
+// defaults move to keep their place: flying is WASD on the keys where QWERTY
+// has them (ZQSD on AZERTY), and a shortcut whose key needs Shift there
+// gets one that doesn't. Asked on the first launch (src/ui/tour.jsx) and in
+// Settings → Keyboard shortcuts; the shortcuts changed by hand stay.
+export const LAYOUTS = [
+  { id: 'qwerty', label: 'QWERTY', hint: 'US, UK, and most keyboards' },
+  { id: 'azerty', label: 'AZERTY', hint: 'French, Belgian' },
+  { id: 'qwertz', label: 'QWERTZ', hint: 'German, Swiss, Central European' },
+  { id: 'dvorak', label: 'Dvorak', hint: 'Dvorak Simplified' },
+  { id: 'colemak', label: 'Colemak', hint: 'Colemak and Colemak-DH' },
+];
+const LAYOUT_DEFAULTS = {
+  qwerty: {},
+  azerty: {
+    flyForward: 'Z',
+    flyLeft: 'Q',
+    flyDown: 'A',
+    // "/" and "." need Shift on AZERTY.
+    keybinds: 'Ctrl+F2',
+    barNextStep: ';',
+  },
+  qwertz: {
+    // "/" and "=" need Shift on QWERTZ; "+" doesn't.
+    keybinds: 'Ctrl+F2',
+    zoomIn: 'Ctrl++',
+  },
+  dvorak: {
+    flyForward: ',',
+    flyLeft: 'A',
+    flyBack: 'O',
+    flyRight: 'E',
+    flyDown: "'",
+    flyUp: '.',
+    // Dvorak's "." and "," fly, so the Meter Maker's steps go on the brackets' keys.
+    barPrevStep: '[',
+    barNextStep: ']',
+  },
+  colemak: {
+    flyBack: 'R',
+    flyRight: 'S',
+    flyUp: 'F',
+    frameYou: 'T',
+    // R flies back, so the animator turns on the key where QWERTY has R.
+    animTurn: 'P',
+  },
+};
+const LAYOUT_KEY = 'arayashiki-keyboard';
+const readLayout = () => {
+  try {
+    return localStorage.getItem(LAYOUT_KEY);
+  } catch {
+    return null;
+  }
+};
+/** The layout picked, or null before anyone's said (QWERTY's defaults meanwhile). */
+export const layoutChosen = signal(readLayout());
+export const layout = { get value() { return LAYOUT_DEFAULTS[layoutChosen.value] ? layoutChosen.value : 'qwerty'; } };
+export function setLayout(id) {
+  if (!LAYOUT_DEFAULTS[id]) return;
+  layoutChosen.value = id;
+  try {
+    localStorage.setItem(LAYOUT_KEY, id);
+  } catch {
+    // not kept
+  }
+}
+
+/**
+ * The layout this keyboard seems to be, where the browser can tell
+ * (Chrome's and WebView2's keyboard map): what the keys at Q, Y, S type.
+ */
+export async function detectLayout() {
+  try {
+    const map = await navigator.keyboard?.getLayoutMap?.();
+    if (!map) return null;
+    const at = (code) => String(map.get(code) ?? '').toLowerCase();
+    if (at('KeyQ') === 'a' && at('KeyW') === 'z') return 'azerty';
+    if (at('KeyY') === 'z') return 'qwertz';
+    if (at('KeyQ') === "'" || at('KeyS') === 'o') return 'dvorak';
+    if (at('KeyS') === 'r' && at('KeyD') === 's') return 'colemak';
+    return 'qwerty';
+  } catch {
+    return null;
+  }
+}
+
+/** An action's default on the layout in use. */
+export const defaultOf = (id) => LAYOUT_DEFAULTS[layout.value]?.[id] ?? ACTIONS.find((a) => a.id === id)?.def ?? '';
+
 const KEY = 'arayashiki-keybinds';
 function load() {
   try {
@@ -150,7 +242,10 @@ effect(() => {
   }
 });
 
-export const bindingOf = (id) => custom.value[id] ?? ACTIONS.find((a) => a.id === id)?.def ?? '';
+export const bindingOf = (id) => {
+  void layoutChosen.value; // re-read when the layout changes
+  return custom.value[id] ?? defaultOf(id);
+};
 
 const NAMES = { ' ': 'Space', Del: 'Delete', Esc: 'Escape' };
 /** A key's own name: "W", "Space", "ArrowUp", "1" (by its place, whatever Shift makes it). */
@@ -217,7 +312,7 @@ export function clashesOf(id) {
 
 /** Binds `id` to `combo`: null puts its default back, "" leaves it without one. */
 export function rebind(id, combo) {
-  const def = ACTIONS.find((a) => a.id === id)?.def;
+  const def = defaultOf(id);
   const { [id]: _old, ...rest } = custom.value;
   custom.value = combo == null || combo === def ? rest : { ...rest, [id]: combo };
 }

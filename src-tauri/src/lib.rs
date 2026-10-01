@@ -16,6 +16,7 @@ mod account;
 mod ai;
 mod bridge;
 mod files;
+mod fonts;
 mod install;
 mod local;
 mod roblox;
@@ -417,6 +418,9 @@ pub fn run() {
             open_text,
             open_code_file,
             save_code_file,
+            fonts::fonts_system,
+            fonts::fonts_google_list,
+            fonts::fonts_google_file,
             files::stream_create,
             files::stream_write,
             files::stream_close,

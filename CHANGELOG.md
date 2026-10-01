@@ -3,6 +3,65 @@
 What changed in each version of Arayashiki, newest first. The app shows this
 under Help → What's new.
 
+## 1.0.3
+
+### Impact frames
+
+- **Insert impact frame…**, in the viewport's right-click menu, a skill's, and
+  a node's (or Ctrl+Shift+I): the few frames of a hit that anime draws as
+  stark silhouettes, made from the moment itself. The characters are drawn
+  from the skill's camera at that moment, then stylised, uploaded, and put
+  into the skill there as Overlay VISUALs, one after another for a moment
+  each.
+- **Presets**: Basic, Negative, Flicker, Anime (speed lines and a burst),
+  Halftone, Manga ink, Red flash, Colourful, Spider-Verse (comic dots,
+  misprinted colour, glitches), Cursed, Glitch, Shatter and Sketch. **Edit the
+  look** makes your own: colours, a gradient, outline, speed lines,
+  screentone, dotted silhouettes, cracks, colour split, glitch slices,
+  scanlines, grain, vignette, a starburst, inverted alternate frames, a fade.
+- Choose who's in it (both, only you, only the enemy, or nobody), how many
+  frames and how long each, and the screen shape. **Shuffle** gives another
+  take, and **Flash it** previews them at speed.
+- An overlay sits on the screen, not in the world, so it only lines up while
+  a Camera block holds the view. The dialog says whether that moment has one,
+  and recommends impact frames for skills with a camera scene.
+
+### Meter Maker
+
+- **A health bar.** "Moved by: Your health" makes the meter show your own
+  health. A passive finds which step it's on with Has Health checks, the way
+  the Percentage damage template does (five checks for twenty steps), and puts
+  the bar there. Set the max health and how often it looks.
+- **Every font on your PC, and Google Fonts.** The font menu is now a font
+  browser with three tabs: the built-in fonts and the ones you've added; the
+  fonts installed on this PC; and Google Fonts' whole catalogue (searchable,
+  by category, most popular first). Each font is previewed in its own letters,
+  in a line of text you choose. Picking a Google font adds it: it's
+  downloaded once and kept, so designs that use it draw with it offline too.
+- **The catch-up trail, in layers, is the meter's own step**, not ahead of it:
+  it only flashes when the meter goes down, so it shows where the meter was.
+  The preview shows it that way too.
+
+### Keyboard
+
+- **Your keyboard layout, first.** The welcome now starts by asking which
+  keyboard you use (QWERTY, AZERTY, QWERTZ, Dvorak or Colemak), picking the one
+  it detects. The shortcuts' defaults follow it: flying is ZQSD on AZERTY, for
+  one, and a shortcut whose key needs Shift there gets one that doesn't. It's
+  also in Settings → Keyboard shortcuts; shortcuts you changed by hand stay.
+
+### AI
+
+- **Local models can keep up to 1M tokens in mind.** The context now goes to
+  128K, 256K, 512K and 1M, with the memory it would take and a warning as it
+  gets unsafe: past what most PCs have, and past what most models are
+  trained for.
+
+### Everywhere
+
+- **Clicking outside a window no longer closes it**, so a stray click can't
+  lose what you were doing. Esc or the × closes it.
+
 ## 1.0.2
 
 ### Updates

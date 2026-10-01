@@ -13,7 +13,7 @@ import {
   reindexRobloxCache,
   saveCodeFile,
 } from '../platform.js';
-import { ACTIONS, GROUPS, bindingOf, clashesOf, comboOf, custom, rebind, resetBinds } from '../keybinds.js';
+import { ACTIONS, GROUPS, LAYOUTS, bindingOf, clashesOf, comboOf, custom, defaultOf, layout, layoutChosen, rebind, resetBinds, setLayout } from '../keybinds.js';
 import { appearance, BACKGROUNDS, setAppearance } from '../prefs.js';
 import { openUpdates, setUpdatePrefs, updatePrefs } from '../updates.js';
 import { startTour } from '../onboarding.js';
@@ -31,6 +31,7 @@ function Redirect({ to }) {
   return null;
 }
 const ManualDialog = lazy(() => import('./manual.jsx'), 'ManualDialog');
+const ImpactDialog = lazy(() => import('./impact.jsx'), 'ImpactDialog');
 const ChangelogDialog = lazy(() => import('./changelog.jsx'), 'ChangelogDialog');
 const ConnectDialog = lazy(() => import('../ai/connect.jsx'), 'ConnectDialog');
 const LocalModels = lazy(() => import('../ai/local-ui.jsx'), 'LocalModels');
@@ -202,8 +203,21 @@ function KeybindsSettings() {
     return () => removeEventListener('keydown', take, true);
   }, [waiting]);
   void custom.value; // re-render when a binding changes
+  void layoutChosen.value;
   return (
     <>
+      <label class="prop-row">
+        <span title="The shortcuts' defaults follow your keyboard: flying is on the keys where QWERTY has W A S D, whatever they type">
+          Keyboard layout
+        </span>
+        <select class="input" value={layout.value} onChange={(e) => setLayout(e.currentTarget.value)}>
+          {LAYOUTS.map((l) => (
+            <option key={l.id} value={l.id}>
+              {l.label} ({l.hint})
+            </option>
+          ))}
+        </select>
+      </label>
       <p class="hint">
         Click a shortcut, then press the keys you want (Escape keeps the old one). Every command has one; clear any you
         don’t want. A shortcut that another one also uses is marked.
@@ -228,12 +242,12 @@ function KeybindsSettings() {
                   >
                     {waiting === a.id ? 'Press keys…' : b ? <kbd>{b}</kbd> : <span class="hint">None</span>}
                   </button>
-                  {b !== a.def ? (
+                  {b !== defaultOf(a.id) ? (
                     <IconButton
                       icon="undo"
                       size={13}
-                      label={a.def ? `Back to ${a.def}` : 'Back to none'}
-                      title={a.def ? `Back to ${a.def}` : 'Back to none'}
+                      label={defaultOf(a.id) ? `Back to ${defaultOf(a.id)}` : 'Back to none'}
+                      title={defaultOf(a.id) ? `Back to ${defaultOf(a.id)}` : 'Back to none'}
                       onClick={() => rebind(a.id, null)}
                     />
                   ) : b ? (
@@ -538,6 +552,8 @@ export function Dialogs() {
       return <TemplatesDialog />;
     case 'manual':
       return <ManualDialog />;
+    case 'impact':
+      return <ImpactDialog />;
     case 'changelog':
       return <ChangelogDialog />;
     case 'connect-ai':

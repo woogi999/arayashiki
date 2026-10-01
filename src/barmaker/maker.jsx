@@ -802,6 +802,37 @@ function SkillExport() {
                 : 'Complex shows each step once and keeps it, cancelling the others by their visual tags, then loops on its checks: lag-proof, and far too many nodes to build by hand.'}
           </p>
           <div class="prop-row">
+            <span>Moved by</span>
+            <div class="segmented" role="group" aria-label="Moved by">
+              <button type="button" aria-pressed={j.source !== 'health'} onClick={() => B.setJjs('source', 'tag')}>
+                A tag
+              </button>
+              <button type="button" aria-pressed={j.source === 'health'} onClick={() => B.setJjs('source', 'health')}>
+                Your health
+              </button>
+            </div>
+          </div>
+          {j.source === 'health' && (
+            <>
+              <div class="pb-nums pb-skill-fields">
+                <label class="pb-num">
+                  <span>Max health</span>
+                  <input type="number" step="1" min="1" class="input num" value={j.healthMax} onChange={num('healthMax')} />
+                </label>
+                <label class="pb-num">
+                  <span>Check health every (s)</span>
+                  <input type="number" step="0.01" min="0.01" class="input num" value={j.healthEvery} onChange={num('healthEvery')} />
+                </label>
+              </div>
+              <p class="hint">
+                A health bar: a passive (“{(j.name.trim() || d.name)} Health”) finds which step your health is on with
+                Has Health checks, as the Percentage damage template does ({Math.ceil(Math.log2(d.frames + 1))} checks
+                for {d.frames} steps), and puts the bar on it. Step N is up to N/{d.frames} of {j.healthMax} health; no
+                regen or debug skills come with it.
+              </p>
+            </>
+          )}
+          <div class="prop-row">
             <span>Starts</span>
             <div class="segmented" role="group" aria-label="Starts">
               <button type="button" aria-pressed={j.start === 'full'} onClick={() => B.setJjs('start', 'full')}>
@@ -817,7 +848,7 @@ function SkillExport() {
           <p class="hint">Keeps the tag between 0 and {d.frames}: anything that pushes it past either end is put back at that end.</p>
           <Check label="Client sided" checked={j.clientSided} onChange={(e) => B.setJjs('clientSided', e.currentTarget.checked)} />
           <p class="hint">Only the player sees their own bar; nobody else does. (Not the same as Run on server.)</p>
-          <div class="pb-inline">
+          <div class="pb-inline" hidden={j.source === 'health'}>
             <Check label="Regenerate" checked={j.regen} onChange={(e) => B.setJjs('regen', e.currentTarget.checked)} />
             {j.regen && (
               <>

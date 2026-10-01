@@ -8,7 +8,7 @@
 //
 // Signals, so switching to the Skills workspace and back keeps everything.
 
-import { batch, signal, computed } from '@preact/signals';
+import { batch, signal, computed, effect } from '@preact/signals';
 import {
   MAX_FRAMES,
   TEMPLATES as EXAMPLES,
@@ -35,6 +35,7 @@ import { openTextFile, saveBlob, uploadDecal } from '../platform.js';
 import { account } from '../account.js';
 import * as S from '../store.js';
 import { actionOf } from '../keybinds.js';
+import { ensureAll, fontsVersion } from '../fonts.js';
 
 export { EXAMPLES, MAX_FRAMES };
 export const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
@@ -184,7 +185,15 @@ export async function restore() {
   }
   restoring = false;
   draw();
+  // A design in an added Google font draws with it once it's loaded.
+  ensureAll();
 }
+effect(() => {
+  if (fontsVersion.value) {
+    draw();
+    queueThumbs();
+  }
+});
 
 // ─── Drawing ────────────────────────────────────────────────────────────
 
@@ -220,7 +229,8 @@ function picture(src) {
 }
 
 // Everything a render needs decoded, before an export reads it.
-const loadAll = () => Promise.all(doc.value.layers.map((l) => l.src && picture(l.src)?.ready));
+// Pictures decoded and added Google fonts loaded (src/fonts.js), before a render that must be right.
+const loadAll = () => Promise.all([ensureAll(), ...doc.value.layers.map((l) => l.src && picture(l.src)?.ready)]);
 
 export function bindCanvas(element) {
   canvas = element;
@@ -326,12 +336,12 @@ function feedBar() {
   const d = doc.value;
   const at = frame.value;
   // Complex Separate is three billboards a thousandth apart: the container,
-  // the trail (shown a little ahead here, as it is when the meter's just
-  // gone down), and the meter in front.
+  // the trail (this step's own: it's what flashes when the meter leaves it),
+  // and the meter in front.
   const layers = separate.value
     ? [
         { canvas: render(d, at, { resolve, part: 'container' }), z: 0 },
-        ...(wantsTrail.value ? [{ canvas: render(d, Math.min(d.frames, at + Math.ceil(d.frames / 5)), { resolve, part: 'trail' }), z: -0.001 }] : []),
+        ...(wantsTrail.value ? [{ canvas: render(d, at, { resolve, part: 'trail' }), z: -0.001 }] : []),
         { canvas: render(d, at, { resolve, part: 'meterLead' }), z: -0.002 },
       ]
     : null;
@@ -1118,6 +1128,8 @@ export function setJjs(key, value) {
   if (key === 'regenEvery') value = Math.max(0.05, Number(value) || 0);
   if (key === 'regenAmount') value = Number(value) || 0;
   if (key === 'trailTime') value = Math.max(0.05, Number(value) || 0);
+  if (key === 'healthMax') value = Math.max(1, Number(value) || 100);
+  if (key === 'healthEvery') value = Math.max(0.01, Number(value) || 0.05);
   change(setIn(doc.value, ['jjs', key], value), `doc:jjs:${key}`);
   refreshSkill();
 }
@@ -1142,6 +1154,7 @@ function skillsNow() {
     rails: j.rails,
     clientSided: j.clientSided,
     regen: j.regen ? { amount: j.regenAmount, every: j.regenEvery } : null,
+    health: j.source === 'health' ? { max: j.healthMax, every: j.healthEvery } : null,
     container: separate.value ? containerIds.value[0] : null,
     trails: separate.value && wantsTrail.value ? trailIds.value : null,
     trailTime: j.trailTime,
