@@ -15,9 +15,13 @@ search for anything, including the sections of this manual.
 
 ### Installing
 
-Run `Arayashiki_x.y.z_x64-setup.exe`. It installs for your Windows account
-only (no administrator needed) and adds Arayashiki to the Start menu. Windows
-11 already has everything it needs (WebView2).
+Run `Arayashiki-Setup.exe` (from
+[GitHub](https://github.com/woogi999/arayashiki/releases/latest)). It fetches
+the latest version, installs it for your Windows account only (no
+administrator needed) and adds Arayashiki to the Start menu and the desktop.
+Windows 11 already has what it needs (WebView2); on a PC without it, the
+setup installs it too. After that, Arayashiki updates itself (see
+[Installing and updates](#installing-and-updates)).
 
 ### The quick tour
 
@@ -38,22 +42,31 @@ Updates.
 **What's new** lists what changed in each version: pick it at the bottom of
 the start screen, in Settings → Updates, or search for "changelog".
 
-### Updates
+### Installing and updates
 
-New versions of Arayashiki come out on
-[GitHub](https://github.com/woogi999/arayashiki/releases). A few seconds
-after it opens, Arayashiki checks for one; when there is, an **Update**
-button appears at the top right. It opens the Updates window, with what's new
-in that version:
+To install Arayashiki, download **Arayashiki-Setup.exe** from
+[GitHub](https://github.com/woogi999/arayashiki/releases/latest) and run it.
+It fetches the latest version, puts it in your user folder (no administrator
+needed), adds it to the Start menu and the desktop, and opens it. To remove
+it, use Windows' Settings → Apps.
 
-- **Download and install** fetches the installer. **Install and restart**
-  then saves any unsaved work, closes Arayashiki and runs the installer. Your
-  movesets, settings and sign-in stay as they are.
-- **Skip this version** hides the button until the next version comes out.
+After that, Arayashiki keeps itself up to date, as a game launcher does. A few
+seconds after it opens, it checks GitHub for a newer version. If there is
+one, it downloads it in the background and a window tells you, with what's
+new in it:
+
+- **Restart now** saves any unsaved work and restarts into the new version,
+  in a few seconds. Your movesets, settings and sign-in stay as they are.
+- **Later** carries on: the update installs itself the next time you open
+  Arayashiki.
+- **Skip this version** (before it downloads) hides it until the next one.
 - **On GitHub** opens the release page in your browser.
 
+While a newer version is waiting, an **Update** button at the top right opens
+the window again. The first time a new version opens, it shows **What's new**.
+
 To check yourself, search for "check for updates", or use Settings → Updates,
-where the check at launch can also be turned off.
+where the check at launch, and downloading by itself, can be turned off.
 
 ### Signing in with Roblox
 
@@ -164,6 +177,18 @@ unchanged except for what you edited.
   category), <kbd>Ctrl+D</kbd> duplicates the picked nodes,
   <kbd>Delete</kbd> deletes them, <kbd>Alt+↑</kbd> / <kbd>Alt+↓</kbd> move
   them.
+- The arrow beside the open skill in the Outliner folds its branches away
+  (and back); the skill stays picked.
+- **Number fields drag**: hold and drag left or right on any number to change
+  it (Shift for fine steps, Ctrl for big ones); a plain click types in it.
+  "x, y, z" fields (POSITION, SIZE, ROTATION…) are three boxes, one per axis.
+- **Continue from ALT POSITION** (a VISUAL's button in Properties, its
+  right-click menu, or <kbd>Ctrl+Shift+D</kbd>) carries the picked VISUAL on:
+  it adds a WAIT and a copy that starts where it ends (its ALT POSITION, ALT
+  ROTATION, size and transparency) and makes the same move again. The WAIT is
+  its TIME less 0.05, so the two overlap and it doesn't blink between them; a
+  Camera's WAIT is its whole TIME (overlapping Camera blocks hand the view back
+  to the player in JJS). Press it again on the copy to keep going.
 
 ### Playing a skill
 
@@ -192,12 +217,30 @@ moveset's passive skills running alongside.
 
 | Do this | To |
 |---|---|
-| Right-drag | Look around from where the camera is (the cursor stays where it was) |
+| Right-drag | Look around from where the camera is (the cursor hides, and is back where it was when you let go) |
 | Middle-drag | Pan |
 | Wheel | Move toward what's under the cursor |
 | <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd>, <kbd>Q</kbd> <kbd>E</kbd> (pointer over the view) | Fly forward, left, back, right, down, up (Shift: slower) |
 | <kbd>F</kbd> | Frame your character |
 | The axis gizmo (top right) | Click an axis to look along it, drag to orbit |
+
+### Moving, scaling and turning things in the view
+
+The tools down the viewport's left side work as Roblox Studio's do. Pick a
+hitbox, projectile or effect (click it in the view, or its node), then:
+
+| Tool | Key | Does |
+|---|---|---|
+| Select | <kbd>Ctrl+1</kbd> | Click to pick; no handles |
+| Move | <kbd>Ctrl+2</kbd> | Drag an arrow (or the plane between two) to move it: its POSITION |
+| Scale | <kbd>Ctrl+3</kbd> | Drag a handle to size it: its SIZE (one number for an effect, x, y, z for a hitbox) |
+| Rotate | <kbd>Ctrl+4</kbd> | Drag a ring to turn it: its ROTATION |
+
+Hold <kbd>Ctrl</kbd> while dragging to snap (half a stud, 15°, a tenth in
+scale). The globe (<kbd>Ctrl+L</kbd>) switches between the world's axes and
+the thing's own. Each drag is one undo step. The handles stay hidden while the
+skill plays, and while the animator or the camera path is open (they have
+their own).
 
 **Follow** carries your camera along with the two characters. **Hitboxes**
 (<kbd>H</kbd>) shows hitboxes in red and projectiles in orange. The shape
@@ -360,7 +403,28 @@ without moving any other node. Each write is one undo step
 (<kbd>Ctrl+Z</kbd>).
 
 **Play** runs the skill from where the animation starts (for a camera, looking
-through it; press it again to stop).
+through it; press it again to stop), all the way to the animation's last key
+and its hold, even past the skill's own end or before it's written. The
+timeline plays along, with a band where the animation's blocks will run and a
+mark at each key, and reaches a second past the last key, for the next one.
+
+Two views, **Keys** and **Graph** (<kbd>Tab</kbd> switches):
+
+- **Keys** is the table of keys.
+- **Graph** is the easing of each stretch between keys, as a curve: how far
+  along it is (up) over its time (across). Pick a stretch in the strip along
+  the top. Drag the curve's two white handles to shape it: that makes it a
+  custom curve (or type its four numbers). Or pick one of JJS's easings in the
+  menu under it. JJS has no custom easings, so a custom curve is written as a
+  few blocks of JJS's own easings that follow it; for a camera the dashed line
+  is what JJS will run, and **Nearest JJS easing** makes the stretch a single
+  block again.
+
+**Bend with handles** is a pen tool: it puts two handles on the picked key.
+Drag the white dots in the viewport to bend the path through the key (the
+other handle turns to stay opposite; <kbd>Alt</kbd> drags one alone), and drag
+a key's own pin to move the key, straight across the screen. **Remove
+handles** makes it straight through the key again.
 
 ### Animating a mesh or part
 
@@ -380,6 +444,9 @@ through it; press it again to stop).
 5. Tick **Cut** on a key for a jump cut: instead of moving there from the key
    before, the animation holds the key before until the cut's moment, then is
    at the cut key at once. Cutscenes cut from shot to shot this way.
+
+Every number in the table drags to change it (see
+[Editing skills and nodes](#editing-skills-and-nodes)).
 
 **Smooth curve** runs a curve through your keys (the chain gets more, shorter
 pieces to follow it: set how many a second; the easing still applies). With
@@ -470,7 +537,39 @@ account, and makes the JJS skill that shows the right picture for the value.
    skill, ready to add to your moveset or copy into JJS.
 
 Designs are saved inside the app (**Save**), or as `.meter.json` files to
-share.
+share (**Save As**). **Settings** is in the Meter Maker's top bar too.
+
+**A picture as the bar.** A meter's **Picture** shape (Shape tab) makes a
+whole picture the bar, not one segment's shape: the fill sweeps across the
+picture's own outline, the way it fills a text bar. **Filled with** is the
+picture's own colours, or the Fill tab's paint; **Still to fill** is the
+picture greyed and dimmed, or the Back tab's paint. A picture with a
+see-through background works best (a sword, a skill icon, a logo).
+
+**In layers.** Under Export → Pictures, **Render in layers** saves the meter
+apart from its container: one container picture (the background, the outline,
+and any layer that never changes), then a folder each of the meter, its
+leading edge and its catch-up trail (whichever the design has), a picture per
+step.
+
+**The skill's styles** (Export → JJS skill):
+
+- **Complex** (the default): each step's picture is shown once and kept,
+  the others cancelled by their tags, then it loops on its checks. Lag-proof.
+- **Complex Separate**: the meter in layers, each its own billboard, a
+  thousandth of a stud apart in z (the more negative, the further in front):
+  the container at the back, shown once for good when the skill starts; the
+  catch-up trail; the meter in front. Only the meter is swapped as the tag
+  changes. When the tag goes down, the step it came from flashes its trail
+  behind the meter and fades over **Trail fades in** seconds. It asks for the
+  container's image ID, the meter's (one per step, with the leading edge in
+  them) and the trail's (one per step, if a bar's catch-up trail is on); the
+  upload makes and fills in all of them.
+- **Legacy**: each step shown again and again, every wait. Simple, but it can
+  lag.
+
+The 3D preview shows where the billboard sits on you, placed the way JJS
+places it (for Complex Separate, its layers stacked).
 
 ## Search everything (Ctrl+Space)
 
@@ -551,8 +650,10 @@ did.
 
 ### Free models on this PC
 
-Pick **On this PC (built in, free)** in the assistant's settings (the gear).
-Nothing to install separately and nothing leaves your PC:
+Pick **On this PC (built in, free)** in the assistant's settings (the gear;
+it's first in the list, and **Run a free model on this PC** picks it), or
+use Settings → AI, which lists the same models. Nothing to install separately
+and nothing leaves your PC:
 
 1. **Get the engine** (about 35 MB, once): llama.cpp, which runs the models.
    It uses your graphics card through Vulkan (NVIDIA, AMD and Intel); **CPU
@@ -594,46 +695,74 @@ command (`arayashiki.exe --mcp`) and a JSON snippet.
 
 Settings (search for it) has five tabs:
 
-- **Keybinds**: click a shortcut, press the new keys. Every shortcut in this
-  manual can be changed.
+- **Keybinds** (<kbd>Ctrl+/</kbd>): every command has a shortcut, grouped as
+  in this manual. Click one and press the new keys, or clear it (×); the
+  undo arrow puts its default back. Two shortcuts heard in the same place are
+  marked as a clash.
 - **Appearance**: the start screen on launch, the interface size, the
   viewport's background, hitboxes.
-- **AI**: the assistant and connecting AI apps.
+- **AI**: the assistant, the free models on this PC (download and pick one
+  here too), and connecting AI apps.
 - **Roblox**: the index of Roblox's own cache on your PC (assets come from
   there when Roblox already downloaded them), and deleting what Arayashiki
   downloaded.
-- **Updates**: the version you have, checking for a newer one (and whether
-  to check at launch), taking the quick tour again, and what's new.
+- **Updates**: the version you have, checking for a newer one, whether to
+  check at launch and to download updates by themselves, taking the quick
+  tour again, and what's new.
 
 ## Keyboard shortcuts
 
-These are the defaults; change any of them in Settings → Keybinds.
+These are the defaults; every command has one, and any can be changed (or
+cleared) in Settings → Keybinds (<kbd>Ctrl+/</kbd>).
 
 | Shortcut | Does |
 |---|---|
 | <kbd>Ctrl+Space</kbd> | Search everything |
-| <kbd>Ctrl+J</kbd> | AI assistant |
-| <kbd>F1</kbd> | This manual |
+| <kbd>Ctrl+J</kbd> / <kbd>Ctrl+Shift+J</kbd> | AI assistant / connect an AI app |
+| <kbd>F1</kbd> / <kbd>Shift+F1</kbd> / <kbd>Ctrl+F1</kbd> | This manual / the quick tour / what's new |
+| <kbd>Ctrl+,</kbd> / <kbd>Ctrl+/</kbd> | Settings / keyboard shortcuts |
+| <kbd>Ctrl+Shift+1</kbd> / <kbd>Ctrl+Shift+2</kbd> | The Skill Builder / the Meter Maker |
+| <kbd>Ctrl+=</kbd> / <kbd>Ctrl+-</kbd> / <kbd>Ctrl+Alt+0</kbd> | Interface bigger / smaller / 100% |
+| <kbd>Alt+U</kbd> / <kbd>Alt+A</kbd> / <kbd>Ctrl+Q</kbd> | Check for updates / your Roblox account / exit |
 | <kbd>Space</kbd> / <kbd>Shift+Space</kbd> | Play / pause; play from the start |
 | <kbd>←</kbd> <kbd>→</kbd> | Back / forward a frame (Shift: ten) |
+| <kbd>Home</kbd> / <kbd>End</kbd> | To the start / the end |
+| <kbd>Shift+1</kbd> / <kbd>Shift+2</kbd> / <kbd>Shift+3</kbd> | Speed: real time / ½ / ¼ |
 | <kbd>↑</kbd> <kbd>↓</kbd> | Previous / next node |
 | <kbd>Alt+↑</kbd> <kbd>Alt+↓</kbd> | Move the node up / down |
 | <kbd>Ctrl+A</kbd> | Select all nodes (or skills, in the Outliner) |
 | <kbd>Ctrl+D</kbd> | Duplicate node |
+| <kbd>Ctrl+Shift+D</kbd> | Continue the picked VISUAL from its ALT POSITION |
 | <kbd>Delete</kbd> | Delete (in the panel you last clicked) |
 | <kbd>Ctrl+Z</kbd> / <kbd>Ctrl+Y</kbd> | Undo / redo |
-| <kbd>Ctrl+N</kbd> | New Character |
+| <kbd>Ctrl+N</kbd> / <kbd>Ctrl+Shift+H</kbd> | New Character / the start screen |
 | <kbd>Ctrl+O</kbd> / <kbd>Ctrl+I</kbd> | Open a .txt / import a code |
 | <kbd>Ctrl+S</kbd> / <kbd>Ctrl+Shift+S</kbd> | Save / save as |
-| <kbd>Ctrl+E</kbd> | Export: code for JJS |
+| <kbd>Ctrl+E</kbd> | Export: code for JJS (or the meter) |
 | <kbd>Ctrl+T</kbd> | Templates |
+| <kbd>Ctrl+Shift+N</kbd> / <kbd>Ctrl+Alt+D</kbd> / <kbd>Ctrl+Shift+Delete</kbd> | Add / duplicate / delete a skill |
+| <kbd>Ctrl+B</kbd> | Add a branch |
+| <kbd>Ctrl+1</kbd> … <kbd>Ctrl+4</kbd> | Viewport tools: Select, Move, Scale, Rotate |
+| <kbd>Ctrl+L</kbd> | Move and turn in world / local axes |
 | <kbd>H</kbd> | Hitboxes on / off |
+| <kbd>Alt+F</kbd> / <kbd>Alt+M</kbd> / <kbd>Alt+D</kbd> / <kbd>Alt+B</kbd> | Follow / sounds / the dummy on and off; the next viewport background |
+| <kbd>W A S D Q E</kbd>, <kbd>F</kbd> | Fly the viewport camera (pointer over the view), frame you |
+| <kbd>Alt+1</kbd> / <kbd>Alt+2</kbd> / <kbd>Alt+3</kbd> | Camera: Free / Auto / Recorded |
+| <kbd>Alt+C</kbd> | The skill's own camera on / off |
+| <kbd>Alt+R</kbd> / <kbd>Alt+Shift+R</kbd> | Reset the camera / its settings |
 | <kbd>K</kbd> | Add a key (the camera path, or the open animation) |
+| <kbd>Alt+K</kbd> / <kbd>Alt+Shift+K</kbd> / <kbd>Alt+P</kbd> | Record a camera take / clear camera keys / edit the camera path |
 | <kbd>Ctrl+K</kbd> | Animate the picked VISUAL |
+| <kbd>Ctrl+Shift+K</kbd> / <kbd>Ctrl+Alt+K</kbd> | New camera animation / new visual animation |
+| <kbd>G</kbd> / <kbd>R</kbd> / <kbd>Tab</kbd> | In the animator: move / turn the picked key; keys or graph |
 | <kbd>F12</kbd> / <kbd>Shift+F12</kbd> | Export a picture / quick screenshot to Pictures |
 | <kbd>Ctrl+F12</kbd> | Export a video |
-| <kbd>W A S D Q E</kbd>, <kbd>F</kbd> | Fly the viewport camera, frame you |
-| <kbd>G</kbd> / <kbd>R</kbd> | In the animator: move / turn the picked key |
+| <kbd>Ctrl+Alt+R</kbd> / <kbd>Ctrl+Alt+S</kbd> | Reset / save the panel layout |
+
+In the Meter Maker: <kbd>V</kbd> move, <kbd>B</kbd> brush, <kbd>E</kbd>
+eraser, <kbd>U</kbd> shapes, <kbd>T</kbd> text, <kbd>Ctrl+0</kbd> fit the
+canvas, <kbd>,</kbd> / <kbd>.</kbd> previous / next step, and the arrows nudge
+the picked layer (Shift: ten pixels).
 
 ## Troubleshooting
 

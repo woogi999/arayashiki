@@ -37,8 +37,9 @@ const GLOBAL = new Set(['save', 'saveAs', 'open', 'import', 'export', 'templates
 
 function onKey(event) {
   const action = actionOf(event);
-  // Search, the assistant and the manual work everywhere, dialogs or not.
-  if (action && ACTIONS.find((a) => a.id === action)?.everywhere) {
+  // Search, the assistant, the manual, settings… work everywhere, dialogs or not.
+  if (action && ACTIONS.find((a) => a.id === action)?.scope === 'everywhere') {
+    if (event.repeat && !/^zoom/.test(action)) return;
     event.preventDefault();
     return runCommand(action);
   }

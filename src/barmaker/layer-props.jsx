@@ -19,6 +19,15 @@ const SHAPES_BAR = [
   { id: 'bar', label: 'Bar' },
   { id: 'ring', label: 'Ring' },
   { id: 'text', label: 'Text' },
+  { id: 'image', label: 'Picture', title: 'A picture is the bar: it fills across its own outline' },
+];
+const IMAGE_FILLS = [
+  { id: true, label: 'Its colours', title: 'The picture shows as it is where it’s filled' },
+  { id: false, label: 'The fill', title: 'Where it’s filled, the picture’s outline in the Fill tab’s paint' },
+];
+const IMAGE_TRACKS = [
+  { id: 'faded', label: 'Faded', title: 'What’s still to fill is the picture, greyed and dimmed' },
+  { id: 'paint', label: 'Background', title: 'What’s still to fill is the picture’s outline in the Back tab’s paint' },
 ];
 const TEXT_LAYOUTS = [
   { id: 'across', label: 'Across' },
@@ -315,6 +324,18 @@ function BarShape({ layer }) {
             <Check label="Bold" checked={layer.textBold} onChange={f('textBold')} />
             <Picks title="Written" options={TEXT_LAYOUTS} value={layer.textLayout} onPick={set('textLayout')} />
             <Slider label="Spacing" unit="%" min="0" max="100" value={layer.textSpacing} onInput={f('textSpacing')} />
+          </>
+        ) : layer.shape === 'image' ? (
+          <>
+            <ImagePick src={layer.barImage} label="Bar picture" onPick={set('barImage')} />
+            <Picks title="Picture" options={IMAGE_FITS} value={layer.barImageFit} onPick={set('barImageFit')} />
+            <Picks title="Fills" options={BAR_DIRECTIONS} value={layer.direction} onPick={set('direction')} />
+            <Picks title="Filled with" options={IMAGE_FILLS} value={layer.barImageOwn !== false} onPick={set('barImageOwn')} />
+            <Picks title="Still to fill" options={IMAGE_TRACKS} value={layer.barImageTrack ?? 'faded'} onPick={set('barImageTrack')} />
+            <p class="hint">
+              The whole picture is the bar, not one segment’s shape: it fills across its outline (anything with a
+              see-through background works best: a sword, a skill icon, a logo).
+            </p>
           </>
         ) : layer.shape === 'ring' ? (
           <>

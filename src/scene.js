@@ -33,12 +33,14 @@ import {
   MeshLambertMaterial,
   OrthographicCamera,
   PerspectiveCamera,
+  Plane,
   PlaneGeometry,
   Quaternion,
   Raycaster,
   RepeatWrapping,
   Scene,
   ShaderMaterial,
+  SphereGeometry,
   Sprite,
   SpriteMaterial,
   SRGBColorSpace,
@@ -52,6 +54,7 @@ import {
 import { StudioCamera } from './studio-camera.js';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js';
 import { mountGizmo } from './view-gizmo.js';
+import { keyFrom, keyMatrix } from './animator.js';
 import { motionAt } from '../core/sim.js';
 import { vec3 } from '../core/schema.js';
 import R6 from './assets/r6.json';
@@ -480,6 +483,11 @@ export function mountSkillScene(host, { textureUrl = async () => null, meshData 
   // Whether the skill is playing: stopped, a Camera block doesn't take the
   // Free camera's view, so you can fly around a moment that has one.
   let playing = false;
+  // The move/turn/scale gizmo's state (see "Moving things in the view"),
+  // up here because show() reaches it before that part has run.
+  let editReady = false;
+  let editState = null; // { branch, index, mode, space, onEdit, onEnd }
+  let editDrag = null; // the frame at the drag's start
   let track = null; // the auto camera's track for this run, made when first needed
   // A camera to look through while editing one (the animator's preview):
   // t → { position, quaternion, fov } or null. It comes before any mode.
@@ -1038,6 +1046,7 @@ export function mountSkillScene(host, { textureUrl = async () => null, meshData 
     const screen = stage(t, camera, undefined, !playing && !from);
     grade = skillCamera ? screen.grade : null;
     overlaysOn = drawOverlays(skillCamera ? screen.overlays : []);
+    placeEdit();
     render();
     camera.position.copy(saved.position);
     camera.quaternion.copy(saved.quaternion);
@@ -1228,8 +1237,28 @@ export function mountSkillScene(host, { textureUrl = async () => null, meshData 
       if (!next.camera) marker.matrix.multiply(new Matrix4().makeScale(...(next.sizes?.[i] ?? [1, 1, 1])));
       marker.renderOrder = 11;
       marker.userData.animKey = i;
+      marker.userData.center = new Vector3().setFromMatrixPosition(m);
       animGroup.add(marker);
     });
+    // The pen tool's handles: a dot for each, on a line from its key.
+    const handleLines = [];
+    for (const h of next.handles ?? []) {
+      handleLines.push(...h.anchor.toArray(), ...h.at.toArray());
+      const dot = new Mesh(new SphereGeometry(0.2, 12, 8), new MeshBasicMaterial({ color: '#ffffff', depthTest: false, transparent: true, opacity: 0.95 }));
+      dot.position.copy(h.at);
+      dot.renderOrder = 12;
+      dot.userData.animHandle = { key: h.key, side: h.side };
+      dot.userData.center = h.at.clone();
+      animGroup.add(dot);
+    }
+    if (handleLines.length) {
+      const g = new BufferGeometry();
+      g.setAttribute('position', new Float32BufferAttribute(handleLines, 3));
+      const lines = new LineSegments(g, new LineBasicMaterial({ color: '#ffffff', depthTest: false, transparent: true, opacity: 0.55 }));
+      lines.renderOrder = 11;
+      lines.raycast = () => {}; // not something to grab
+      animGroup.add(lines);
+    }
     const m = next.keys[next.selected];
     if (m && next.onDrag) {
       m.decompose(animProxy.position, animProxy.quaternion, animProxy.scale);
@@ -1248,21 +1277,231 @@ export function mountSkillScene(host, { textureUrl = async () => null, meshData 
     show(time);
   }
 
+  // ─── Moving things in the view ────────────────────────────────────────
+
+  // The picked node's box or effect gets a gizmo, as in Roblox Studio or
+  // Blender: move, turn or scale it in the view and its POSITION, ROTATION
+  // and SIZE follow. Each kind is a frame it hangs from (`base`) and its
+  // fields as a matrix in that frame (`local`), back and forth:
+  //   HITBOX      root (or its projectile) · turned by the heading; POSITION
+  //               as is, ROTATION in degrees, SIZE per axis
+  //   PROJECTILE  the same, without a turn (ROTATION aims it)
+  //   VISUAL      the body part (or projectile) · CFrame.new(-x, y, -z) ·
+  //               ROTATION, SIZE uniform (BuilderFX's own placing)
+  const editProxy = new Object3D();
+  scene.add(editProxy);
+  const editGizmo = new TransformControls(camera, renderer.domElement);
+  editGizmo.setSize(0.85);
+  const editHelper = editGizmo.getHelper();
+  editHelper.visible = false;
+  scene.add(editHelper);
+  let snapping = false;
+  editGizmo.addEventListener('change', () => ready && render());
+
+  const fmt = (v) => v.map((x) => String(Math.round(x * 1000) / 1000 || 0)).join(', ');
+  const SHAPED = new Set(['Mesh', 'Block', 'Sphere', 'Cylinder', 'Wedge', 'Distortion']);
+  const NOT_PLACED = new Set(['Camera', 'Cancel', 'Visibility', 'Screen Color', 'Overlay', 'Shake', 'FOV']);
+  const editable = (e) =>
+    !e.p &&
+    e.index != null &&
+    (e.kind === 'HITBOX' || e.kind === 'PROJECTILE' || (e.kind === 'VISUAL' && !NOT_PLACED.has(e.node?.EFFECT)));
+
+  /** The event drawn for the picked node: the one live now, else its first. */
+  function editEvent() {
+    if (!run || !editState) return null;
+    const mine = run.events.filter((e) => e.branch === editState.branch && e.index === editState.index && editable(e));
+    return mine.find((e) => time >= e.t && time < Math.max(e.end ?? e.t, e.t + 0.05)) ?? mine[0] ?? null;
+  }
+
+  /** What `e` hangs from now, and how its fields turn into a matrix there and back. */
+  function editFrame(e) {
+    const n = e.node;
+    if (e.kind === 'HITBOX' || e.kind === 'PROJECTILE') {
+      const shot = e.kind === 'PROJECTILE' ? run.shots[e.shot] : null;
+      if (e.kind === 'PROJECTILE' && !shot) return null;
+      const pos = vec3(n.POSITION);
+      const yaw = e.yaw ?? people[e.who].root.rotation.y;
+      const turn = new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), yaw);
+      // Where the box is, less its POSITION turned by the heading.
+      const at = shot ? new Vector3(...shot.origin) : new Vector3(...e.at);
+      const from = at.sub(new Vector3(...pos).applyQuaternion(turn));
+      const base = new Matrix4().compose(from, turn, new Vector3(1, 1, 1));
+      const size = vec3(n.SIZE, e.kind === 'HITBOX' ? [5, 5, 5] : [6, 6, 6]);
+      const rot = vec3(n.ROTATION);
+      const local = new Matrix4().compose(
+        new Vector3(...pos),
+        shot ? new Quaternion() : new Quaternion().setFromEuler(new Euler(rot[0] * RAD, rot[1] * RAD, rot[2] * RAD, 'YXZ')),
+        new Vector3(...size.map((v) => Math.max(0.05, Math.abs(v)))),
+      );
+      const fields = (m) => {
+        const p = new Vector3();
+        const q = new Quaternion();
+        const sc = new Vector3();
+        m.decompose(p, q, sc);
+        const out = { POSITION: fmt(p.toArray()), SIZE: fmt(sc.toArray()) };
+        if (!shot) {
+          const r = new Euler().setFromQuaternion(q, 'YXZ');
+          out.ROTATION = fmt([r.x / RAD, r.y / RAD, r.z / RAD]);
+        }
+        return out;
+      };
+      return { base, local, fields, turns: !shot, uniform: false, scales: true };
+    }
+    const part = n['BODY PART'] || 'HumanoidRootPart';
+    const tag = n['PROJECTILE TAG'];
+    const shot = e.shot ?? (tag ? run.shots.findLast((sh) => sh.tag === tag && sh.who === e.who && sh.t0 <= e.t + 1e-9)?.id : null);
+    // A moving effect leaves from where the part was when it started.
+    const moving = vec3(n['ALT POSITION']).some((c) => Math.abs(c) > 1e-6);
+    const when = moving ? e.t : Math.max(e.t, time);
+    const base = shot != null ? shotFrameAt(shot, when) : frameAt(e.who, part, when);
+    const size = Number(n.SIZE ?? 1) || 1;
+    const scales = SHAPED.has(n.EFFECT) || n.SIZE != null;
+    const local = keyMatrix({ pos: vec3(n.POSITION), rot: vec3(n.ROTATION) }).multiply(
+      new Matrix4().makeScale(...[size, size, size].map((v) => Math.max(0.05, Math.abs(v)))),
+    );
+    const fields = (m) => {
+      const p = new Vector3();
+      const q = new Quaternion();
+      const sc = new Vector3();
+      m.decompose(p, q, sc);
+      const { pos, rot } = keyFrom(new Matrix4().compose(p, q, new Vector3(1, 1, 1)));
+      const out = { POSITION: fmt(pos), ROTATION: fmt(rot) };
+      if (scales) out.SIZE = Math.round(Math.max(0.01, sc.x) * 1000) / 1000;
+      return out;
+    };
+    return { base, local, fields, turns: true, uniform: true, scales };
+  }
+
+  /** Puts the gizmo on the picked node's box or effect (unless it's being dragged). */
+  function placeEdit() {
+    if (!editReady || editDrag) return;
+    const e = editState && editState.mode !== 'select' && !playing && !previewCamera ? editEvent() : null;
+    const f = e && editFrame(e);
+    if (!f || (editState.mode === 'rotate' && !f.turns) || (editState.mode === 'scale' && !f.scales)) {
+      editGizmo.detach();
+      editHelper.visible = false;
+      return;
+    }
+    new Matrix4().multiplyMatrices(f.base, f.local).decompose(editProxy.position, editProxy.quaternion, editProxy.scale);
+    editProxy.updateMatrixWorld();
+    editGizmo.attach(editProxy);
+    editGizmo.setMode(editState.mode);
+    editGizmo.setSpace(editState.mode === 'scale' ? 'local' : (editState.space ?? 'world'));
+    editHelper.visible = true;
+  }
+
+  editGizmo.addEventListener('dragging-changed', (ev) => {
+    if (ev.value) {
+      const e = editEvent();
+      const frame = e && editFrame(e);
+      editDrag = frame && { frame, scale: editProxy.scale.clone() };
+    } else {
+      editDrag = null;
+      editState?.onEnd?.();
+      placeEdit();
+      show(time);
+    }
+  });
+  editGizmo.addEventListener('objectChange', () => {
+    if (!editDrag || !editState?.onEdit) return;
+    const f = editDrag.frame;
+    // A single SIZE: the axis dragged furthest scales all three together.
+    if (f.uniform && editState.mode === 'scale') {
+      const s = editProxy.scale;
+      const was = editDrag.scale;
+      const ratio = [s.x / was.x, s.y / was.y, s.z / was.z].reduce((a, b) => (Math.abs(Math.log(Math.abs(b) || 1)) > Math.abs(Math.log(Math.abs(a) || 1)) ? b : a));
+      s.copy(was).multiplyScalar(ratio);
+    }
+    editProxy.updateMatrixWorld();
+    const local = f.base.clone().invert().multiply(editProxy.matrixWorld);
+    editState.onEdit(f.fields(local));
+  });
+  // Ctrl snaps: half a stud, 15 degrees, a tenth in scale (as Studio's increments).
+  const snap = (on) => {
+    if (on === snapping) return;
+    snapping = on;
+    editGizmo.setTranslationSnap(on ? 0.5 : null);
+    editGizmo.setRotationSnap(on ? 15 * RAD : null);
+    editGizmo.setScaleSnap(on ? 0.1 : null);
+  };
+  const snapKeys = (ev) => snap(ev.ctrlKey || ev.metaKey);
+  addEventListener('keydown', snapKeys);
+  addEventListener('keyup', snapKeys);
+
+  /**
+   * The tool for the picked node: { branch, index, mode: 'select' |
+   * 'translate' | 'rotate' | 'scale', space: 'world' | 'local', onEdit(fields),
+   * onEnd() }, or null.
+   */
+  function setEditTool(next) {
+    editState = next;
+    placeEdit();
+    show(time);
+  }
+  editReady = true;
+
   // ─── Picking ──────────────────────────────────────────────────────────
 
   const ray = new Raycaster();
   let downAt = null;
+  const rayFrom = (ev) => {
+    const rect = renderer.domElement.getBoundingClientRect();
+    const at = new Vector2(((ev.clientX - rect.left) / rect.width) * 2 - 1, -((ev.clientY - rect.top) / rect.height) * 2 + 1);
+    ray.setFromCamera(at, camera);
+  };
+
+  // The animator's pins (its keys) and their handles drag straight in the
+  // view, across the screen at their depth, as a pen tool's anchors do.
+  // Alt drags one handle alone (a corner); otherwise its partner mirrors it.
+  let pinDrag = null;
+  const pinPlane = new Plane();
+  const onPinMove = (ev) => {
+    if (!pinDrag || !animState) return;
+    if (Math.hypot(ev.clientX - pinDrag.x, ev.clientY - pinDrag.y) > 3) pinDrag.moved = true;
+    if (!pinDrag.moved) return;
+    rayFrom(ev);
+    const hit = ray.ray.intersectPlane(pinPlane, new Vector3());
+    if (!hit) return;
+    const at = hit.add(pinDrag.offset);
+    if (pinDrag.handle) animState.onHandle?.(pinDrag.handle.key, pinDrag.handle.side, at, { alone: ev.altKey });
+    else {
+      const m = animState.keys[pinDrag.key]?.clone();
+      if (m) animState.onDrag?.(pinDrag.key, m.setPosition(at));
+    }
+  };
+  const onPinUp = (ev) => {
+    const d = pinDrag;
+    pinDrag = null;
+    removeEventListener('pointermove', onPinMove, true);
+    removeEventListener('pointerup', onPinUp, true);
+    if (!d) return;
+    if (d.moved) animState?.onDragEnd?.();
+    else if (d.key != null) onPick({ kind: 'anim-key', index: d.key });
+    void ev;
+  };
   const onDown = (ev) => {
-    if (ev.button === 0) downAt = [ev.clientX, ev.clientY];
+    if (ev.button !== 0) return;
+    downAt = [ev.clientX, ev.clientY];
+    if (!animState?.onDrag || gizmo3d.axis || editGizmo.axis || previewCamera) return;
+    rayFrom(ev);
+    const hit = ray.intersectObjects(animGroup.children.slice(1), false).find((h) => h.object.userData.animHandle || h.object.userData.animKey != null);
+    if (!hit) return;
+    const o = hit.object.userData;
+    const centre = o.center.clone();
+    pinPlane.setFromNormalAndCoplanarPoint(camera.getWorldDirection(new Vector3()), centre);
+    const onPlane = ray.ray.intersectPlane(pinPlane, new Vector3()) ?? centre.clone();
+    pinDrag = { key: o.animHandle ? null : o.animKey, handle: o.animHandle ?? null, offset: centre.sub(onPlane), x: ev.clientX, y: ev.clientY, moved: false };
+    downAt = null; // not a click on what's behind it
+    ev.stopImmediatePropagation();
+    addEventListener('pointermove', onPinMove, true);
+    addEventListener('pointerup', onPinUp, true);
   };
   const onUp = (ev) => {
     if (ev.button !== 0 || !downAt) return;
     const moved = Math.hypot(ev.clientX - downAt[0], ev.clientY - downAt[1]);
     downAt = null;
-    if (moved > 4 || gizmoDragging || gizmo3d.axis) return;
-    const rect = renderer.domElement.getBoundingClientRect();
-    const at = new Vector2(((ev.clientX - rect.left) / rect.width) * 2 - 1, -((ev.clientY - rect.top) / rect.height) * 2 + 1);
-    ray.setFromCamera(at, camera);
+    if (moved > 4 || gizmoDragging || gizmo3d.axis || editDrag || editGizmo.axis) return;
+    rayFrom(ev);
     const additive = ev.ctrlKey || ev.metaKey;
     if (animState) {
       const key = ray.intersectObjects(animGroup.children.slice(1), false)[0];
@@ -1282,7 +1521,7 @@ export function mountSkillScene(host, { textureUrl = async () => null, meshData 
     }
     onPick({ kind: 'none', additive });
   };
-  renderer.domElement.addEventListener('pointerdown', onDown);
+  renderer.domElement.addEventListener('pointerdown', onDown, true);
   renderer.domElement.addEventListener('pointerup', onUp);
   ready = true;
 
@@ -1456,6 +1695,7 @@ export function mountSkillScene(host, { textureUrl = async () => null, meshData 
     capture,
     endCapture,
     setAnimOverlay,
+    setEditTool,
     /** Whether a right-drag (look) or middle-drag (pan) is going on. */
     get navigating() {
       return controls.dragging;
@@ -1511,7 +1751,12 @@ export function mountSkillScene(host, { textureUrl = async () => null, meshData 
       controls.dispose();
       gizmo.dispose();
       gizmo3d.dispose();
-      renderer.domElement.removeEventListener('pointerdown', onDown);
+      editGizmo.dispose();
+      removeEventListener('keydown', snapKeys);
+      removeEventListener('keyup', snapKeys);
+      renderer.domElement.removeEventListener('pointerdown', onDown, true);
+      removeEventListener('pointermove', onPinMove, true);
+      removeEventListener('pointerup', onPinUp, true);
       renderer.domElement.removeEventListener('pointerup', onUp);
       clearEffects();
       scene.traverse((o) => {

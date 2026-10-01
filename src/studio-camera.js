@@ -1,12 +1,13 @@
 // The 3D Viewport's camera, driven the way Roblox Studio's is:
 //
 //   right-drag            turn the camera where it stands (look around); the
-//                         pointer is locked, so the cursor stays where it was
+//                         cursor is hidden and stays where it was
 //   middle-drag           pan
 //   wheel                 move toward (or away from) what's under the cursor
 //   W A S D, Q E          fly: forward, left, back, right, down, up
 //                         (while the pointer is over the view); Shift slows
 //   F                     frame the character (`onFocus` says where)
+//   (the keys are rebindable: src/keybinds.js, the 'view' actions)
 //
 // Nothing is anchored and nothing is clamped: the camera goes wherever it's
 // flown, as close or as far as you like. The only limit is that it can't
@@ -17,12 +18,21 @@
 // scale that pan and zoom steps follow, so they feel the same near and far.
 
 import { Euler, Quaternion, Vector2, Vector3 } from 'three';
+import { isDesktop, warpCursor } from './platform.js';
+import { flyActionOf } from './keybinds.js';
 
 const LOOK = 0.0045; // radians per pixel
 const FLY = 26; // studs a second
 const SLOW = 0.25; // with Shift
 const LIMIT = Math.PI / 2 - 0.001;
-const KEYS = { w: [0, 0, -1], s: [0, 0, 1], a: [-1, 0, 0], d: [1, 0, 0], q: [0, -1, 0], e: [0, 1, 0] };
+const KEYS = {
+  flyForward: [0, 0, -1],
+  flyBack: [0, 0, 1],
+  flyLeft: [-1, 0, 0],
+  flyRight: [1, 0, 0],
+  flyDown: [0, -1, 0],
+  flyUp: [0, 1, 0],
+};
 const isTyping = (el) => el?.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(el?.tagName);
 
 export class StudioCamera {
@@ -176,14 +186,26 @@ export class StudioCamera {
     } catch {
       // a pointer the browser no longer knows; the drag works without capture
     }
-    this.drag = { mode: e.button === 2 ? 'look' : 'pan', x: e.clientX, y: e.clientY, id: e.pointerId, moved: 0 };
+    this.drag = {
+      mode: e.button === 2 ? 'look' : 'pan',
+      x: e.clientX,
+      y: e.clientY,
+      ax: e.clientX,
+      ay: e.clientY,
+      id: e.pointerId,
+      moved: 0,
+    };
     this.dom.style.cursor = e.button === 2 ? 'none' : 'move';
   }
 
-  // Looking locks the pointer (as Studio does): the cursor stays where the
-  // drag began instead of wandering off, and comes back there on release.
-  // Only once it really drags, so a plain right-click still opens the menu.
+  // Looking keeps the cursor where the drag began, as Studio does, instead
+  // of letting it wander off. In the app the cursor is hidden and put back
+  // there whenever it strays (see move); a browser has no way to move it,
+  // so it locks the pointer instead, which shows Chrome's "press Esc"
+  // banner. Only once it really drags, so a plain right-click still opens
+  // the menu.
   lock() {
+    if (isDesktop) return;
     if (document.pointerLockElement === this.dom || !this.dom.requestPointerLock) return;
     try {
       const p = this.dom.requestPointerLock({ unadjustedMovement: true });
@@ -198,16 +220,36 @@ export class StudioCamera {
     if (document.pointerLockElement === this.dom) document.exitPointerLock();
   }
 
+  /** Puts the hidden cursor back where the look began, once it's strayed. */
+  recenter(d) {
+    if (d.warping || Math.hypot(d.x - d.ax, d.y - d.ay) < 24) return;
+    d.warping = performance.now();
+    warpCursor(d.ax, d.ay).catch(() => (d.warping = 0));
+  }
+
   move(e) {
     if (!this.drag) return;
+    const d = this.drag;
     const locked = document.pointerLockElement === this.dom;
-    const dx = locked ? e.movementX : e.clientX - this.drag.x;
-    const dy = locked ? e.movementY : e.clientY - this.drag.y;
-    this.drag.x = e.clientX;
-    this.drag.y = e.clientY;
-    if (this.drag.mode === 'look') {
-      this.drag.moved += Math.abs(dx) + Math.abs(dy);
-      if (!locked && this.drag.moved > 3) this.lock();
+    // The jump the warp makes isn't the mouse's: it lands near the anchor
+    // (with whatever the mouse moved meanwhile), from at least 24 px away.
+    if (d.warping) {
+      if (Math.hypot(e.clientX - d.ax, e.clientY - d.ay) < 12) {
+        d.warping = 0;
+        d.x = e.clientX;
+        d.y = e.clientY;
+        return;
+      }
+      if (performance.now() - d.warping > 250) d.warping = 0; // it never landed
+    }
+    const dx = locked ? e.movementX : e.clientX - d.x;
+    const dy = locked ? e.movementY : e.clientY - d.y;
+    d.x = e.clientX;
+    d.y = e.clientY;
+    if (d.mode === 'look') {
+      d.moved += Math.abs(dx) + Math.abs(dy);
+      if (!locked && d.moved > 3) this.lock();
+      if (isDesktop) this.recenter(d);
       this.yaw -= dx * LOOK;
       this.pitch = Math.max(-LIMIT, Math.min(LIMIT, this.pitch - dy * LOOK));
       this.apply();
@@ -229,7 +271,11 @@ export class StudioCamera {
     } catch {
       // already released
     }
-    if (this.drag.mode === 'look' && this.drag.moved > 3) this.lookedAt = performance.now();
+    const d = this.drag;
+    if (d.mode === 'look' && d.moved > 3) {
+      this.lookedAt = performance.now();
+      if (isDesktop && Math.hypot(d.x - d.ax, d.y - d.ay) > 1) warpCursor(d.ax, d.ay).catch(() => {});
+    }
     this.drag = null;
     this.unlock();
     this.dom.style.cursor = '';
@@ -249,18 +295,21 @@ export class StudioCamera {
   }
 
   key(e, down) {
-    const k = e.key.toLowerCase();
-    if (!down) {
-      this.held.delete(k);
-      if (k === 'shift') this.held.delete('shift');
+    if (e.key === 'Shift') {
+      if (down) this.held.add('shift');
+      else this.held.delete('shift');
       return;
     }
-    if (isTyping(e.target) || e.ctrlKey || e.metaKey || e.altKey) return;
-    if (k === 'shift') return this.held.add('shift');
+    const act = flyActionOf(e);
+    if (!down) {
+      if (act) this.held.delete(act);
+      return;
+    }
+    if (!act || isTyping(e.target) || e.ctrlKey || e.metaKey || e.altKey) return;
     // Flying and framing only while the pointer is over the view (or a
     // look-drag is on), so the keys stay free for the rest of the window.
     if (!this.hover && !this.drag) return;
-    if (k === 'f') {
+    if (act === 'frameYou') {
       const at = this.onFocus();
       if (at) {
         const back = this.forward().multiplyScalar(-14);
@@ -269,10 +318,10 @@ export class StudioCamera {
       e.preventDefault();
       return;
     }
-    if (!KEYS[k]) return;
+    if (!KEYS[act]) return;
     e.preventDefault();
     e.stopPropagation();
-    this.held.add(k);
+    this.held.add(act);
     if (!this.frame) {
       this.last = performance.now();
       this.frame = requestAnimationFrame(this.fly);

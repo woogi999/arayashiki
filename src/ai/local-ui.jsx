@@ -61,7 +61,17 @@ export function LocalModels({ model, ctx, gpu, onModel, onOptions }) {
   }, [st]);
   const extra = ready.filter((m) => !CATALOG.some((c) => c.file === m.file));
 
-  if (!st) return <p class="hint">Looking at this PC…</p>;
+  if (!st)
+    return error ? (
+      <div class="local">
+        <p class="hint">Models on this PC couldn’t be read: {error}</p>
+        <Button icon="refresh" onClick={() => run(refreshLocal)}>
+          Try again
+        </Button>
+      </div>
+    ) : (
+      <p class="hint">Looking at this PC…</p>
+    );
 
   return (
     <div class="local">

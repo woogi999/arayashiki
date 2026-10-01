@@ -43,6 +43,7 @@ import { ease } from './fx/roblox.js';
 import { appearance } from './prefs.js';
 import { crashed, restoreWork } from './session.js';
 import { thin, withKey } from './camera-keys.js';
+import { continuation } from './animator.js';
 
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 const BRANCH_FIELDS = ['BRANCH', 'BRANCH TARGET', 'BRANCH FINISHER', 'BRANCH COLLIDED'];
@@ -206,7 +207,17 @@ export const program = computed(() => skill.value?.DATA ?? null);
 export const branches = computed(() => branchNames(program.value));
 export const line = computed(() => lineOf(program.value, branch.value));
 export const selectedNode = computed(() => line.value[nodeIndex.value] ?? null);
-export const duration = computed(() => run.value?.duration ?? 0);
+// A stretch the timeline must reach past the skill's own end, and shows as
+// a band: the animation open in the animator ({ start, end, keys, label,
+// room }, in seconds into the skill), so a camera longer than the skill (or
+// a draft not in it yet) plays all the way through, in step with the skill.
+// `room` is time past its end the playhead can go to, for the next key;
+// playing stops at the end.
+export const extent = signal(null);
+const reach = (r, ex) => (r ? Math.max(r.duration, ex ? ex.end + (ex.room ?? 0) : 0) : 0);
+export const duration = computed(() => reach(run.value, extent.value));
+/** Where playing stops: the skill's end, or the animation's if that's later. */
+const playEnd = () => Math.max(run.peek()?.duration ?? 0, extent.peek()?.end ?? 0);
 
 export const categoryRows = computed(() =>
   CATEGORIES.map((c) => ({
@@ -530,6 +541,42 @@ export function duplicateNode() {
     nodeSelection.value = copies.map((_, k) => at + k);
     nodeIndex.value = at + copies.length - 1;
   });
+}
+
+/**
+ * Carries the picked VISUAL on from its ALT POSITION: a WAIT (its TIME less
+ * 0.05, so the two overlap and it doesn't blink; a Camera's whole TIME) and
+ * a copy that starts where it ends and makes the same move again (see
+ * continuation in animator.js), right after it. Pressed again on the copy,
+ * it goes on further, a piece at a time.
+ */
+export function continueVisual() {
+  const i = nodeIndex.value;
+  const node = line.value[i];
+  if (node?.K_NAME !== 'VISUAL') {
+    status.value = 'Pick a VISUAL node to carry on from its ALT POSITION.';
+    return;
+  }
+  const { node: next, wait } = continuation(node);
+  const out = [...line.value];
+  out.splice(i + 1, 0, { K_NAME: 'WAIT', TIME: wait }, next);
+  setLine(out);
+  batch(() => {
+    nodeIndex.value = i + 2;
+    nodeSelection.value = [i + 2];
+  });
+  status.value =
+    node.EFFECT === 'Camera'
+      ? `Camera carried on: a WAIT ${wait}s (its whole TIME: Camera blocks mustn't overlap) and a block from where it ended.`
+      : `Carried on: a WAIT ${wait}s (its TIME less 0.05, so they overlap) and a VISUAL starting at its ALT POSITION.`;
+}
+
+/** Sets several fields of the picked node at once (the viewport's gizmo); `key` joins a drag into one undo step. */
+export function setNodeFields(fields, key) {
+  const i = nodeIndex.value;
+  const node = line.value[i];
+  if (!node) return;
+  editProgram([...linePath(branch.value), i], { ...node, ...fields }, key);
 }
 
 /** Deletes the picked nodes. */
@@ -904,6 +951,7 @@ export function attachScene(next) {
     scene.setRun(run.value);
     scene.show(time.peek());
     if (look.peek()) scene.setLook(look.peek());
+    syncEditTool();
   }
 }
 
@@ -915,6 +963,64 @@ const aspectRatio = (text) => {
 // The motion animator (src/ui/animator.jsx) hears clicks on its key markers.
 let animPick = null;
 export const setAnimPick = (fn) => (animPick = fn);
+
+// ─── Moving things in the view ──────────────────────────────────────────
+
+// The viewport's tool, as Roblox Studio's: 'select' (click to pick),
+// 'translate', 'scale' or 'rotate' (a gizmo on the picked node's box or
+// effect: drag it and the node's POSITION, SIZE or ROTATION follow), in
+// world or local axes.
+const readTool = () => {
+  try {
+    return JSON.parse(localStorage.getItem('arayashiki-view-tool') ?? 'null') ?? {};
+  } catch {
+    return {};
+  }
+};
+export const editTool = signal(readTool().mode ?? 'translate');
+export const editSpace = signal(readTool().space ?? 'world');
+effect(() => {
+  try {
+    localStorage.setItem('arayashiki-view-tool', JSON.stringify({ mode: editTool.value, space: editSpace.value }));
+  } catch {
+    // not kept
+  }
+});
+let gizmoDrag = 0;
+function syncEditTool() {
+  const mode = editTool.value;
+  const space = editSpace.value;
+  const i = nodeIndex.value;
+  const b = branch.value;
+  const uid = skillUid.value;
+  const busy = animatorOpen.value || camPathOpen.value || workspace.value !== 'skills';
+  if (!scene) return;
+  scene.setEditTool(
+    busy || !uid
+      ? null
+      : {
+          branch: b,
+          index: i,
+          mode,
+          space,
+          onEdit: (fields) => setNodeFields(fields, `${uid}:${b}:${i}:gizmo:${gizmoDrag}`),
+          onEnd: () => {
+            gizmoDrag++;
+            status.value = `Moved in the view: ${line.peek()[i]?.K_NAME ?? 'node'} ${i}. Ctrl snaps while you drag; Ctrl+Z undoes it.`;
+          },
+        },
+  );
+}
+effect(syncEditTool);
+const TOOL_NAMES = { select: 'Select', translate: 'Move', scale: 'Scale', rotate: 'Rotate' };
+export function setEditTool(mode) {
+  editTool.value = mode;
+  status.value = `Tool: ${TOOL_NAMES[mode]}${mode === 'select' ? '' : ' (pick a hitbox, projectile or effect, then drag its handles)'}.`;
+}
+export function toggleEditSpace() {
+  editSpace.value = editSpace.peek() === 'world' ? 'local' : 'world';
+  status.value = `Moving and turning in ${editSpace.peek()} axes.`;
+}
 
 /** A click in the viewport: an effect or a box takes you to its node. */
 export function pickInView({ kind, event, additive, index }) {
@@ -1083,7 +1189,7 @@ export function simulateNow() {
       : null;
   batch(() => {
     run.value = next;
-    time.value = Math.min(time.peek(), next?.duration ?? 0);
+    time.value = Math.min(time.peek(), reach(next, extent.peek()));
   });
 }
 
@@ -1092,17 +1198,18 @@ export function play() {
   simulateNow();
   const r = run.value;
   if (!r) return;
-  if (time.value >= r.duration - 0.01) time.value = 0;
+  const end = time.value < playEnd() - 0.01 ? playEnd() : duration.peek();
+  if (time.value >= end - 0.01) time.value = 0;
   playing.value = true;
   let last = performance.now();
   const tick = (now) => {
     if (!playing.value) return;
-    const next = Math.min(r.duration, time.value + ((now - last) / 1000) * speed.value);
+    const next = Math.min(end, time.value + ((now - last) / 1000) * speed.value);
     last = now;
     time.value = next;
     syncSounds(next);
     if (recordingCam.peek()) recordFrame(next);
-    if (next >= r.duration) {
+    if (next >= end) {
       stop();
       return;
     }

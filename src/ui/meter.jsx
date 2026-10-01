@@ -39,7 +39,7 @@ const MIN_VIEW = 20 / 60; // zoomed all the way in: 20 frames across
 
 // `view` is the stretch of time shown ({ t0, t1 }), or null for all of it.
 function layoutOf(run, width, view) {
-  const span = Math.max(run.duration, 0.1);
+  const span = Math.max(S.duration.peek(), 0.1);
   const t0 = view ? view.t0 : 0;
   const t1 = view ? view.t1 : span;
   const inner = Math.max(40, width - GUTTER - RIGHT);
@@ -97,7 +97,6 @@ export function FrameMeter() {
       text2: css('--text-2'),
       text3: css('--text-3'),
       hit: css('--hit'),
-      accent: css('--accent'),
       select: css('--sel-line'),
       you: css('--you'),
       dummy: css('--dummy'),
@@ -214,6 +213,37 @@ export function FrameMeter() {
       hitBoxes.push({ x0: px - 5, x1: px + 5, y0: cy - 1, y1: cy + 9, e });
     }
     g.restore();
+
+    // The animation open in the animator: where its blocks will run, and its keys.
+    const ex = S.extent.peek();
+    if (ex) {
+      const band = nodeInfo('VISUAL').color;
+      clip();
+      const x0 = L.x(ex.start);
+      const x1 = Math.max(x0 + 2, L.x(ex.end));
+      g.fillStyle = band;
+      g.globalAlpha = 0.1;
+      g.fillRect(x0, RULER, x1 - x0, L.height - RULER);
+      g.globalAlpha = 0.85;
+      g.fillRect(x0, RULER - 4, x1 - x0, 3);
+      for (const k of ex.keys ?? []) {
+        const px = Math.round(L.x(k)) + 0.5;
+        g.beginPath();
+        g.moveTo(px, RULER - 9);
+        g.lineTo(px + 3.5, RULER - 5.5);
+        g.lineTo(px, RULER - 2);
+        g.lineTo(px - 3.5, RULER - 5.5);
+        g.closePath();
+        g.fill();
+      }
+      g.globalAlpha = 1;
+      if (ex.label && x1 - x0 > 60) {
+        g.fillStyle = band;
+        g.font = `600 10px ${css('--font-ui')}`;
+        g.fillText(ex.label, Math.max(GUTTER, x0) + 6, RULER + 9);
+      }
+      g.restore();
+    }
     boxes.current = hitBoxes.filter((b) => b.x1 >= GUTTER && b.x0 <= GUTTER + L.inner);
     placeHead();
   }
@@ -243,6 +273,7 @@ export function FrameMeter() {
   });
   useSignalEffect(() => {
     S.run.value;
+    S.extent.value;
     S.branch.value;
     S.nodeIndex.value;
     S.nodeSelection.value;

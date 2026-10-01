@@ -61,7 +61,7 @@ checksum = "330a5ed07fa54e4702c9d6c4174f74427fc0ef6e214bbd677ae50a5099946470"
 
 [[package]]
 name = "arayashiki"
-version = "1.0.1"
+version = "1.0.2"
 dependencies = [
  "flate2",
  "keyring",
@@ -76,7 +76,18 @@ dependencies = [
  "tauri-plugin-dialog",
  "tauri-plugin-single-instance",
  "url",
+ "windows-sys 0.59.0",
  "zstd",
+]
+
+[[package]]
+name = "arayashiki-setup"
+version = "1.0.0"
+dependencies = [
+ "reqwest 0.12.28",
+ "serde_json",
+ "tauri-winres",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -1139,6 +1150,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b1f9e3d69d39e4862ffed03ed071a76f9a13ba1d9109d355b0f0aa6b15e393c4"
 dependencies = [
  "futures-core",
+ "futures-sink",
 ]
 
 [[package]]
@@ -3027,6 +3039,7 @@ checksum = "eddd3ca559203180a307f12d114c268abf583f59b03cb906fd0b3ff8646c1147"
 dependencies = [
  "base64 0.22.1",
  "bytes",
+ "futures-channel",
  "futures-core",
  "futures-util",
  "http",

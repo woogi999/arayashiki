@@ -1,12 +1,19 @@
-// The Progress Bar Maker's 3D preview: where the bar's billboard sits on an
-// R6 character, and how it looks there. The character and floor are the 3D
-// Viewport's own (src/scene.js); the billboard is a square sprite, SIZE × 2
-// studs across, on the HumanoidRootPart.
+// The Meter Maker's 3D preview: where the bar's billboard sits on an R6
+// character, and how it looks there. The character and floor are the 3D
+// Viewport's own (src/scene.js).
 //
 // A JJS billboard is placed pseudo-2D (confirmed in-game): its offset is on
 // the screen, not in the world. x goes across (negative is to the right), y
 // up and down, and z is its layer, like a z-index: negative in front of the
-// character, positive behind it. So the offset here follows the camera.
+// character, positive behind it. It's placed the way BuilderFX does it (and
+// the 3D Viewport draws it, src/fx/builderfx.js): a BillboardGui 15 studs
+// square on the root part, the picture 0.15 × SIZE of it (2.25 × SIZE
+// studs), at x = -x / 10 + 0.5 and y = -y / 10 + 0.5 of it (1.5 studs a
+// unit), pushed z studs away from the camera.
+//
+// A meter in layers ("Complex Separate") is several billboards, one in front
+// of the other by their z: the container at the back, the catch-up trail,
+// then the meter.
 
 import {
   AmbientLight,
@@ -59,28 +66,37 @@ export function mountBarScene(host) {
   const you = buildCharacter({ skin: '#f5cd30', torso: '#0d69ac', legs: '#a4bd47' }, faceTexture());
   scene.add(you.root);
 
-  const sprite = new Sprite(new SpriteMaterial({ transparent: true, depthWrite: false }));
-  scene.add(sprite);
-
+  // One sprite per layer: [{ canvas | url, z }], back to front.
+  let sprites = [];
+  let size = 2;
   let offset = [0, 0, 0];
   let loads = 0;
+  const GUI = 15;
 
   // Screen right and up, from the camera, around the root part.
   function place() {
-    const [x, y, z] = offset;
     camera.updateMatrixWorld();
     const centre = new Vector3();
     you.torso.getWorldPosition(centre);
     const right = new Vector3().setFromMatrixColumn(camera.matrixWorld, 0);
     const up = new Vector3().setFromMatrixColumn(camera.matrixWorld, 1);
-    const toCamera = new Vector3().subVectors(camera.position, centre).normalize();
-    sprite.position.copy(centre).addScaledVector(right, -x).addScaledVector(up, y);
-    // In front: drawn over the character. Behind: pushed back past it, so the
-    // body covers it. At 0: where it is, in the middle of the body.
-    sprite.material.depthTest = z >= 0;
-    sprite.renderOrder = z < 0 ? 10 : 0;
-    if (z > 0) sprite.position.addScaledVector(toCamera, -1.5);
-    sprite.material.needsUpdate = true;
+    const back = new Vector3().setFromMatrixColumn(camera.matrixWorld, 2);
+    const [x, y] = offset;
+    const across = 0.15 * size * GUI;
+    for (const sp of sprites) {
+      const z = sp.userData.z;
+      sp.position
+        .copy(centre)
+        .addScaledVector(right, (-x / 10) * GUI)
+        .addScaledVector(up, (y / 10) * GUI)
+        .addScaledVector(back, -z);
+      sp.scale.set(across, across, 1);
+      // In front (negative z): drawn over the character; behind, the body covers it.
+      sp.material.depthTest = z >= 0;
+      // The more negative, the later it's drawn: over the ones behind it.
+      sp.renderOrder = 10 - z * 1000;
+      sp.material.needsUpdate = true;
+    }
   }
 
   const render = () => {
@@ -101,29 +117,40 @@ export function mountBarScene(host) {
 
   return {
     // The picture is a `canvas` (the maker's own drawing) or a `url` (a
-    // Roblox image, for image IDs); `position` is the POSITION field.
-    update({ canvas, url, size, position }) {
-      const swap = (map) => {
-        const old = sprite.material.map;
-        if (map) map.colorSpace = SRGBColorSpace;
-        sprite.material.map = map;
-        sprite.material.color.set(map ? '#ffffff' : '#5a5a5a');
-        sprite.material.needsUpdate = true;
-        if (old !== map) old?.dispose();
-      };
+    // Roblox image, for image IDs); `position` is the POSITION field. A meter
+    // in layers passes `layers`: [{ canvas, z }], each z added to the
+    // position's.
+    update({ canvas, url, size: s, position, layers }) {
       const load = ++loads;
-      if (canvas) swap(new CanvasTexture(canvas));
-      else if (url)
-        new TextureLoader().load(url, (map) => {
-          if (load === loads) {
-            swap(map);
-            render();
-          } else map.dispose();
-        });
-      else swap(null);
       offset = vec3(position);
-      const s = Math.max(0.1, Number(size) || 0) * 2;
-      sprite.scale.set(s, s, 1);
+      size = Math.max(0.1, Number(s) || 0);
+      const want = layers ?? [{ canvas, url, z: 0 }];
+      for (const sp of sprites) {
+        scene.remove(sp);
+        sp.material.map?.dispose();
+        sp.material.dispose();
+      }
+      sprites = want.map((l) => {
+        const sp = new Sprite(new SpriteMaterial({ transparent: true, depthWrite: false }));
+        sp.userData.z = offset[2] + (l.z ?? 0);
+        const set = (map) => {
+          if (map) map.colorSpace = SRGBColorSpace;
+          sp.material.map = map;
+          sp.material.color.set(map ? '#ffffff' : '#5a5a5a');
+          sp.material.needsUpdate = true;
+        };
+        if (l.canvas) set(new CanvasTexture(l.canvas));
+        else if (l.url)
+          new TextureLoader().load(l.url, (map) => {
+            if (load === loads) {
+              set(map);
+              render();
+            } else map.dispose();
+          });
+        else set(null);
+        scene.add(sp);
+        return sp;
+      });
       render();
     },
     resetCamera() {

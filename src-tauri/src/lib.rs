@@ -8,13 +8,15 @@
 //   * Taking a moveset from outside: `arayashiki --open <file>` (what
 //     the CLI's `sbs open` and the MCP server's `open_in_app` run). A second
 //     launch hands its file to the window already open.
-//   * Checking GitHub for a newer release and installing it (updates.rs).
+//   * Updating itself from GitHub releases (updates.rs), and installing
+//     and uninstalling itself for the setup (install.rs).
 //   * Free AI models on this PC: llama.cpp's server and GGUF models (local.rs).
 
 mod account;
 mod ai;
 mod bridge;
 mod files;
+mod install;
 mod local;
 mod roblox;
 mod updates;
@@ -305,6 +307,17 @@ fn ui_log(app: tauri::AppHandle, line: String) {
     }
 }
 
+/// Puts the cursor back where a look-drag began (studio-camera.js): the
+/// view turns with the mouse while the cursor stays put, without the
+/// pointer lock's "press Esc to show your cursor" banner. `x`, `y` are in the
+/// window's CSS pixels.
+#[tauri::command]
+fn cursor_warp(window: tauri::WebviewWindow, x: f64, y: f64) -> Result<(), String> {
+    window
+        .set_cursor_position(tauri::LogicalPosition::new(x, y))
+        .map_err(|e| e.to_string())
+}
+
 /// Closes the window for good (after the UI has asked about unsaved work).
 #[tauri::command]
 fn quit_app(app: tauri::AppHandle) {
@@ -320,6 +333,10 @@ pub fn run() {
     // running app (starting it if needed) through the bridge.
     if args.iter().any(|a| a == "--mcp") {
         bridge::run_mcp_proxy();
+        return;
+    }
+    // Setting up, removing, or updating itself before any window opens.
+    if install::at_launch(&args) || updates::at_launch(&args) {
         return;
     }
     tauri::Builder::default()
@@ -387,6 +404,7 @@ pub fn run() {
             write_code_file,
             read_code_file,
             quit_app,
+            cursor_warp,
             ui_log,
             account_status,
             account_sign_in,
@@ -417,6 +435,9 @@ pub fn run() {
             updates::update_check,
             updates::update_download,
             updates::update_install,
+            updates::update_stage,
+            updates::update_staged,
+            updates::update_restart,
             updates::open_url,
             local::local_status,
             local::local_install_engine,

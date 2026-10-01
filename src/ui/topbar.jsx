@@ -2,6 +2,7 @@
 // text menus on the left, the name of what's being edited in the middle,
 // history and Export on the right. The menus are the workspace's own.
 import * as S from '../store.js';
+import { bindingOf } from '../keybinds.js';
 import * as B from '../barmaker/state.js';
 import { IconButton } from './controls.jsx';
 import { AccountButton } from './account.jsx';
@@ -61,8 +62,8 @@ function Workspaces() {
 function History({ past, future, undo, redo }) {
   return (
     <>
-      <IconButton icon="undo" label="Undo" title="Undo (Ctrl+Z)" size={14} disabled={!past} onClick={undo} />
-      <IconButton icon="redo" label="Redo" title="Redo (Ctrl+Y)" size={14} disabled={!future} onClick={redo} />
+      <IconButton icon="undo" label="Undo" title={`Undo (${bindingOf('undo')})`} size={14} disabled={!past} onClick={undo} />
+      <IconButton icon="redo" label="Redo" title={`Redo (${bindingOf('redo')})`} size={14} disabled={!future} onClick={redo} />
     </>
   );
 }
@@ -129,7 +130,9 @@ function BarsBar() {
       <nav class="topbar-menus" aria-label="File">
         {menu('New', 'Start a new meter', () => B.openDialog('new'))}
         {menu('Open', 'Saved designs and design files (Ctrl+O)', () => B.openDialog('open'))}
-        {menu('Save', 'Keep it in the app (Ctrl+S)', B.saveHere)}
+        {menu('Save', `Keep it in the app (${bindingOf('save')})`, B.saveHere)}
+        {menu('Save As', `Save it to a design file (.meter.json) (${bindingOf('saveAs')})`, B.saveDesignFile)}
+        {menu('Settings', 'Keybinds, appearance, the AI tools (MCP), Roblox caches, updates', () => (S.dialog.value = 'settings'))}
       </nav>
       <div class="moveset-name">
         <input

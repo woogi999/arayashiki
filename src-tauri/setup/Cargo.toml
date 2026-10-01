@@ -1,0 +1,20 @@
+[package]
+name = "arayashiki-setup"
+version = "1.0.0"
+description = "Installs the latest Arayashiki from GitHub."
+edition = "2021"
+publish = false
+
+[[bin]]
+name = "Arayashiki-Setup"
+path = "src/main.rs"
+
+[dependencies]
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json", "gzip", "blocking"] }
+serde_json = "1"
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.59", features = ["Win32_Foundation", "Win32_System_LibraryLoader", "Win32_UI_Controls", "Win32_UI_WindowsAndMessaging"] }
+
+[build-dependencies]
+tauri-winres = "0.3"

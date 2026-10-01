@@ -3,6 +3,110 @@
 What changed in each version of Arayashiki, newest first. The app shows this
 under Help → What's new.
 
+## 1.0.2
+
+### Updates
+
+- **Arayashiki updates itself**, as a game launcher does. A few seconds after
+  it opens, it checks GitHub. A newer version downloads in the background, and
+  a window says so, with what's new in it. **Restart now** puts it in within a
+  few seconds; **Later** carries on, and it installs itself the next time you
+  open the app. No installer to run. Settings → Updates can turn off the check
+  or the download.
+- **A new installer that never goes out of date.** `Arayashiki-Setup.exe`
+  asks GitHub for the latest version, installs it in your user folder (no
+  administrator needed, WebView2 too if the PC lacks it), and adds it to the
+  Start menu, the desktop and Settings → Apps. It's the same file for every
+  release.
+- The first time a new version opens, it shows **What's new**.
+
+### Viewport
+
+- **No more "To show your cursor, press Esc" banner.** Right-drag to look still
+  keeps the cursor where it was: it's hidden while you turn and comes back to
+  the same spot when you let go.
+- **Move, scale and rotate things in the view**, as in Roblox Studio or
+  Blender. Pick a hitbox, projectile or effect, then drag the handles of the
+  **Move**, **Scale** or **Rotate** tool (the strip down the view's left side,
+  or Ctrl+2, Ctrl+3 and Ctrl+4; Ctrl+1 is Select). Its POSITION, SIZE and
+  ROTATION follow. Hold Ctrl while you drag to snap to half a stud, 15° or a
+  tenth. Ctrl+L switches between world and local axes. Each drag is one undo
+  step.
+
+### Camera and visual animations
+
+- **Play goes all the way through.** Play used to stop where the skill
+  ended, often around the second key. Now it runs to the animation's last key,
+  even past the skill's end or for a draft that isn't written yet. The timeline
+  plays along, and a band on it shows where the animation's blocks will run,
+  with a mark at each key. There's a second of room after the last key, for
+  placing the next one.
+- **Pen-tool handles.** **Bend with handles** puts two handles on the picked
+  key. Drag the white dots in the view to bend the path through it; Alt drags
+  one handle without its partner. You can now also drag the key pins
+  themselves, straight across the screen.
+- **A graph editor for the easing.** Switch the animator from **Keys** to
+  **Graph** (or press Tab) to see each stretch between keys as a curve. Pick a
+  stretch from the strip along the top. Drag the curve's two handles to shape it
+  into a custom curve, or pick one of JJS's easings. A custom curve is written
+  as a few blocks of JJS's own easings that follow it. For a camera, a dashed
+  line shows those blocks as JJS will run them, and **Nearest JJS easing**
+  turns the stretch back into a single block.
+
+### Editing
+
+- **Continue from ALT POSITION.** A VISUAL now has a button (also Ctrl+Shift+D
+  and in its right-click menu) that adds a copy of it after a WAIT. The copy
+  starts where the VISUAL ends and makes the same move again. The WAIT is the
+  VISUAL's TIME less 0.05, so the two overlap and the effect doesn't blink. A
+  Camera's WAIT is its whole TIME instead, because overlapping Camera blocks
+  make the view jitter in JJS. Press it again on the copy to keep going.
+- **Drag number fields to change them**, as in Blender. Hold and drag left or
+  right on any number. Shift gives finer steps and Ctrl bigger ones. A plain
+  click still types. "x, y, z" fields (POSITION, SIZE, ROTATION…) are now three
+  boxes, one per axis.
+- **Fold a skill's branches in the Outliner.** The arrow beside a skill hides
+  or shows its branches, and the skill stays selected.
+
+### Keyboard
+
+- **Every command has a shortcut now**, and every one can be changed in
+  Settings → Keyboard shortcuts (Ctrl+/). This includes flying with **W A S D
+  Q E**, framing with **F**, the viewport tools, the cameras (Alt+1, Alt+2,
+  Alt+3), playback speed (Shift+1, Shift+2, Shift+3), the animator's G, R and
+  Tab, and the Meter Maker's tools. The list is grouped, any shortcut can be
+  cleared, and two that clash are marked.
+
+### Meter Maker
+
+- **A picture can be the bar.** The new **Picture** bar shape fills across the
+  picture's own outline, not just one segment's. It fills in the picture's own
+  colours or the fill's, and the part still to fill is the picture faded or
+  the background.
+- **Render in layers**, under Export → Pictures: one container picture (the
+  background, outline and anything else that never changes), then a folder
+  each of the meter, its leading edge and its catch-up trail, one picture per
+  step.
+- **Complex Separate**, a new skill style. The meter is built from separate
+  billboards, each 0.001 studs apart in z (the more negative, the further in
+  front). The container is shown once, at the back, and only the meter is
+  swapped as the tag changes. When the value goes down, the step it came from
+  flashes its catch-up trail behind the meter and fades. It asks for the
+  container's image ID, the meter's, and the trail's (if the trail is on), and
+  the upload makes all of them.
+- **The 3D preview is centred again.** It was shifted up and to the left, and
+  the character was out of view. It now places the billboard the way JJS does.
+- **Settings and Save As are in the Meter Maker's top bar.** Save As saves
+  the design to a file.
+
+### AI
+
+- **Models on this PC are easier to find.** Settings → AI now lists the
+  built-in models to download and use. "On this PC" is first in the
+  assistant's list of services, and a "Run a free model on this PC" button
+  starts you off. If the app can't read its models folder, it now says why
+  instead of waiting forever.
+
 ## 1.0.1
 
 ### Camera animations

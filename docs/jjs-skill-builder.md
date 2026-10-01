@@ -956,7 +956,7 @@ These are replicas, where no export shows the real thing:
 ### Displaying a value: the progress bar skill (confirmed in-game)
 
 The Progress Bar Maker's export (`core/barskill.js`) is a passive state
-machine on one tag, in one of two styles. Both start the same way and share
+machine on one tag, in one of three styles. All start the same way and share
 the `-` dispatcher (the checks from the top step down, the rails, `BRANCH "-"`).
 
 **Complex** (the default; the owner's lag-proof version, matched exactly by a
@@ -996,6 +996,29 @@ also stop the pile-up, but it would redraw on every push, and could flicker.)
 `LOOP BACK` counts the nodes from `>Checks` to the `WAIT`: the checks, the two
 comments and the wait (without rails: the checks, `>Checks` and the wait). It
 lands on `>Checks`, so the loop only ever checks.
+
+**Complex Separate** (a variant of Complex; built here, not yet checked
+in-game). The meter is drawn in layers, each a billboard of its own, stacked
+by POSITION z a thousandth of a stud apart (a billboard's z is its layer: the
+more negative, the further in front):
+
+```
+entry:      VISUAL Cancel + Billboard, the container's image, TIME 1e38,
+            VISUAL TAG "BarBox", at z          (shown once, at the back)
+            TAG Bar = start; BRANCH "-"
+"N":        as Complex, but the meter's image (no container) at z − 0.002;
+            the checks for steps under N, and "<0", go to "DropN" instead
+"DropN":    VISUAL Cancel "BarTrail"; VISUAL Billboard, step N's trail image,
+            VISUAL TAG "BarTrail", at z − 0.001, TIME = the trail time,
+            OPACITY 0 → ALT OPACITY 1 (Quad Out: a flash fading); BRANCH "-"
+```
+
+So only the meter is swapped as the tag changes, and when it goes down the
+step it left flashes its catch-up trail between the container and the meter,
+then fades, before the dispatcher finds the new step. Without trail images
+there are no Drop branches: it's Complex with the container apart. The Meter
+Maker renders the three picture sets (`render(doc, step, { part })` in
+`src/barmaker/draw.js`: `container`, `meterLead`, `trail`) and uploads them.
 
 **Legacy** (the first version). Each step is shown briefly and the dispatcher
 runs again, which draws it again, for ever:

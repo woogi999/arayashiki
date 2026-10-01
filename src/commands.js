@@ -11,6 +11,7 @@ import { resetLayout } from './ui/dock.jsx';
 import { startTour } from './onboarding.js';
 import { openUpdates } from './updates.js';
 
+const SCALES_LIST = [0.8, 0.9, 1, 1.1, 1.25, 1.5];
 const skills = () => S.workspace.peek() === 'skills';
 const editing = () => skills() && !S.showStart.peek();
 const hasSkill = () => editing() && Boolean(S.skill.peek());
@@ -30,7 +31,7 @@ export const COMMANDS = [
   { id: 'open', title: 'Open a .txt', group: 'File', icon: 'folder', keywords: 'open file load code', run: () => S.openFile() },
   { id: 'import', title: 'Import a code', group: 'File', icon: 'file-text', keywords: 'paste code jjs KLUv', run: dialog('import') },
   { id: 'save', title: 'Save', group: 'File', icon: 'save', keywords: 'save txt', run: () => (S.workspace.peek() === 'bars' ? B.saveHere() : S.saveHere()) },
-  { id: 'saveAs', title: 'Save As…', group: 'File', icon: 'save', keywords: 'save as copy txt', run: () => S.saveHere({ as: true }) },
+  { id: 'saveAs', title: 'Save As…', group: 'File', icon: 'save', keywords: 'save as copy txt file meter design', run: () => (S.workspace.peek() === 'bars' ? B.saveDesignFile() : S.saveHere({ as: true })) },
   { id: 'export', title: 'Export code (copy for JJS)', group: 'File', icon: 'copy', keywords: 'export copy code jjs clipboard', run: () => S.openExport('code') },
   { id: 'templates', title: 'Templates', group: 'File', icon: 'sparkles', keywords: 'ready made skills form m1 dash sheathe percentage meter', run: dialog('templates') },
   { id: 'start', title: 'Start screen', group: 'File', icon: 'layout', keywords: 'home splash welcome recent', run: () => ((S.workspace.value = 'skills'), (S.showStart.value = true)) },
@@ -41,6 +42,7 @@ export const COMMANDS = [
   { id: 'redo', title: 'Redo', group: 'Edit', icon: 'redo', keywords: 'redo again', run: () => (S.workspace.peek() === 'bars' ? B.redo() : S.redo()) },
   { id: 'selectAll', title: 'Select all nodes', group: 'Nodes', icon: 'list', keywords: 'select all pick every node ctrl a', when: hasSkill, run: () => S.selectAll() },
   { id: 'duplicate', title: 'Duplicate node', group: 'Nodes', icon: 'copy', keywords: 'copy clone node', when: hasNode, run: () => S.duplicateNode() },
+  { id: 'continueVisual', title: 'Continue the VISUAL from its ALT POSITION', group: 'Nodes', icon: 'copy-plus', keywords: 'duplicate visual alt position next piece chain carry on extend continue wait overlap', when: () => hasNode() && S.selectedNode.peek()?.K_NAME === 'VISUAL', run: () => S.continueVisual() },
   { id: 'delete', title: 'Delete', group: 'Nodes', icon: 'trash-2', keywords: 'remove delete node skill', when: hasSkill, run: () => (S.activeArea.peek() === 'outliner' ? S.deleteOutlined() : S.deleteNode()) },
   { id: 'moveUp', title: 'Move node up', group: 'Nodes', icon: 'arrow-up', keywords: 'reorder', when: hasNode, run: () => S.moveNode(-1) },
   { id: 'moveDown', title: 'Move node down', group: 'Nodes', icon: 'arrow-down', keywords: 'reorder', when: hasNode, run: () => S.moveNode(1) },
@@ -56,11 +58,18 @@ export const COMMANDS = [
   { id: 'restart', title: 'Play from the start', group: 'Playback', icon: 'skip-back', keywords: 'restart replay beginning', when: hasSkill, run: () => S.restart() },
   { id: 'frameBack', title: 'Back a frame', group: 'Playback', icon: 'step-back', keywords: 'previous frame', when: hasSkill, run: () => S.stepFrames(-1) },
   { id: 'frameNext', title: 'Forward a frame', group: 'Playback', icon: 'step-forward', keywords: 'next frame', when: hasSkill, run: () => S.stepFrames(1) },
+  { id: 'toStart', title: 'To the start', group: 'Playback', icon: 'skip-back', keywords: 'beginning home first frame', when: hasSkill, run: () => S.seek(0) },
+  { id: 'toEnd', title: 'To the end', group: 'Playback', icon: 'skip-forward', keywords: 'end last frame', when: hasSkill, run: () => S.seek(S.duration.peek()) },
   { id: 'speed1', title: 'Speed: real time', group: 'Playback', icon: 'timer', keywords: 'speed 1x normal', run: () => (S.speed.value = 1) },
   { id: 'speedHalf', title: 'Speed: half (slow motion)', group: 'Playback', icon: 'timer', keywords: 'speed 0.5 slow mo slowmo', run: () => (S.speed.value = 0.5) },
   { id: 'speedQuarter', title: 'Speed: quarter (slow motion)', group: 'Playback', icon: 'timer', keywords: 'speed 0.25 slow mo slowmo', run: () => (S.speed.value = 0.25) },
 
   // View
+  { id: 'toolSelect', title: 'Tool: Select', group: 'Viewport', icon: 'mouse-pointer', keywords: 'select pick click tool studio', when: editing, run: () => S.setEditTool('select') },
+  { id: 'toolMove', title: 'Tool: Move (drag the picked box or effect)', group: 'Viewport', icon: 'move', keywords: 'move drag translate position gizmo tool studio blender hitbox visual', when: editing, run: () => S.setEditTool('translate') },
+  { id: 'toolScale', title: 'Tool: Scale', group: 'Viewport', icon: 'scale', keywords: 'scale size resize gizmo tool studio blender hitbox visual', when: editing, run: () => S.setEditTool('scale') },
+  { id: 'toolRotate', title: 'Tool: Rotate', group: 'Viewport', icon: 'rotate', keywords: 'rotate turn rotation gizmo tool studio blender hitbox visual', when: editing, run: () => S.setEditTool('rotate') },
+  { id: 'toolSpace', title: 'Move and turn in world / local axes', group: 'Viewport', icon: 'globe', keywords: 'local world axes space gizmo', when: editing, run: () => S.toggleEditSpace() },
   { id: 'hitboxes', title: 'Show / hide hitboxes', group: 'View', icon: 'box', keywords: 'hitbox projectile boxes', run: () => (S.showHitboxes.value = !S.showHitboxes.peek()) },
   { id: 'follow', title: 'Follow both characters', group: 'View', icon: 'navigation', keywords: 'follow camera track', run: () => (S.follow.value = !S.follow.peek()) },
   { id: 'sounds', title: 'Sounds on / off', group: 'View', icon: 'volume-2', keywords: 'audio sfx mute', run: () => (S.sounds.value = !S.sounds.peek()) },
@@ -98,7 +107,7 @@ export const COMMANDS = [
   { id: 'keybinds', title: 'Keyboard shortcuts', group: 'Settings', icon: 'keyboard', keywords: 'keys hotkeys shortcuts bindings', run: () => ((S.settingsTab.value = 'keys'), (S.dialog.value = 'settings')) },
   { id: 'account', title: 'Sign in with Roblox / your avatar', group: 'Settings', icon: 'user-round', keywords: 'roblox account login sign in avatar', run: dialog('account') },
   { id: 'startOnLaunch', title: 'Start screen on launch on / off', group: 'Settings', icon: 'layout', keywords: 'splash startup', run: () => S.setStartOnLaunch(!S.startOnLaunch()) },
-  ...[0.8, 0.9, 1, 1.1, 1.25, 1.5].map((v) => ({
+  ...SCALES_LIST.map((v) => ({
     id: `scale${v}`,
     title: `Interface size ${Math.round(v * 100)}%`,
     group: 'Settings',
@@ -107,6 +116,13 @@ export const COMMANDS = [
     run: () => setAppearance({ scale: v }),
     checked: () => appearance.peek().scale === v,
   })),
+  { id: 'zoomIn', title: 'Interface bigger', group: 'Settings', icon: 'zoom-in', keywords: 'ui scale zoom bigger larger', run: () => zoomBy(1) },
+  { id: 'zoomOut', title: 'Interface smaller', group: 'Settings', icon: 'zoom-out', keywords: 'ui scale zoom smaller', run: () => zoomBy(-1) },
+  { id: 'zoomReset', title: 'Interface at 100%', group: 'Settings', icon: 'zoom-in', keywords: 'ui scale zoom reset normal', run: () => setAppearance({ scale: 1 }) },
+  { id: 'bgNext', title: 'Next viewport background', group: 'Settings', icon: 'image', keywords: 'background colour color viewport cycle', run: () => {
+    const i = BACKGROUNDS.findIndex(([v]) => v === appearance.peek().viewportBg);
+    setAppearance({ viewportBg: BACKGROUNDS[(i + 1) % BACKGROUNDS.length][0] });
+  } },
   ...BACKGROUNDS.map(([value, label]) => ({
     id: `bg${value}`,
     title: `Viewport background: ${label}`,
@@ -116,6 +132,13 @@ export const COMMANDS = [
     run: () => setAppearance({ viewportBg: value }),
   })),
 ];
+
+const SCALES = [0.8, 0.9, 1, 1.1, 1.25, 1.5];
+function zoomBy(step) {
+  const now = appearance.peek().scale ?? 1;
+  const i = SCALES.reduce((best, v, j) => (Math.abs(v - now) < Math.abs(SCALES[best] - now) ? j : best), 0);
+  setAppearance({ scale: SCALES[Math.max(0, Math.min(SCALES.length - 1, i + step))] });
+}
 
 export const command = (id) => COMMANDS.find((c) => c.id === id);
 export const shortcutOf = (id) => bindingOf(id);

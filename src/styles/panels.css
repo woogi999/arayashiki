@@ -737,3 +737,124 @@ body.is-moving * {
     border-top: 1px solid var(--line);
   }
 }
+
+/* ─── The animator's graph editor (src/ui/ease-graph.jsx) ──────────── */
+
+.eg {
+  display: grid;
+  gap: 8px;
+}
+
+.eg-strip {
+  display: flex;
+  gap: 2px;
+  min-height: 44px;
+}
+
+.eg-stretch {
+  display: grid;
+  flex: 1 1 0;
+  min-width: 34px;
+  grid-template-rows: 1fr auto;
+  padding: 3px 4px 2px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--area);
+  color: var(--text-3);
+  font-size: var(--text-xs);
+  cursor: pointer;
+}
+
+.eg-stretch:hover {
+  border-color: var(--line-strong);
+  color: var(--text-2);
+}
+
+.eg-stretch[aria-selected='true'] {
+  border-color: var(--sel-line);
+  background: var(--row-selected);
+  color: var(--text);
+}
+
+.eg-stretch svg {
+  width: 100%;
+  height: 26px;
+}
+
+.eg-stretch path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+}
+
+.eg-plot {
+  width: 100%;
+  max-height: 290px;
+  border-radius: var(--radius);
+  background: var(--field);
+  touch-action: none;
+}
+
+.eg-grid {
+  stroke: var(--line);
+}
+
+.eg-axis {
+  stroke: var(--line-strong);
+  stroke-dasharray: 3 3;
+}
+
+.eg-cut {
+  stroke: var(--text-3);
+  stroke-dasharray: 1 3;
+}
+
+.eg-label {
+  fill: var(--text-3);
+  font: 500 10px var(--font-mono);
+}
+
+.eg-curve {
+  fill: none;
+  stroke: var(--text);
+  stroke-width: 2;
+}
+
+.eg-run {
+  fill: none;
+  stroke: var(--you);
+  stroke-dasharray: 5 4;
+  stroke-width: 1.5;
+}
+
+.eg-handle line {
+  stroke: var(--text-2);
+}
+
+.eg-handle circle {
+  fill: var(--bg-1);
+  stroke: var(--text);
+  stroke-width: 2;
+  cursor: grab;
+}
+
+.eg-handle.is-preset line,
+.eg-handle.is-preset circle {
+  opacity: 0.45;
+}
+
+.eg-handle circle:hover {
+  fill: var(--text);
+}
+
+.eg-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.eg-nums {
+  display: inline-flex;
+  gap: 3px;
+}

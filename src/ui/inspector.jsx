@@ -6,7 +6,9 @@ import { animOf, defaultsOf, effectFields, fieldsOf, nodeInfo, rgbOf } from '../
 import { ANIM_SETS } from '../../core/gamedata.js';
 import * as S from '../store.js';
 import { Icon } from '../icons.jsx';
-import { IconButton, KindChip, Switch } from './controls.jsx';
+import { Button, IconButton, KindChip, Switch } from './controls.jsx';
+import { bindingOf } from '../keybinds.js';
+import { ANIMATABLE } from '../animator.js';
 import { AssetCard } from './asset-card.jsx';
 
 // Fields that hold a Roblox asset ID: a sound's ID, and the pictures
@@ -115,6 +117,35 @@ function FieldInput({ field, id, value, text }) {
       );
     case 'json':
       return <textarea id={id} class="input num" rows={2} spellcheck={false} value={text} onChange={commit} />;
+    case 'vec3': {
+      // Three boxes, each draggable (src/scrub.js); anything that isn't three
+      // numbers stays a text field.
+      const parts = String(text ?? '').split(',').map((x) => x.trim());
+      if (parts.length !== 3 || !parts.every((x) => x !== '' && Number.isFinite(Number(x))))
+        return <input id={id} type="text" class="input num" spellcheck={false} value={text} onChange={commit} />;
+      const setAxis = (i, raw) => {
+        const n = Number(raw);
+        if (!Number.isFinite(n)) return;
+        S.setNodeField(field.key, parts.map((x, j) => (j === i ? String(n) : x)).join(', '));
+      };
+      return (
+        <span class="vec3-input">
+          {['x', 'y', 'z'].map((axis, i) => (
+            <input
+              key={axis}
+              id={i === 0 ? id : undefined}
+              type="number"
+              step="any"
+              class="input num"
+              aria-label={`${field.key} ${axis}`}
+              title={`${field.key} ${axis}: drag to change, click to type`}
+              value={parts[i]}
+              onChange={(e) => setAxis(i, e.currentTarget.value)}
+            />
+          ))}
+        </span>
+      );
+    }
     default: {
       const list =
         field.type === 'branch'
@@ -192,6 +223,22 @@ export function Inspector() {
         <KindChip color={info.color} icon={info.icon} />
         <p>{info.about}</p>
       </div>
+      {node.K_NAME === 'VISUAL' && (
+        <div class="inspector-actions">
+          <Button
+            icon="copy-plus"
+            onClick={S.continueVisual}
+            title={`A WAIT (${node.EFFECT === 'Camera' ? 'its whole TIME: Camera blocks mustn’t overlap' : 'its TIME less 0.05, so the two overlap and it doesn’t blink'}) and a copy that starts at its ALT POSITION and makes the same move again (${bindingOf('continueVisual')})`}
+          >
+            Continue from ALT POSITION
+          </Button>
+          {ANIMATABLE.includes(node.EFFECT) && (
+            <Button icon="wand" variant="ghost" onClick={() => import('./animator.jsx').then((m) => m.openAnimator())} title={`Keyframe it (${bindingOf('animate')})`}>
+              Animate…
+            </Button>
+          )}
+        </div>
+      )}
       {node.K_NAME === 'ANIM' && <AnimPreview use={node.ANIM_USE ?? defaultsOf('ANIM').ANIM_USE} />}
       {node.K_NAME === 'ANIM' && (
         <datalist id="anim-names">

@@ -14,6 +14,7 @@ import {
   TEMPLATES as EXAMPLES,
   drawingFingerprint,
   frameName,
+  hasPart,
   newBar,
   newDoc,
   newImage,
@@ -33,6 +34,7 @@ import { restoreWork } from '../session.js';
 import { openTextFile, saveBlob, uploadDecal } from '../platform.js';
 import { account } from '../account.js';
 import * as S from '../store.js';
+import { actionOf } from '../keybinds.js';
 
 export { EXAMPLES, MAX_FRAMES };
 export const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
@@ -126,9 +128,23 @@ export const selected = computed(() => doc.value.layers.find((l) => l.id === sel
 export const pictures = computed(() => doc.value.frames + 1);
 export const jjs = computed(() => ({ ...newJjs(), ...doc.value.jjs }));
 export const jjsIds = computed(() => parseIds(jjs.value.ids));
+// Complex Separate: the meter in layers, and the pictures it needs besides the meter's.
+export const separate = computed(() => jjs.value.style === 'separate');
+export const wantsTrail = computed(() => hasPart(doc.value, 'trail'));
+export const containerIds = computed(() => parseIds(jjs.value.containerId));
+export const trailIds = computed(() => parseIds(jjs.value.trailIds));
+/** How many pictures the skill needs uploaded: the steps, or (separate) the container, the meter's steps and the trail's. */
+export const uploadCount = computed(() =>
+  separate.value ? 1 + pictures.value + (wantsTrail.value ? pictures.value : 0) : pictures.value,
+);
+// The picture export: everything in one picture per step, or in layers
+// (container, meter, leading edge, trail: a folder of each).
+export const layeredExport = signal(false);
 // Whether the uploaded pictures were made from the design as it is now.
 export const uploadsStale = computed(() => {
-  const { uploadedFor, uploads } = jjs.value;
+  const { uploadedFor, uploads, layeredUploads } = jjs.value;
+  if (jjs.value.style === 'separate')
+    return Boolean(layeredUploads?.fingerprint && layeredUploads.fingerprint !== `${drawingFingerprint(doc.value)}:separate`);
   return Boolean(uploads?.length && uploadedFor && uploadedFor !== drawingFingerprint(doc.value));
 });
 export const firstName = computed(() => frameName(exportName.value, 0, doc.value.frames));
@@ -307,8 +323,21 @@ export async function mountPreview(element) {
 }
 
 function feedBar() {
+  const d = doc.value;
+  const at = frame.value;
+  // Complex Separate is three billboards a thousandth apart: the container,
+  // the trail (shown a little ahead here, as it is when the meter's just
+  // gone down), and the meter in front.
+  const layers = separate.value
+    ? [
+        { canvas: render(d, at, { resolve, part: 'container' }), z: 0 },
+        ...(wantsTrail.value ? [{ canvas: render(d, Math.min(d.frames, at + Math.ceil(d.frames / 5)), { resolve, part: 'trail' }), z: -0.001 }] : []),
+        { canvas: render(d, at, { resolve, part: 'meterLead' }), z: -0.002 },
+      ]
+    : null;
   barScene?.update({
-    canvas: render(doc.value, frame.value, { resolve }),
+    canvas: layers ? null : render(d, at, { resolve }),
+    layers,
     size: jjs.value.size,
     position: jjs.value.position,
   });
@@ -913,30 +942,35 @@ function endStroke() {
 
 // ─── Keys ───────────────────────────────────────────────────────────────
 
-const TOOL_KEYS = { v: 'move', b: 'brush', e: 'eraser', u: 'shape', t: 'text' };
+const TOOL_ACTIONS = { barMove: 'move', barBrush: 'brush', barEraser: 'eraser', barShape: 'shape', barText: 'text' };
 const isTyping = (el) => el?.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(el?.tagName);
 
+/** The Meter Maker's keys (rebindable: src/keybinds.js, the 'bars' and 'both' actions). */
 export function onKey(event) {
   if (dialog.value || S.dialog.value) return; // dialogs handle their own keys
-  if (isTyping(event.target) || event.altKey) return;
-  const mod = event.ctrlKey || event.metaKey;
+  if (isTyping(event.target)) return;
   const k = event.key.toLowerCase();
   const act = (fn) => {
     event.preventDefault();
     fn();
   };
-  if (mod && k === 'z') return act(event.shiftKey ? redo : undo);
-  if (mod && k === 'y') return act(redo);
-  if (mod && k === 's') return act(saveHere);
-  if (mod && k === 'o') return act(() => openDialog('open'));
-  if (mod && k === 'e') return act(() => openDialog('export'));
-  if (mod && k === '0') return act(() => zoomTo(0));
-  if (mod) return;
-  if (k === ' ') {
+  const action = actionOf(event, 'bars');
+  if (action === 'undo') return act(event.shiftKey ? redo : undo);
+  if (action === 'redo') return act(redo);
+  if (action === 'save') return act(saveHere);
+  if (action === 'saveAs') return act(saveDesignFile);
+  if (action === 'open') return act(() => openDialog('open'));
+  if (action === 'export') return act(() => openDialog('export'));
+  if (action === 'barFit') return act(() => zoomTo(0));
+  if (action === 'barPrevStep') return act(() => showFrame(frame.value - 1));
+  if (action === 'barNextStep') return act(() => showFrame(frame.value + 1));
+  if (action === 'play') {
     if (event.target?.tagName === 'BUTTON') return;
     return act(play);
   }
-  if ((k === 'delete' || k === 'backspace') && selected.value) return act(deleteLayer);
+  if (action === 'delete' && selected.value) return act(deleteLayer);
+  if (TOOL_ACTIONS[action]) return act(() => pickTool(TOOL_ACTIONS[action]));
+  if (event.ctrlKey || event.metaKey || event.altKey) return;
   const nudge = { arrowleft: [-1, 0], arrowright: [1, 0], arrowup: [0, -1], arrowdown: [0, 1] }[k];
   if (nudge && selected.value && selected.value.type !== 'paint') {
     const step = event.shiftKey ? 10 : 1;
@@ -945,7 +979,6 @@ export function onKey(event) {
       change(patchLayer(layer.id, { x: layer.x + nudge[0] * step, y: layer.y + nudge[1] * step }), `${layer.id}:nudge`),
     );
   }
-  if (TOOL_KEYS[k]) pickTool(TOOL_KEYS[k]);
 }
 
 // ─── Steps ──────────────────────────────────────────────────────────────
@@ -1008,20 +1041,41 @@ async function withBusy(job) {
   }
 }
 
+// In layers: the container once, then a folder each for the meter, its
+// leading edge and its catch-up trail (those the design has), a picture a step.
+function layeredParts(d) {
+  return [
+    ['meter', 'meter'],
+    ...(hasPart(d, 'lead') ? [['lead', 'leading-edge']] : []),
+    ...(hasPart(d, 'trail') ? [['trail', 'trail']] : []),
+  ];
+}
+
 export const saveZip = () =>
   withBusy(async () => {
     const d = doc.value;
     const entries = {};
-    for (let k = 0; k <= d.frames; k++) {
-      const blob = await canvasBlob(render(d, k, { resolve }));
-      entries[frameName(exportName.value, k, d.frames)] = new Uint8Array(await blob.arrayBuffer());
-    }
+    if (layeredExport.value) {
+      const box = await canvasBlob(render(d, 0, { resolve, part: 'container' }));
+      entries[`${exportName.value || 'progress'}_container.png`] = new Uint8Array(await box.arrayBuffer());
+      for (const [part, folder] of layeredParts(d))
+        for (let k = 0; k <= d.frames; k++) {
+          const blob = await canvasBlob(render(d, k, { resolve, part }));
+          entries[`${folder}/${frameName(exportName.value, k, d.frames)}`] = new Uint8Array(await blob.arrayBuffer());
+        }
+    } else
+      for (let k = 0; k <= d.frames; k++) {
+        const blob = await canvasBlob(render(d, k, { resolve }));
+        entries[frameName(exportName.value, k, d.frames)] = new Uint8Array(await blob.arrayBuffer());
+      }
     const { zipSync } = await import('fflate');
     // PNGs are compressed already; zipping them again only costs time.
     const zip = new Blob([zipSync(entries, { level: 0 })], { type: 'application/zip' });
     const where = await saveBlob(zip, `${exportName.value || 'progress'}.zip`, 'Zip archive');
     if (where)
-      status.value = `Saved ${d.frames + 1} pictures, ${firstName.value} (empty) to ${lastName.value} (full): ${sizeLabel(zip.size)}`;
+      status.value = layeredExport.value
+        ? `Saved the container and ${layeredParts(d).map(([, f]) => f).join(', ')} (${d.frames + 1} pictures each): ${sizeLabel(zip.size)}`
+        : `Saved ${d.frames + 1} pictures, ${firstName.value} (empty) to ${lastName.value} (full): ${sizeLabel(zip.size)}`;
   });
 
 export const saveFrame = () =>
@@ -1063,6 +1117,7 @@ export function setJjs(key, value) {
   if (key === 'checkEvery') value = Math.max(0.01, Number(value) || 0);
   if (key === 'regenEvery') value = Math.max(0.05, Number(value) || 0);
   if (key === 'regenAmount') value = Number(value) || 0;
+  if (key === 'trailTime') value = Math.max(0.05, Number(value) || 0);
   change(setIn(doc.value, ['jjs', key], value), `doc:jjs:${key}`);
   refreshSkill();
 }
@@ -1072,6 +1127,7 @@ function skillsNow() {
   const ids = jjsIds.value;
   if (ids.length !== pictures.value) return null;
   const j = jjs.value;
+  if (separate.value && (containerIds.value.length !== 1 || (wantsTrail.value && trailIds.value.length !== pictures.value))) return null;
   return buildSkill({
     textures: ids,
     name: j.name.trim() || doc.value.name,
@@ -1086,7 +1142,20 @@ function skillsNow() {
     rails: j.rails,
     clientSided: j.clientSided,
     regen: j.regen ? { amount: j.regenAmount, every: j.regenEvery } : null,
+    container: separate.value ? containerIds.value[0] : null,
+    trails: separate.value && wantsTrail.value ? trailIds.value : null,
+    trailTime: j.trailTime,
   });
+}
+
+/** What the skill still needs, in words, or null. */
+function missing() {
+  const n = pictures.value;
+  const parts = [];
+  if (jjsIds.value.length !== n) parts.push(`${n} meter image IDs, one per step from 0 (empty) to ${doc.value.frames} (full); there are ${jjsIds.value.length}`);
+  if (separate.value && containerIds.value.length !== 1) parts.push('the container’s image ID');
+  if (separate.value && wantsTrail.value && trailIds.value.length !== n) parts.push(`${n} trail image IDs; there are ${trailIds.value.length}`);
+  return parts.length ? `The skill needs ${parts.join(', and ')}.` : null;
 }
 
 // The skill code, remade whenever the IDs or settings change; an older,
@@ -1097,12 +1166,10 @@ export async function refreshSkill() {
   copied.value = false;
   const skills = skillsNow();
   if (!skills) {
-    const ids = jjsIds.value.length;
+    const any = jjsIds.value.length || containerIds.value.length || trailIds.value.length;
     batch(() => {
       skillCode.value = '';
-      skillNote.value = ids
-        ? `The skill needs ${pictures.value} image IDs, one for each step from 0 (empty) to ${doc.value.frames} (full); there are ${ids}.`
-        : null;
+      skillNote.value = any ? missing() : null;
     });
     return;
   }
@@ -1142,6 +1209,7 @@ export function addToMoveset() {
 // every step is up, the IDs are filled in and the skill is put straight
 // into the moveset.
 export async function uploadToRoblox() {
+  if (separate.value) return uploadLayered();
   if (uploading.value) return;
   stop();
   batch(() => {
@@ -1177,6 +1245,66 @@ export async function uploadToRoblox() {
       commit(setIn(setIn(doc.value, ['jjs', 'uploads'], [...kept]), ['jjs', 'uploadedFor'], fingerprint));
     }
     commit(setIn(doc.value, ['jjs', 'ids'], rows.map((r) => r.imageId).join('\n')));
+    await refreshSkill();
+    addToMoveset();
+  } catch (e) {
+    const failed = rows.find((r) => r.state === 'uploading');
+    if (failed) {
+      failed.state = 'failed';
+      failed.error = String(e?.message ?? e);
+    }
+    show();
+    uploadError.value = String(e?.message ?? e);
+  } finally {
+    uploading.value = false;
+  }
+}
+
+// Complex Separate's uploads: the container, then the meter's steps (with
+// their leading edge), then the trail's, each kept as it goes under the
+// drawing's fingerprint, so a retry skips what's already up.
+async function uploadLayered() {
+  if (uploading.value) return;
+  stop();
+  batch(() => {
+    uploading.value = true;
+    uploadError.value = null;
+  });
+  const d = doc.value;
+  const fingerprint = `${drawingFingerprint(d)}:separate`;
+  const was = jjs.value.layeredUploads;
+  const items = was?.fingerprint === fingerprint ? { ...was.items } : {};
+  const jobs = [
+    { key: 'container:0', part: 'container', frame: 0, label: 'Container' },
+    ...Array.from({ length: d.frames + 1 }, (_, k) => ({ key: `meter:${k}`, part: 'meterLead', frame: k, label: `Meter ${k}` })),
+    ...(wantsTrail.value ? Array.from({ length: d.frames + 1 }, (_, k) => ({ key: `trail:${k}`, part: 'trail', frame: k, label: `Trail ${k}` })) : []),
+  ];
+  const rows = jobs.map((j, i) => ({ step: i, label: j.label, state: items[j.key]?.imageId ? 'done' : 'waiting', ...items[j.key] }));
+  const show = () => (uploadRows.value = rows.map((r) => ({ ...r })));
+  show();
+  try {
+    await loadAll();
+    if (!account.value?.signedIn) throw new Error('Sign in with Roblox first');
+    for (const [i, job] of jobs.entries()) {
+      const row = rows[i];
+      if (row.state === 'done') continue;
+      row.state = 'uploading';
+      show();
+      const blob = await canvasBlob(render(d, job.frame, { resolve, part: job.part }));
+      const { decalId, imageId, moderation } = await uploadDecal(blob, {
+        name: `${d.name} ${job.label}${job.part === 'container' ? '' : `/${d.frames}`}`,
+        description: `${job.label} of a meter in layers, made with Arayashiki's Meter Maker.`,
+      });
+      Object.assign(row, { decalId, imageId, moderation, state: 'done' });
+      show();
+      items[job.key] = { decalId, imageId, moderation };
+      commit(setIn(doc.value, ['jjs', 'layeredUploads'], { fingerprint, items: { ...items } }));
+    }
+    const ids = (prefix) => Array.from({ length: d.frames + 1 }, (_, k) => items[`${prefix}:${k}`]?.imageId).join('\n');
+    let next = setIn(doc.value, ['jjs', 'ids'], ids('meter'));
+    next = setIn(next, ['jjs', 'containerId'], String(items['container:0'].imageId));
+    if (wantsTrail.value) next = setIn(next, ['jjs', 'trailIds'], ids('trail'));
+    commit(next);
     await refreshSkill();
     addToMoveset();
   } catch (e) {

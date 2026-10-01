@@ -343,6 +343,12 @@ export const newBar = (extra = {}) =>
     // A picture as each segment's shape (segShape 'image').
     segImage: null,
     segImageFit: 'contain',
+    // A picture as the whole bar (shape 'image'): its outline is the bar, and
+    // it fills in its own colours (or the fill's) across it.
+    barImage: null,
+    barImageFit: 'contain',
+    barImageOwn: true,
+    barImageTrack: 'faded',
     // Text bars (shape 'text').
     text: '力',
     textFont: 'serif',
@@ -438,8 +444,16 @@ export const newJjs = () => ({
   start: 'full',
   size: 2,
   position: '0, 0, 0',
-  // 'complex' (lag-proof, the default) or 'legacy': see utils/jjs-skill.js.
+  // 'complex' (lag-proof, the default), 'separate' (Complex Separate: the
+  // meter in layers) or 'legacy': see core/barskill.js.
   style: 'complex',
+  // Complex Separate's other pictures: the container's image ID, one trail
+  // image ID per step, how long a trail takes to fade, and their uploads
+  // ({ fingerprint, items: { "container:0" | "meter:N" | "trail:N": { decalId, imageId } } }).
+  containerId: '',
+  trailIds: '',
+  trailTime: 0.4,
+  layeredUploads: null,
   checkEvery: 0.05,
   showFor: 0.12,
   waitFor: 0.1,
@@ -1384,12 +1398,102 @@ function textGeometry(L) {
   };
 }
 
+// ─── A picture as a bar ──────────────────────────────────────────────────
+// The picture is the bar: its outline (whatever isn't see-through) is the
+// track, and the fill sweeps across it the way it does a text bar, in its
+// own colours or the fill's. Not one segment's shape: the whole thing.
+
+export const BAR_IMAGE_TRACKS = ['faded', 'paint'];
+
+function imageGeometry(L) {
+  const img = imageOf(L.barImage);
+  const box = img ? fitInto(img, { x: L.x, y: L.y, w: L.w, h: L.h }, L.barImageFit === 'stretch' ? 'stretch' : 'contain') : { x: L.x, y: L.y, w: L.w, h: L.h };
+  const horizontal = !['ttb', 'btt', 'center-v'].includes(L.direction);
+  const mirrored = L.direction === 'rtl' || L.direction === 'btt';
+  const center = L.direction?.startsWith('center');
+  const n = Math.max(1, Math.round(L.segments) || 1);
+  // The picture is cut into `segments` equal stretches along the way it fills.
+  const cell = (i) =>
+    horizontal
+      ? { x: box.x + (i * box.w) / n, y: box.y, w: box.w / n, h: box.h }
+      : { x: box.x, y: box.y + (i * box.h) / n, w: box.w, h: box.h / n };
+  const posOf = (u) => (horizontal ? box.x + (u / n) * box.w : box.y + (u / n) * box.h);
+  // Its silhouette in the context's fill colour.
+  function silhouette(ctx) {
+    if (!img) {
+      ctx.fillRect(box.x, box.y, box.w, box.h);
+      return;
+    }
+    const colour = ctx.fillStyle;
+    // eslint-disable-next-line warp-drive/no-legacy-request-patterns -- a canvas state push, not a data request
+    ctx.save();
+    ctx.drawImage(img, box.x, box.y, box.w, box.h);
+    ctx.globalCompositeOperation = 'source-in';
+    ctx.fillStyle = colour;
+    ctx.fillRect(box.x, box.y, box.w, box.h);
+    ctx.restore();
+  }
+  const reach = (cov) => ({
+    max: Math.max(...cov.parts.map((q) => q.i + q.b)),
+    min: Math.min(...cov.parts.map((q) => q.i + q.a)),
+  });
+  return {
+    pathless: true,
+    image: img,
+    box,
+    coverage: (t) => coverage({ ...L, segments: n }, t),
+    cells: () => Array.from({ length: n }, (_, i) => cell(i)),
+    area(span) {
+      if (!span) return { box };
+      const a = posOf(span[0]);
+      const b = Math.max(a + 1, posOf(span[1]));
+      return { box: horizontal ? { x: a, y: box.y, w: b - a, h: box.h } : { x: box.x, y: a, w: box.w, h: b - a } };
+    },
+    track: silhouette,
+    fillMask: silhouette,
+    region(ctx, cov) {
+      for (const { i, a, b } of cov.parts) {
+        const c = cell(i);
+        const r = horizontal ? { x: c.x + a * c.w, y: c.y, w: (b - a) * c.w, h: c.h } : { x: c.x, y: c.y + a * c.h, w: c.w, h: (b - a) * c.h };
+        ctx.fillRect(r.x, r.y, r.w, r.h);
+      }
+    },
+    travel(cov) {
+      if (center || !cov.parts.length) return { dx: 0, dy: 0 };
+      const { max, min } = reach(cov);
+      const start = horizontal ? box.x : box.y;
+      const end = start + (horizontal ? box.w : box.h);
+      const d = mirrored ? posOf(min) - end : posOf(max) - start;
+      return horizontal ? { dx: d, dy: 0 } : { dx: 0, dy: d };
+    },
+    tip(ctx, cov, len, color) {
+      if (!cov.parts.length) return;
+      const { max, min } = reach(cov);
+      const edges = [];
+      if (!mirrored && max < n - 1e-6) edges.push([posOf(max), 1]);
+      if ((mirrored || center) && min > 1e-6) edges.push([posOf(min), -1]);
+      for (const [q, dir] of edges) {
+        const from = q - dir * len;
+        const g = horizontal ? ctx.createLinearGradient(from, 0, q, 0) : ctx.createLinearGradient(0, from, 0, q);
+        g.addColorStop(0, 'rgba(0,0,0,0)');
+        g.addColorStop(1, color);
+        ctx.fillStyle = g;
+        const lo = Math.min(from, q);
+        if (horizontal) ctx.fillRect(lo, box.y, len, box.h);
+        else ctx.fillRect(box.x, lo, box.w, len);
+      }
+    },
+  };
+}
+
 export const geometryOf = (L) =>
   L.shape === 'text'
     ? textGeometry(L)
     : L.shape === 'ring'
       ? ringGeometry(L)
-      : linearGeometry(L);
+      : L.shape === 'image'
+        ? imageGeometry(L)
+        : linearGeometry(L);
 
 // ─── Rendering ───────────────────────────────────────────────────────────
 
@@ -1676,7 +1780,7 @@ function drawInnerShadow(out, mask, fx, env) {
 function filledShape(geo, L, env, cov) {
   const shape = blank(env);
   if (!cov.parts.length) return shape;
-  const shaped = L.fillEnds === 'shape' && L.shape !== 'text';
+  const shaped = L.fillEnds === 'shape' && L.shape !== 'text' && L.shape !== 'image';
   place(shape, L, env);
   shape.fillStyle = '#fff';
   geo.region(shape, cov, shaped);
@@ -1757,6 +1861,16 @@ function drawStroke(out, geo, L, env, mask) {
   stamp(out, c);
 }
 
+// The parts a meter can be drawn in, one picture each ("render in layers",
+// and the Complex Separate skill, core/barskill.js): the container (the
+// track, its inner shadow and outline, and whatever else never changes),
+// the meter (the fill and all that comes with it), the leading edge on its
+// own, and the catch-up trail at the step's own level (shown behind the
+// meter for a moment when it goes down). 'meterLead' is the meter with its
+// leading edge, as the skill shows it.
+export const PARTS = ['container', 'meter', 'lead', 'trail'];
+const wants = (env, part) => !env.part || env.part === part || (env.part === 'meterLead' && (part === 'meter' || part === 'lead'));
+
 // Returns the filled part's shape (white where filled), for clipping.
 function drawBar(out, L, env) {
   const geo = geometryOf(L);
@@ -1768,18 +1882,36 @@ function drawBar(out, L, env) {
   place(mask, L, env);
   mask.fillStyle = '#fff';
   geo.track(mask);
+  // A picture bar in its own colours: the picture is the fill.
+  const fill = L.shape === 'image' && L.barImageOwn && L.barImage ? { type: 'image', src: L.barImage, fit: L.barImageFit === 'stretch' ? 'stretch' : 'contain' } : L.fill;
+  const fillBox = L.shape === 'image' ? { box: geo.box } : null;
 
-  if (L.trackOn) {
+  if (L.trackOn && wants(env, 'container')) {
     const tr = blank(env);
     place(tr, L, env);
-    fillWith(tr, L.track, geo.area(), geo, env);
+    if (L.shape === 'image' && L.barImageTrack !== 'paint' && geo.image) {
+      // The picture itself, greyed and dimmed, as what's still to fill.
+      // eslint-disable-next-line warp-drive/no-legacy-request-patterns -- a canvas state push, not a data request
+      tr.save();
+      tr.filter = 'grayscale(1) brightness(0.55)';
+      tr.globalAlpha = clamp(sortedStops(L.track)[0]?.alpha ?? 100, 0, 100) / 100;
+      tr.drawImage(geo.image, geo.box.x, geo.box.y, geo.box.w, geo.box.h);
+      tr.restore();
+    } else fillWith(tr, L.track, geo.area(), geo, env);
     stamp(tr, mask, 'destination-in');
     if (L.trackCut) stamp(tr, shape, 'destination-out');
     stamp(out, tr);
   }
 
+  // The catch-up trail as its own picture: at this step's level, where the
+  // meter was before it went down.
+  if (env.part === 'trail') {
+    if (L.trail?.on && cov.parts.length) stamp(out, tinted(shape, env, rgba(L.trail.color, L.trail.alpha)));
+    return shape;
+  }
+
   // The catch-up trail runs a little ahead of the fill.
-  if (L.trail?.on && t < 1) {
+  if (L.trail?.on && t < 1 && !env.part) {
     const ahead = filledShape(
       geo,
       L,
@@ -1789,24 +1921,33 @@ function drawBar(out, L, env) {
     stamp(out, tinted(ahead, env, rgba(L.trail.color, L.trail.alpha)));
   }
 
-  if (cov.parts.length) {
+  if (cov.parts.length && env.part === 'lead') {
+    // The leading edge on its own.
+    if (L.tip?.on) {
+      const f = blank(env);
+      place(f, L, env);
+      geo.tip(f, cov, Math.max(1, L.tip.size), rgba(L.tip.color, L.tip.alpha));
+      stamp(f, shape, 'destination-in');
+      stamp(out, f);
+    }
+  } else if (cov.parts.length && wants(env, 'meter')) {
     const f = blank(env);
     place(f, L, env);
-    const whole = geo.area();
-    if (L.fillMode === 'progress' && L.fill.type !== 'image') {
-      f.fillStyle = sampleStops(L.fill.stops, t * 100);
+    const whole = fillBox ?? geo.area();
+    if (L.fillMode === 'progress' && fill.type !== 'image') {
+      f.fillStyle = sampleStops(fill.stops, t * 100);
       everywhere(f, env);
     } else
       fillWith(
         f,
-        L.fill,
-        L.fillMode === 'stretch' ? geo.area([cov.lo, cov.hi]) : whole,
+        fill,
+        L.fillMode === 'stretch' && !fillBox ? geo.area([cov.lo, cov.hi]) : whole,
         geo,
         env,
       );
     if (L.stripes?.on) drawPattern(f, L, whole.box, env, geo.travel(cov));
     if (L.shine?.on) drawShine(f, L, whole.box);
-    if (L.tip?.on)
+    if (L.tip?.on && wants(env, 'lead'))
       geo.tip(f, cov, Math.max(1, L.tip.size), rgba(L.tip.color, L.tip.alpha));
     if (L.grain?.on) drawGrain(f, L, env);
     if (L.flash?.on && t >= 1) {
@@ -1835,8 +1976,10 @@ function drawBar(out, L, env) {
     stamp(out, f);
   }
 
-  if (L.innerShadow?.on) drawInnerShadow(out, mask, L.innerShadow, env);
-  drawStroke(out, geo, L, env, mask);
+  if (wants(env, 'container')) {
+    if (L.innerShadow?.on) drawInnerShadow(out, mask, L.innerShadow, env);
+    drawStroke(out, geo, L, env, mask);
+  }
   return shape;
 }
 
@@ -1923,6 +2066,16 @@ function renderLayer(L, env) {
   return { ctx: withFx(ctx, L, env), clipShape };
 }
 
+// Whether a layer that isn't a bar looks different from step to step: text
+// with a {percent} or the like in it, or a fade or range over the steps.
+function changesByStep(L) {
+  return (L.type === 'text' && /\{(percent|frame|frames|left)\}/.test(L.text ?? '')) || Boolean(L.fx?.fade?.on || L.fx?.range?.on);
+}
+
+/** Whether a design has a part to draw: 'lead' (a leading edge) or 'trail' (a catch-up trail). */
+export const hasPart = (doc, part) =>
+  doc.layers.some((l) => l.type === 'bar' && l.visible && (part === 'lead' ? l.tip?.on : part === 'trail' ? l.trail?.on : true));
+
 // How see-through a layer is on this step, or 0 when it's hidden on it.
 function layerAlpha(L, env) {
   const pct = env.frames ? (env.frame / env.frames) * 100 : 0;
@@ -2008,9 +2161,10 @@ export function render(doc, frame, options = {}) {
     scale: options.scale ?? 1,
     resolve: options.resolve,
     override: options.override,
+    part: options.part ?? null,
   };
   const out = blank(env);
-  if (doc.background?.on) {
+  if (doc.background?.on && wants(env, 'container')) {
     out.fillStyle = doc.background.color;
     out.fillRect(0, 0, out.canvas.width, out.canvas.height);
   }
@@ -2023,8 +2177,13 @@ export function render(doc, frame, options = {}) {
     while (i < layers.length && layers[i].clip) clipped.push(layers[i++]);
     const alpha = layer.visible ? layerAlpha(layer, env) : 0;
     if (!alpha) continue;
+    // Drawn in parts: a bar draws its own parts; anything else goes with the
+    // container, unless it changes from step to step (it goes with the meter).
+    if (env.part && layer.type !== 'bar' && !wants(env, changesByStep(layer) ? 'meter' : 'container')) continue;
     const { ctx: group, clipShape } = renderLayer(layer, env);
-    const shown = clipped
+    // What's clipped to a bar shows with the part it shows through.
+    const through = layer.type === 'bar' ? (layer.clipTo === 'all' ? 'container' : 'meter') : changesByStep(layer) ? 'meter' : 'container';
+    const shown = (env.part && !wants(env, through) ? [] : clipped)
       .filter((c) => c.visible)
       .map((c) => [c, layerAlpha(c, env)])
       .filter(([, a]) => a > 0);

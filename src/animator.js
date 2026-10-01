@@ -174,10 +174,66 @@ function rotOf(q) {
   return [e.x / RAD, e.y / RAD, e.z / RAD];
 }
 
+/**
+ * A custom easing curve, drawn in the animator's graph: a cubic Bézier from
+ * (0, 0) to (1, 1) through [x1, y1, x2, y2], as CSS's cubic-bezier. JJS has
+ * no such easing, so a stretch eased this way is cut into pieces of its own
+ * easings that follow it (cameraLegs, samples).
+ */
+export function bezierEase(curve, x) {
+  const [x1, y1, x2, y2] = curve ?? [0.42, 0, 0.58, 1];
+  const at = (p1, p2, t) => 3 * (1 - t) * (1 - t) * t * p1 + 3 * (1 - t) * t * t * p2 + t * t * t;
+  if (x <= 0) return 0;
+  if (x >= 1) return 1;
+  // x(t) only rises (x1, x2 in 0…1): halve the gap until it's found.
+  let lo = 0;
+  let hi = 1;
+  for (let i = 0; i < 40; i++) {
+    const mid = (lo + hi) / 2;
+    if (at(Math.min(1, Math.max(0, x1)), Math.min(1, Math.max(0, x2)), mid) < x) lo = mid;
+    else hi = mid;
+  }
+  return at(y1, y2, (lo + hi) / 2);
+}
+export const isCustom = (k) => String(k?.ease ?? '').startsWith('Custom');
+
 /** How far through the stretch from key A to key B a moment is, by A's easing. */
 function eased(A, B, t) {
+  if (isCustom(A)) return bezierEase(A.curve, (t - A.t) / Math.max(EPS, B.t - A.t));
   const [style, direction] = String(A.ease ?? 'Linear In').split(' ');
   return tweenAt(t - A.t, Math.max(EPS, B.t - A.t), style || 'Linear', direction || 'In');
+}
+
+// ─── The path's handles (the animator's pen tool) ───────────────────────
+//
+// A key can carry Bézier handles, as a pen tool's anchor does: `hout`
+// leaving it toward the next key, `hin` arriving from the one before, each
+// an offset from the key's position (studs, in the key's terms). A stretch
+// with a handle at either end bends along the Bézier between them; one
+// without is straight (or the smooth curve).
+
+/** The smooth curve's tangent at key j, as Bézier handles: { hin, hout }. */
+export function autoHandles(a, j) {
+  const keys = a.keys;
+  const K = keys[j];
+  const prev = j > 0 && !K.cut ? keys[j - 1] : K;
+  const next = keys[j + 1] && !keys[j + 1].cut ? keys[j + 1] : K;
+  const m = K.pos.map((_, i) => (next.pos[i] - prev.pos[i]) / 2);
+  // A third of the tangent each way (Catmull-Rom as Bézier), scaled to the stretch it reaches into.
+  const span = (from, to) => Math.max(EPS, Math.abs(to.t - from.t));
+  const around = span(prev, next) / 2 || 1;
+  const outK = span(K, next) / around;
+  const inK = span(prev, K) / around;
+  return {
+    hin: m.map((v) => r3((-v / 3) * (prev === K ? 0 : inK))),
+    hout: m.map((v) => r3((v / 3) * (next === K ? 0 : outK))),
+  };
+}
+const curved = (a, A, B) => A.hout != null || B.hin != null;
+
+function bezier(p0, p1, p2, p3, k) {
+  const u = 1 - k;
+  return p0.map((_, i) => u * u * u * p0[i] + 3 * u * u * k * p1[i] + 3 * u * k * k * p2[i] + k * k * k * p3[i]);
 }
 
 /**
@@ -200,7 +256,19 @@ export function poseAt(a, t) {
   // A curve doesn't reach across a cut: it starts again at the cut key.
   const P0 = i > 0 && !A.cut ? keys[i - 1] : A;
   const P3 = keys[i + 2] && !keys[i + 2].cut ? keys[i + 2] : B;
-  const pos = a.smooth ? catmull(P0.pos, A.pos, B.pos, P3.pos, k) : A.pos.map((v, j) => v + (B.pos[j] - v) * k);
+  let pos;
+  if (curved(a, A, B)) {
+    // The pen tool's handles; a missing one follows the smooth curve (or none, straight).
+    const out = A.hout ?? (a.smooth ? autoHandles(a, i).hout : [0, 0, 0]);
+    const inn = B.hin ?? (a.smooth ? autoHandles(a, i + 1).hin : [0, 0, 0]);
+    pos = bezier(
+      A.pos,
+      A.pos.map((v, j) => v + out[j]),
+      B.pos.map((v, j) => v + inn[j]),
+      B.pos,
+      k,
+    );
+  } else pos = a.smooth ? catmull(P0.pos, A.pos, B.pos, P3.pos, k) : A.pos.map((v, j) => v + (B.pos[j] - v) * k);
   const rot = rotOf(quatOf(A.rot).slerp(quatOf(B.rot), k));
   return {
     t,
@@ -263,7 +331,8 @@ export function samples(anim) {
     const N = keys[i + 1];
     if (!N || N.t - K.t < EPS) return;
     const times = new Set();
-    if (a.smooth && keys.length > 2 && !N.cut) {
+    // A curve (smooth, or the pen's handles) or a custom easing: points along it, Linear between.
+    if (!N.cut && ((a.smooth && keys.length > 2) || curved(a, K, N) || isCustom(K))) {
       const n = Math.max(1, Math.round((N.t - K.t) * a.rate));
       for (let j = 1; j < n; j++) times.add(r3(K.t + ((N.t - K.t) * j) / n));
     }
@@ -397,7 +466,11 @@ export function cameraLegs(anim) {
         const from = j === 0 ? { ...start, t: t0 } : { ...pose(t0), t: t0 };
         const to = j === ts.length - 2 ? { ...jitter(at, { ...N }), t: t1 } : { ...pose(t1), t: t1 };
         // A whole stretch eases as its key says when that follows (exact, in JJS itself).
-        return { from, to, fit: fitPiece(pose, t0, t1, from, to, ts.length === 2 ? (K.ease ?? 'Linear In') : null) };
+        return {
+          from,
+          to,
+          fit: fitPiece(pose, t0, t1, from, to, ts.length === 2 && !isCustom(K) ? (K.ease ?? 'Linear In') : null),
+        };
       });
     };
     let pieces;
@@ -701,6 +774,59 @@ export function writeChain(line, a, nodes, { index, time, weave = false } = {}) 
   if (a.effect === 'Camera') ({ line: base, trimmed } = separateCameras(base));
   const endAfter = (lineTimes(base).at(-1) ?? 0) + (base.length && isWait(base.at(-1)) ? waitTime(base.at(-1)) : 0);
   return { line: base, start, extended: Math.max(0, r3(endAfter - endBefore - lastWait)), trimmed };
+}
+
+// ─── Carrying a VISUAL on ───────────────────────────────────────────────
+
+/** How long a VISUAL's WAIT before its continuation is: its TIME, less this overlap (none for a camera). */
+export const CONTINUE_OVERLAP = 0.05;
+
+/**
+ * The VISUAL that carries `node` on from where it ends: it starts at its
+ * ALT POSITION (and ALT ROTATION, size, transparency, colour) and makes the
+ * same move again from there, in its own axes, as one more piece of a
+ * chain would. With the WAIT to put before it: the node's TIME less 0.05,
+ * so the two overlap a moment and the effect doesn't blink between them;
+ * a Camera's WAIT is its whole TIME (overlapping, JJS hands the view back
+ * to the player mid-shot).
+ */
+export function continuation(node) {
+  const n = withDefaults(node);
+  const camera = n.EFFECT === 'Camera';
+  const pos = vec(n.POSITION);
+  const rot = vec(n.ROTATION);
+  const alt = vec(n['ALT POSITION']);
+  const altRot = n['ALT ROTATION'] != null && n['ALT ROTATION'] !== '' ? vec(n['ALT ROTATION']) : rot;
+  const P = cfPos(-pos[0], pos[1], -pos[2]);
+  const start = keyMatrix({ pos, rot });
+  // Where it ends, in the body part's frame: a camera at pos · alt · altRot,
+  // a part at its start · pos · alt · altRot (POSITION counts twice).
+  const move = P.clone()
+    .multiply(cfPos(-alt[0], alt[1], -alt[2]))
+    .multiply(cfOrient(...altRot));
+  const end = camera ? move.clone() : start.clone().multiply(move);
+  const next = keyFrom(end);
+  // The same move from there, in its own axes: end' = start' · (start⁻¹ · end),
+  // so alt' · altRot' = rot' · delta for a camera, pos'⁻¹ · delta for a part.
+  const delta = start.clone().invert().multiply(end);
+  const P2 = cfPos(-next.pos[0], next.pos[1], -next.pos[2]);
+  const R2 = cfOrient(...next.rot);
+  const rest = keyFrom(camera ? R2.clone().multiply(delta) : P2.clone().invert().multiply(delta));
+  const moving = alt.some((c) => Math.abs(c) > EPS) || altRot.some((c, i) => Math.abs(c - rot[i]) > EPS);
+  const out = { ...node, POSITION: str(next.pos), ROTATION: str(next.rot) };
+  if (moving) {
+    out['ALT POSITION'] = str(rest.pos);
+    out['ALT ROTATION'] = str(rest.rot);
+  }
+  const size = Number(n.SIZE ?? 1);
+  const altSize = Number(n['ALT SIZE'] ?? 1);
+  if (node.SIZE != null && Number.isFinite(size) && Number.isFinite(altSize)) out.SIZE = r3(size * altSize);
+  if (node['ALT SIZE 2'] != null && String(node['ALT SIZE 2']).trim() !== '') out['SIZE 2'] = node['ALT SIZE 2'];
+  if (node['ALT OPACITY'] != null) out.OPACITY = node['ALT OPACITY'];
+  if (node['ALT COLOR'] != null && node['ALT COLOR'] !== '') out.COLOR = node['ALT COLOR'];
+  const time = Math.max(0, Number(n.TIME ?? 1) || 0);
+  const wait = camera ? time : Math.max(0, time - CONTINUE_OVERLAP);
+  return { node: out, wait: r3(wait) };
 }
 
 /** A tag for a new animation that the line doesn't use yet. */

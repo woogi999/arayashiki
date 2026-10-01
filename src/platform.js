@@ -307,14 +307,17 @@ const newer = (a, b) => {
 
 /**
  * The latest GitHub release against this build: { current, latest, newer,
- * name, notes, page, published, installer: { name, size, url } | null }.
+ * name, notes, page, published, installer, app } (each file { name, size,
+ * url } or null), selfUpdate (this copy can replace itself) and staged (a
+ * version already downloaded).
  */
 export async function checkForUpdate() {
   if (isDesktop) return call('update_check');
   // The browser preview asks GitHub itself.
   const current = __APP_VERSION__;
   const res = await fetch(`https://api.github.com/repos/${REPO}/releases/latest`);
-  if (res.status === 404) return { current, latest: current, newer: false, notes: '', page: RELEASES_PAGE, installer: null };
+  if (res.status === 404)
+    return { current, latest: current, newer: false, notes: '', page: RELEASES_PAGE, installer: null, app: null };
   if (!res.ok) throw new Error(`GitHub answered ${res.status}.`);
   const r = await res.json();
   const latest = String(r.tag_name ?? '').replace(/^v/i, '');
@@ -328,8 +331,22 @@ export async function checkForUpdate() {
     page: r.html_url,
     published: r.published_at,
     installer: exe ? { name: exe.name, size: exe.size, url: exe.browser_download_url } : null,
+    app: null,
+    selfUpdate: false,
+    staged: null,
   };
 }
+
+/** Downloads a release's arayashiki.exe for the next restart; `onProgress({ got, total })`. */
+export async function stageUpdate(url, version, onProgress) {
+  const { Channel } = await import('@tauri-apps/api/core');
+  const progress = new Channel();
+  progress.onmessage = onProgress;
+  return call('update_stage', { url, version, progress });
+}
+
+/** Swaps in the downloaded update and starts it; the app closes. */
+export const restartToUpdate = () => call('update_restart');
 
 /** Downloads an installer; `onProgress({ got, total })`. Resolves its path. */
 export async function downloadUpdate(url, onProgress) {
@@ -341,6 +358,9 @@ export async function downloadUpdate(url, onProgress) {
 
 /** Starts the downloaded installer; the app closes. */
 export const installUpdate = (path) => call('update_install', { path });
+
+/** Moves the cursor to (x, y) in the window's CSS pixels (desktop only). */
+export const warpCursor = (x, y) => call('cursor_warp', { x, y });
 
 /** Opens an https link in the default browser. */
 export async function openExternal(url) {

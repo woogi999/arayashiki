@@ -9,6 +9,7 @@ import { Button, IconButton, Modal } from '../ui/controls.jsx';
 import { account } from '../account.js';
 import * as S from '../store.js';
 import * as B from './state.js';
+import { hasPart } from './draw.js';
 import { ColourField, Check, Slider } from './fields.jsx';
 import { LayerProps } from './layer-props.jsx';
 
@@ -531,9 +532,20 @@ function PicturesExport() {
         {d.frames + 1} pictures, from <code>{B.firstName.value}</code> (empty) to <code>{B.lastName.value}</code> (full),{' '}
         {d.width}×{d.height} each.
       </p>
+      <Check
+        label="Render in layers"
+        checked={B.layeredExport.value}
+        onChange={(e) => (B.layeredExport.value = e.currentTarget.checked)}
+      />
+      <p class="hint">
+        The meter apart from its container: one container picture (the background, outline and whatever else never
+        changes), then a folder each of the meter{hasPart(d, 'lead') ? ', its leading edge' : ''}
+        {hasPart(d, 'trail') ? ' and its catch-up trail' : ''}, a picture per step. Complex Separate (JJS skill) uses
+        them.
+      </p>
       <div class="modal-actions">
         <Button variant="primary" icon="file-archive" disabled={B.busy.value} onClick={B.saveZip}>
-          Every step (.zip)
+          {B.layeredExport.value ? 'Every step, in layers (.zip)' : 'Every step (.zip)'}
         </Button>
         <Button disabled={B.busy.value} onClick={B.saveFrame}>
           Step {B.frame.value} only (.png)
@@ -561,7 +573,7 @@ function Preview3d() {
     };
   }, []);
   // Redrawn when the step, the size or the offset change.
-  useEffect(() => B.draw(), [B.frame.value, B.jjs.value.size, B.jjs.value.position]);
+  useEffect(() => B.draw(), [B.frame.value, B.jjs.value.size, B.jjs.value.position, B.jjs.value.style]);
   return (
     <div class="pb-bar3d">
       <div class="pb-bar3d-view" ref={host} />
@@ -588,7 +600,7 @@ function UploadRows() {
     <ol class="pb-uploads">
       {B.uploadRows.value.map((row) => (
         <li key={row.step} class={`pb-upload-row is-${row.state}`}>
-          <span class="pb-upload-step num">{row.step}</span>
+          <span class="pb-upload-step num">{row.label ?? row.step}</span>
           <span class="pb-upload-state">
             {row.state === 'done' ? (
               <>
@@ -633,8 +645,8 @@ function SkillExport() {
             <p class="pb-account">
               <Icon name="user-round" size={14} />
               <span>
-                Uploading as <strong>@{who.user?.username}</strong>: {d.frames + 1} decals, then each one’s image ID goes
-                in below and the skill goes into your moveset.
+                Uploading as <strong>@{who.user?.username}</strong>: {B.uploadCount.value} decals, then each one’s image ID
+                goes in below and the skill goes into your moveset.
               </span>
             </p>
           ) : (
@@ -658,7 +670,7 @@ function SkillExport() {
           </div>
           {who?.signedIn && (
             <Button variant="primary" icon="upload" disabled={B.uploading.value} onClick={B.uploadToRoblox}>
-              {B.uploading.value ? 'Uploading…' : `Upload ${d.frames + 1} pictures and add the skill`}
+              {B.uploading.value ? 'Uploading…' : `Upload ${B.uploadCount.value} pictures and add the skill`}
             </Button>
           )}
           {B.uploadsStale.value && (
@@ -678,11 +690,25 @@ function SkillExport() {
       <section class="panel">
         <h3 class="panel-head">2 · Image IDs</h3>
         <div class="panel-body">
+          {B.separate.value && (
+            <label class="pb-num">
+              <span>Container (its background and outline)</span>
+              <input
+                type="text"
+                class="input num"
+                spellcheck={false}
+                placeholder="One image ID"
+                value={j.containerId}
+                onInput={(e) => B.setJjs('containerId', e.currentTarget.value)}
+              />
+            </label>
+          )}
+          {B.separate.value && <span class="pb-ids-label">Meter, one per step</span>}
           <textarea
             class="input num pb-ids"
             rows={3}
             spellcheck={false}
-            aria-label="Image IDs, one per step"
+            aria-label={B.separate.value ? 'Meter image IDs, one per step' : 'Image IDs, one per step'}
             placeholder="One image ID per step, step 0 (empty) first"
             value={j.ids}
             onInput={(e) => B.setJjs('ids', e.currentTarget.value)}
@@ -690,6 +716,23 @@ function SkillExport() {
           <p class="hint">
             {B.jjsIds.value.length} of {d.frames + 1} IDs. Filled in by the upload; image (texture) IDs, not decal IDs.
           </p>
+          {B.separate.value && B.wantsTrail.value && (
+            <>
+              <span class="pb-ids-label">Catch-up trail, one per step</span>
+              <textarea
+                class="input num pb-ids"
+                rows={3}
+                spellcheck={false}
+                aria-label="Trail image IDs, one per step"
+                placeholder="One image ID per step, step 0 first"
+                value={j.trailIds}
+                onInput={(e) => B.setJjs('trailIds', e.currentTarget.value)}
+              />
+              <p class="hint">
+                {B.trailIds.value.length} of {d.frames + 1} IDs.
+              </p>
+            </>
+          )}
         </div>
       </section>
 
@@ -730,12 +773,21 @@ function SkillExport() {
                 <input type="number" step="0.01" min="0.01" class="input num" value={j.checkEvery} onChange={num('checkEvery')} />
               </label>
             )}
+            {B.separate.value && B.wantsTrail.value && (
+              <label class="pb-num">
+                <span>Trail fades in (s)</span>
+                <input type="number" step="0.05" min="0.05" class="input num" value={j.trailTime} onChange={num('trailTime')} />
+              </label>
+            )}
           </div>
           <div class="prop-row">
             <span>Style</span>
             <div class="segmented" role="group" aria-label="Style">
               <button type="button" aria-pressed={j.style === 'complex'} onClick={() => B.setJjs('style', 'complex')}>
                 Complex
+              </button>
+              <button type="button" aria-pressed={j.style === 'separate'} onClick={() => B.setJjs('style', 'separate')}>
+                Complex Separate
               </button>
               <button type="button" aria-pressed={j.style === 'legacy'} onClick={() => B.setJjs('style', 'legacy')}>
                 Legacy
@@ -745,7 +797,9 @@ function SkillExport() {
           <p class="hint">
             {j.style === 'legacy'
               ? 'Legacy shows the step again and again, every wait: simple, but it can lag.'
-              : 'Complex shows each step once and keeps it, cancelling the others by their visual tags, then loops on its checks: lag-proof, and far too many nodes to build by hand.'}
+              : j.style === 'separate'
+                ? `Complex Separate draws the meter in layers, each its own billboard a thousandth of a stud apart in z (the more negative, the further in front): the container (background and outline) once, at the back, for good; then only the meter is swapped as the tag changes.${B.wantsTrail.value ? ' When it goes down, the step it left flashes its catch-up trail behind the meter and fades.' : ' Turn on a bar’s catch-up trail (Fill) to flash it behind the meter when it goes down.'}`
+                : 'Complex shows each step once and keeps it, cancelling the others by their visual tags, then loops on its checks: lag-proof, and far too many nodes to build by hand.'}
           </p>
           <div class="prop-row">
             <span>Starts</span>

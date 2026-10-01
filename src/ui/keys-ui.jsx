@@ -118,7 +118,7 @@ export const EASE_STYLES = ['Linear', 'Sine', 'Quad', 'Cubic', 'Quart', 'Quint',
 export const EASE_DIRECTIONS = ['In', 'Out', 'InOut'];
 
 /** An easing ("Quad Out"), as two small menus. */
-export function EaseSelect({ value = 'Linear In', onChange, label = 'Easing to the next key' }) {
+export function EaseSelect({ value = 'Linear In', onChange, label = 'Easing to the next key', custom = true }) {
   const [style, direction = 'InOut'] = String(value).split(' ');
   return (
     <span class="key-ease" title={label}>
@@ -126,8 +126,9 @@ export function EaseSelect({ value = 'Linear In', onChange, label = 'Easing to t
         {EASE_STYLES.map((s) => (
           <option key={s}>{s}</option>
         ))}
+        {custom && <option value="Custom">Custom curve</option>}
       </select>
-      <select class="input" aria-label={`${label}: direction`} value={direction} disabled={style === 'Linear'} onChange={(e) => onChange(`${style} ${e.currentTarget.value}`)}>
+      <select class="input" aria-label={`${label}: direction`} value={direction} disabled={style === 'Linear' || style === 'Custom'} onChange={(e) => onChange(`${style} ${e.currentTarget.value}`)}>
         {EASE_DIRECTIONS.map((d) => (
           <option key={d}>{d}</option>
         ))}

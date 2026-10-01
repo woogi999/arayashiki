@@ -22,6 +22,21 @@
 //             >Checks for ever (back over the checks, the two comments and
 //             the wait: the other steps + 2 rails + 3)
 //
+// Complex Separate: the meter drawn in layers, each a billboard of its own,
+// a thousandth of a stud apart in z so they stack in order (the more
+// negative, the further in front): the container (its background and
+// outline, which never change) at the back, shown once for good when the
+// skill starts; the catch-up trail; and the meter in front. Only the meter
+// is swapped as the tag changes, as Complex swaps its steps. When the tag
+// goes down, the step it came from flashes its trail behind the meter,
+// fading away, so you see how much was lost:
+//
+//   start     the container, for ever; set the tag; go to "-"
+//   "<step>"  as Complex, but the meter only; a lower step goes by
+//             "Drop<step>" instead of straight there
+//   "Drop<step>"  Cancel the last trail; this step's trail, fading out over
+//             the trail time; go to "-", which finds the new step
+//
 // Legacy (the first version): each step shows its billboard for a moment and
 // goes back to "-", which checks again and shows it again, for ever:
 //
@@ -59,9 +74,16 @@ export function billboardAlt(position) {
   return `0, ${y ? -2 * y : 0}, 0`;
 }
 
+// The same "x, y, z" moved `dz` in z (a billboard's layer), to the thousandth.
+export function layerAt(position, dz) {
+  const [x, y, z] = vec3(position);
+  const r = (v) => Math.round(v * 1000) / 1000;
+  return `${r(x)}, ${r(y)}, ${r(z + dz)}`;
+}
+
 function visual(
   texture,
-  { size, position, time, clientSided, effect = 'Billboard', visualTag },
+  { size, position, time, clientSided, effect = 'Billboard', visualTag, fade = false },
 ) {
   const node = {
     SIZE: size,
@@ -92,6 +114,8 @@ function visual(
     'ALT OPACITY': 0,
   };
   if (visualTag) node['VISUAL TAG'] = visualTag;
+  // Fading out over its TIME, quickly at first (a flash going).
+  if (fade) Object.assign(node, { 'ALT OPACITY': 1, 'EASING STYLE': 'Quad', 'EASING DIRECTION': 'Out' });
   return node;
 }
 
@@ -165,7 +189,11 @@ const nudge = (tag, value) => ({
  * size         the billboard's size
  * position     its offset from the body part, "x, y, z"
  * style        'complex' (each step shown once, for ever, and cancelled by
- *              its VISUAL TAG) or 'legacy' (shown again and again)
+ *              its VISUAL TAG), 'separate' (Complex Separate: the meter in
+ *              layers, see above) or 'legacy' (shown again and again)
+ * container    separate: the container's image ID (shown once, at the back)
+ * trails       separate: one trail image ID per step, or null for no trail
+ * trailTime    separate: how long a trail takes to fade, in seconds
  * checkEvery   complex: the wait between checks of the tag, in seconds
  * showFor      legacy: how long each billboard is shown for, in seconds
  * waitFor      legacy: the wait before the tag is checked again, in seconds
@@ -193,6 +221,9 @@ export function buildSkill({
   rails = true,
   clientSided = false,
   regen = { amount: 1, every: 1 },
+  container = null,
+  trails = null,
+  trailTime = 0.4,
 }) {
   const top = textures.length - 1;
   const steps = textures.map((_, i) => String(i));
@@ -223,6 +254,40 @@ export function buildSkill({
     );
     return withHelpers(name, tag, start, top, branches, regen);
   }
+  if (style === 'separate') {
+    // Back to front, a thousandth apart: container, trail, meter.
+    const withTrail = Array.isArray(trails) && trails.length === textures.length;
+    const trailTag = `${tag}Trail`;
+    const drop = withTrail ? (step) => (step > 0 ? `Drop${step}` : null) : null;
+    Object.assign(
+      branches,
+      complexSteps({
+        textures,
+        tag,
+        rails,
+        checkEvery,
+        show: { size, position: layerAt(position, -0.002), clientSided },
+        drop,
+      }),
+    );
+    if (withTrail)
+      for (let step = 1; step <= top; step++)
+        branches[`Drop${step}`] = {
+          Line: [
+            visual(Number(trails[step]), { size, position: layerAt(position, -0.001), time: FOREVER, clientSided, effect: 'Cancel', visualTag: trailTag }),
+            visual(Number(trails[step]), { size, position: layerAt(position, -0.001), time: trailTime, clientSided, visualTag: trailTag, fade: true }),
+            back,
+          ],
+          Req: [],
+        };
+    const boxTag = `${tag}Box`;
+    const box = container != null && String(container).trim() !== '' ? Number(container) : null;
+    const before = box == null ? [] : [
+      visual(box, { size, position: layerAt(position, 0), time: FOREVER, clientSided, effect: 'Cancel', visualTag: boxTag }),
+      visual(box, { size, position: layerAt(position, 0), time: FOREVER, clientSided, visualTag: boxTag }),
+    ];
+    return withHelpers(name, tag, start, top, branches, regen, before);
+  }
   textures.forEach((texture, i) => {
     branches[String(i)] = {
       Line: [billboard(texture), { TIME: waitFor, K_NAME: 'WAIT' }, back],
@@ -251,7 +316,9 @@ export function buildSkill({
 // A step's billboard, shown for good, and its own tag to cancel it by.
 const stepTag = (tag, i) => `${tag}${i}`;
 
-function complexSteps({ textures, tag, rails, checkEvery, show }) {
+// `drop(step)`, when given, names the branch a lower step goes by from
+// `step` (Complex Separate's trail), instead of straight to it.
+function complexSteps({ textures, tag, rails, checkEvery, show, drop = null }) {
   const top = textures.length - 1;
   const steps = textures.map((_, k) => k);
   const branches = {};
@@ -275,13 +342,14 @@ function complexSteps({ textures, tag, rails, checkEvery, show }) {
     { under = 'SafetyLesser', over = 'SafetyGreater' } = {},
   ) => {
     const tail = [comment('Checks')];
+    const down = drop?.(step);
     // Highest first, as the dispatcher has them.
     for (const k of [...steps].reverse())
-      if (k !== step) tail.push(check(tag, String(k), String(k)));
+      if (k !== step) tail.push(check(tag, String(k), k < step && down ? down : String(k)));
     if (rails)
       tail.push(
         comment('Safety Rails'),
-        check(tag, '<0', under),
+        check(tag, '<0', down && under === 'SafetyLesser' ? down : under),
         check(tag, `>${top}`, over),
       );
     tail.push({ TIME: checkEvery, K_NAME: 'WAIT' });
@@ -338,11 +406,12 @@ function complexSteps({ textures, tag, rails, checkEvery, show }) {
   return branches;
 }
 
-function withHelpers(name, tag, start, top, branches, regen) {
+function withHelpers(name, tag, start, top, branches, regen, before = []) {
   const skills = [
     skillOf(name, 99, {
       Req: [],
       Line: [
+        ...before,
         {
           TAG: tag,
           K_NAME: 'TAG',

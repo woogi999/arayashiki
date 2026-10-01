@@ -159,23 +159,31 @@ Run CLI commands with `npm run sbs -- <command>`, for example
 ```sh
 npm install
 npm run dev        # the app, with hot reload (Tauri + Vite)
-npm run build      # the release app and its installer
+npm run build      # the release app (src-tauri/target/release/arayashiki.exe)
+npm run release    # the app, the setup and the notes, gathered in release/
 npm test           # engine, golden simulations, agent tools, MCP, search
 ```
 
 Needs Node 22.15 or later, Rust (stable, MSVC) and WebView2 (part of Windows
-11). The installer lands in `src-tauri/target/release/bundle/nsis/`, the app
-itself at `src-tauri/target/release/arayashiki.exe`.
+11).
 
-The installer's sidebar and header pictures (`src-tauri/installer/`) are
-drawn from the app's mark by `python lib/make-installer-art.py` (needs
-Pillow); run it again if the mark changes.
+**Installing and updating.** There's no installer to rebuild per version.
+`Arayashiki-Setup.exe` (`src-tauri/setup/`, `npm run build:setup`) asks
+GitHub's API for the latest release, downloads its `arayashiki.exe` into
+`%LOCALAPPDATA%\Arayashiki` and runs it with `--install`, and the app makes its
+own shortcuts and Settings → Apps entry (`src-tauri/src/install.rs`). From
+then on the app updates itself (`src-tauri/src/updates.rs`): it checks at
+launch, downloads a newer `arayashiki.exe` in the background, and swaps it in
+when you restart, or at the next launch. The setup's link never changes:
+`https://github.com/woogi999/arayashiki/releases/latest/download/Arayashiki-Setup.exe`.
 
-**Releasing.** The app checks GitHub's latest release of
-`woogi999/arayashiki` for updates (`src-tauri/src/updates.rs`). Bump the
-version in `package.json`, `src-tauri/tauri.conf.json` and
-`src-tauri/Cargo.toml`, build, then publish a release tagged `vX.Y.Z` with
-the `…_x64-setup.exe` attached: installed copies offer it from then on.
+**Releasing.** Bump the version in `package.json`, `src-tauri/tauri.conf.json`
+and `src-tauri/Cargo.toml`, add its section to `CHANGELOG.md`, and run
+`npm run release` (with `-- --publish` and a `GITHUB_TOKEN`, it makes the
+GitHub release too). Publish a release tagged `vX.Y.Z` with `arayashiki.exe`
+and `Arayashiki-Setup.exe` attached: installed copies update to it by
+themselves. (`npx tauri build` still makes the old NSIS installer, in
+`src-tauri/target/release/bundle/nsis/`, if it's ever wanted.)
 
 For agents working from the repo:
 

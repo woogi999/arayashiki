@@ -1,7 +1,7 @@
 // The Updates window (src/updates.js): what's out on GitHub against this
-// build, the release notes, and downloading and running the installer. The
-// top bar's "Update" button (topbar.jsx), shown when a newer release is out,
-// opens it.
+// build, the release notes, the download's progress, and "Restart now". It
+// opens by itself when a newer release is found at launch; the top bar's
+// "Update" button (topbar.jsx) opens it again.
 import { useMemo, useState } from 'preact/hooks';
 import * as S from '../store.js';
 import * as B from '../barmaker/state.js';
@@ -122,7 +122,7 @@ function Status() {
           <Icon name="download" size={20} />
         </span>
         <div>
-          <h3>Arayashiki {r.latest} is out</h3>
+          <h3>{st.phase === 'ready' ? `Arayashiki ${r.latest} is ready` : `Arayashiki ${r.latest} is out`}</h3>
           <p class="hint">
             You have <span class="num">{r.current}</span>
             {r.published ? ` · released ${when(r.published)}` : ''}
@@ -131,6 +131,13 @@ function Status() {
       </div>
       <Notes text={r.notes ?? ''} />
       {st.phase === 'downloading' && <Progress got={st.got} total={st.total} />}
+      {(st.phase === 'ready' || st.phase === 'restarting') && (
+        <p class="hint upd-ready">
+          <Icon name="check" size={14} />
+          Downloaded and ready. Restarting takes a few seconds; your movesets and settings stay as they are.
+          {unsaved && ' Unsaved work is saved first.'} Not now? It installs itself the next time you open Arayashiki.
+        </p>
+      )}
       {st.phase === 'downloaded' && (
         <p class="hint upd-ready">
           <Icon name="check" size={14} />
@@ -154,15 +161,20 @@ function Status() {
           On GitHub
         </Button>
         <span class="spacer" />
-        {!isDesktop || !r.installer ? (
+        {(st.phase === 'ready' || st.phase === 'downloading') && (
+          <Button variant="ghost" onClick={close}>
+            {st.phase === 'ready' ? 'Later' : 'Hide'}
+          </Button>
+        )}
+        {!isDesktop || (!r.installer && !U.inPlace(r)) ? (
           <Button icon="download" variant="primary" onClick={() => openExternal(r.page || RELEASES_PAGE)}>
             Download from GitHub
           </Button>
-        ) : st.phase === 'downloaded' || st.phase === 'installing' ? (
+        ) : ['ready', 'restarting', 'downloaded', 'installing'].includes(st.phase) ? (
           <Button
             icon="refresh"
             variant="primary"
-            disabled={saving || st.phase === 'installing'}
+            disabled={saving || st.phase === 'installing' || st.phase === 'restarting'}
             onClick={async () => {
               setSaving(true);
               try {
@@ -172,11 +184,21 @@ function Status() {
               }
             }}
           >
-            {st.phase === 'installing' ? 'Starting the installer…' : saving ? 'Saving…' : 'Install and restart'}
+            {st.phase === 'restarting'
+              ? 'Restarting…'
+              : st.phase === 'installing'
+                ? 'Starting the installer…'
+                : saving
+                  ? 'Saving…'
+                  : st.phase === 'ready'
+                    ? 'Restart now'
+                    : 'Install and restart'}
           </Button>
         ) : (
           <Button icon="download" variant="primary" disabled={st.phase === 'downloading'} onClick={U.download}>
-            {st.phase === 'downloading' ? 'Downloading…' : `Download and install (${mb(r.installer.size)})`}
+            {st.phase === 'downloading'
+              ? 'Downloading…'
+              : `${U.inPlace(r) ? 'Update' : 'Download and install'} (${mb((U.inPlace(r) ? r.app : r.installer).size)})`}
           </Button>
         )}
       </div>

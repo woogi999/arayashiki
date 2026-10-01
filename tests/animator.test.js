@@ -6,7 +6,9 @@ import assert from 'node:assert/strict';
 import { Matrix4, Vector3, Quaternion } from 'three';
 import {
   animationNodes,
+  bezierEase,
   cameraLegs,
+  continuation,
   chainNodes,
   FPS,
   insertAt,
@@ -307,4 +309,111 @@ test('a Camera block still running when the next starts is cut to end there, at 
     [0, 22.5, 0],
   );
   assert.deepEqual(out.slice(1), line.slice(1));
+});
+
+test('a VISUAL carries on from its ALT POSITION, with a WAIT 0.05 short of its TIME', () => {
+  const block = {
+    K_NAME: 'VISUAL',
+    EFFECT: 'Block',
+    TIME: 0.5,
+    POSITION: '0, 0, 3',
+    'ALT POSITION': '0, 0, 5',
+    SIZE: 2,
+    'ALT SIZE': 1.5,
+    OPACITY: 0,
+    'ALT OPACITY': 0.5,
+  };
+  const a = continuation(block);
+  assert.equal(a.wait, 0.45);
+  // It ends at start · pos · alt (POSITION counts twice): 3 + 3 + 5 = 11.
+  assert.equal(a.node.POSITION, '0, 0, 11');
+  assert.equal(a.node.SIZE, 3);
+  assert.equal(a.node.OPACITY, 0.5);
+  // And makes the same 8-stud move again: 11 + 11 + alt = 19.
+  assert.equal(a.node['ALT POSITION'], '0, 0, -3');
+  const b = continuation(a.node);
+  assert.equal(b.node.POSITION, '0, 0, 19');
+  // A camera block's WAIT is its whole TIME: overlapping, JJS hands the view back mid-shot.
+  const cam = continuation({
+    K_NAME: 'VISUAL',
+    EFFECT: 'Camera',
+    TIME: 1,
+    POSITION: '0, 4, -10',
+    'ALT POSITION': '2, 0, 0',
+    ROTATION: '-15, 0, 0',
+    'ALT ROTATION': '-15, 20, 0',
+  });
+  assert.equal(cam.wait, 1);
+  assert.equal(cam.node.POSITION, '2, 4, -10');
+  assert.equal(cam.node.ROTATION, '-15, 20, 0');
+});
+
+test('a custom easing curve becomes blocks of JJS easings that follow it', () => {
+  assert.equal(bezierEase([0.42, 0, 0.58, 1], 0.5).toFixed(3), '0.500');
+  assert.ok(bezierEase([0.9, 0, 0.1, 1], 0.25) < 0.1, 'slow to start');
+  const a = {
+    ...base,
+    effect: 'Camera',
+    smooth: false,
+    hold: 0,
+    keys: [
+      // Fast, a pause in the middle, fast again: no one JJS easing does that.
+      {
+        t: 0,
+        pos: [0, 4, -10],
+        rot: [0, 0, 0],
+        size: 1,
+        opacity: 0,
+        ease: 'Custom',
+        curve: [0.1, 0.9, 0.9, 0.1],
+        shake: 0,
+        turn: 0,
+      },
+      { t: 1, pos: [10, 4, -10], rot: [0, 0, 0], size: 1, opacity: 0, ease: 'Linear In', shake: 0, turn: 0 },
+    ],
+  };
+  const legs = cameraLegs(a);
+  assert.ok(legs.length > 1, 'more than one block');
+  for (const l of legs)
+    assert.match(
+      l.ease,
+      /^(Linear|Sine|Quad|Cubic|Quart|Quint|Exponential|Circular|Back|Bounce|Elastic) (In|Out|InOut)$/,
+    );
+  for (let i = 1; i < legs.length; i++) assert.equal(legs[i].from.t, legs[i - 1].to.t, 'back to back');
+  // A curve close to one of JJS's own is that easing, one block.
+  const near = { ...a, keys: [{ ...a.keys[0], curve: [0.87, 0, 0.13, 1] }, a.keys[1]] };
+  assert.equal(cameraLegs(near).length, 1);
+});
+
+test('pen handles bend the path through a key', () => {
+  const keys = [
+    {
+      t: 0,
+      pos: [0, 0, 0],
+      rot: [0, 0, 0],
+      size: 1,
+      opacity: 0,
+      ease: 'Linear In',
+      shake: 0,
+      turn: 0,
+      hout: [0, 6, 0],
+    },
+    {
+      t: 1,
+      pos: [10, 0, 0],
+      rot: [0, 0, 0],
+      size: 1,
+      opacity: 0,
+      ease: 'Linear In',
+      shake: 0,
+      turn: 0,
+      hin: [0, 6, 0],
+    },
+  ];
+  const a = { ...base, effect: 'Camera', smooth: false, hold: 0, keys };
+  const mid = poseAt(a, 0.5);
+  assert.ok(mid.pos[1] > 4, 'it arcs up between the keys');
+  assert.ok(cameraLegs(a).length > 1, 'and the camera needs more than one block for it');
+  const part = { ...a, effect: 'Block', smooth: false };
+  assert.ok(samples(part).length > 2, 'a part samples along it too');
 });

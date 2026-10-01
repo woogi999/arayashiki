@@ -118,6 +118,14 @@ import {
   RefreshCw,
   Loader2,
   CircleStop,
+  Move,
+  Scale3d,
+  Rotate3d,
+  Globe,
+  Spline,
+  ChartSpline,
+  CopyPlus,
+  ImageUp,
 } from 'lucide-preact';
 
 const ICONS = {
@@ -238,6 +246,15 @@ const ICONS = {
   'refresh': RefreshCw,
   'loader': Loader2,
   'circle-stop': CircleStop,
+  'move': Move,
+  'scale': Scale3d,
+  'rotate': Rotate3d,
+  'globe': Globe,
+  'mouse-pointer': MousePointer2,
+  'spline': Spline,
+  'graph': ChartSpline,
+  'copy-plus': CopyPlus,
+  'image-up': ImageUp,
 };
 
 export function Icon({ name, size = 16, class: className, ...rest }) {

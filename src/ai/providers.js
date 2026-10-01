@@ -17,6 +17,7 @@ import { isDesktop } from '../platform.js';
 import { localBase, refreshLocal } from './local.js';
 
 export const PROVIDERS = [
+  { id: 'local', label: 'On this PC (built in, free)', local: true, builtin: true },
   {
     id: 'anthropic',
     label: 'Claude (Anthropic)',
@@ -32,7 +33,6 @@ export const PROVIDERS = [
   { id: 'xai', label: 'xAI (Grok)', base: 'https://api.x.ai/v1', keyUrl: 'https://console.x.ai', vision: true },
   { id: 'deepseek', label: 'DeepSeek', base: 'https://api.deepseek.com/v1', keyUrl: 'https://platform.deepseek.com/api_keys' },
   { id: 'mistral', label: 'Mistral', base: 'https://api.mistral.ai/v1', keyUrl: 'https://console.mistral.ai/api-keys' },
-  { id: 'local', label: 'On this PC (built in, free)', local: true, builtin: true },
   { id: 'ollama', label: 'Ollama (on this PC, free)', base: 'http://localhost:11434/v1', local: true },
   { id: 'lmstudio', label: 'LM Studio (on this PC, free)', base: 'http://localhost:1234/v1', local: true },
   { id: 'custom', label: 'Another OpenAI-compatible service', base: '', keyUrl: null },

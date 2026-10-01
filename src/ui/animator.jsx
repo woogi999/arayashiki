@@ -19,6 +19,7 @@ import { BODY_PARTS } from '../../core/schema.js';
 import {
   ANIMATABLE,
   anim,
+  autoHandles,
   animKey,
   animationNodes,
   cameraAt,
@@ -39,6 +40,8 @@ import {
 } from '../animator.js';
 import { Button, IconButton, Segmented, Switch } from './controls.jsx';
 import { EaseSelect, FloatingPanel, Num, Vec } from './keys-ui.jsx';
+import { actionOf, bindingOf } from '../keybinds.js';
+import { EaseGraph, nearCurve } from './ease-graph.jsx';
 
 // Where the animation sits: the skill, branch and when its first node runs
 // (`draft`: not in the skill yet; `index` is where it will go; `weave`: it
@@ -48,6 +51,7 @@ const gizmoMode = signal('translate');
 const lookThrough = signal(false);
 const previewing = signal(false); // Play: looking through it while the skill plays
 const note = signal(null);
+const animView = signal('keys'); // the panel shows 'keys' (the table) or 'graph' (the easing graph)
 
 // Shake presets for the picked key: [label, studs, degrees].
 const SHAKES = [
@@ -191,6 +195,12 @@ function setAnim(patch, { now = false } = {}) {
   else applySoon();
 }
 function setKey(i, patch) {
+  // Picking "Custom curve" starts the curve from the easing it had.
+  if (String(patch.ease ?? '').startsWith('Custom')) {
+    const k = anim.value.keys[i];
+    patch = { ...patch, ease: 'Custom', curve: patch.curve ?? k.curve ?? nearCurve(k.ease) };
+    if (!String(k.ease).startsWith('Custom') && !patch.curve) animView.value = 'graph';
+  }
   const keys = anim.value.keys.map((k, j) => (j === i ? { ...k, ...patch } : k));
   const picked = keys[i];
   keys.sort((a, b) => a.t - b.t);
@@ -232,8 +242,30 @@ function addKey() {
   if (a.effect === 'Camera' && S.sceneNow()) Object.assign(key, viewPose(t));
   const keys = [...a.keys, key].sort((x, y) => x.t - y.t);
   animKey.value = keys.indexOf(key);
-  S.seek(w.start + t);
   setAnim({ keys });
+  S.seek(w.start + t); // after: the timeline reaches the new key now
+}
+
+/** The pen tool on key i: Bézier handles to bend the path through it (or off again, straight). */
+function toggleHandles(i) {
+  const a = anim.peek();
+  const k = a.keys[i];
+  if (k.hin || k.hout) {
+    const { hin: _in, hout: _out, ...rest } = k;
+    setAnim({ keys: a.keys.map((x, j) => (j === i ? rest : x)) });
+    return;
+  }
+  let { hin, hout } = autoHandles({ ...a, smooth: true }, i);
+  // A key on a straight line has no bend to start from: handles along the path, a third of the way.
+  const flat = (h) => Math.hypot(...h) < 0.05;
+  if (flat(hin) && flat(hout)) {
+    const next = a.keys[i + 1] ?? k;
+    const prev = a.keys[i - 1] ?? k;
+    hout = k.pos.map((v, j) => Math.round(((next.pos[j] - v) / 3) * 1000) / 1000);
+    hin = k.pos.map((v, j) => Math.round(((prev.pos[j] - v) / 3) * 1000) / 1000);
+  }
+  setAnim({ keys: a.keys.map((x, j) => (j === i ? { ...x, ...(i > 0 ? { hin } : {}), ...(i < a.keys.length - 1 ? { hout } : {}) } : x)) });
+  note.value = `Key ${i + 1} has handles: drag the white dots in the view to bend the path (Alt drags one alone).`;
 }
 
 function deleteKey(i) {
@@ -365,6 +397,29 @@ effect(() => {
       anim.value = { ...anim.peek(), keys: anim.peek().keys.map((x, j) => (j === i ? { ...x, ...keyFrom(local) } : x)) };
     },
     onDragEnd: () => !where.peek()?.draft && apply(),
+    // The pen tool: the picked key's handles, dragged in the view.
+    handles: ['hin', 'hout'].flatMap((side) => {
+      const k = a.keys[picked];
+      if (!k?.[side]) return [];
+      const at = new Vector3().setFromMatrixPosition(frameAt(k.t).multiply(keyMatrix({ ...k, pos: k.pos.map((v, j) => v + k[side][j]) })));
+      return [{ key: picked, side, at, anchor: new Vector3().setFromMatrixPosition(keys[picked]) }];
+    }),
+    onHandle(i, side, worldAt, { alone }) {
+      const cur = anim.peek();
+      const k = cur.keys[i];
+      // Into the key's own terms (x left, z forward), as an offset from it.
+      const p = worldAt.clone().applyMatrix4(frameAt(k.t).invert());
+      const off = [-p.x - k.pos[0], p.y - k.pos[1], -p.z - k.pos[2]].map(r3);
+      const other = side === 'hin' ? 'hout' : 'hin';
+      const patch = { [side]: off };
+      // Smooth, as a pen tool's anchor: the other handle turns to stay opposite, keeping its length.
+      if (!alone && k[other]) {
+        const len = Math.hypot(...k[other]);
+        const mine = Math.hypot(...off) || 1;
+        patch[other] = off.map((v) => r3((-v / mine) * len));
+      }
+      anim.value = { ...cur, keys: cur.keys.map((x, j) => (j === i ? { ...x, ...patch } : x)) };
+    },
   });
 });
 
@@ -404,6 +459,25 @@ effect(() => {
     return { position, quaternion };
   });
 });
+// The timeline reaches the animation's end (and a second past it, room for
+// the next key) and shows where it runs, so Play goes all the way through
+// it in step with the skill, even past the skill's own end or as a draft.
+effect(() => {
+  const a = anim.value;
+  const w = where.value;
+  if (!a || !w) {
+    S.extent.value = null;
+    return;
+  }
+  const length = a.effect === 'Camera' ? cameraLength(a) : a.keys.at(-1).t + (a.hold ?? 0);
+  S.extent.value = {
+    start: w.start,
+    end: w.start + length,
+    room: 1,
+    keys: a.keys.map((k) => w.start + k.t),
+    label: a.effect === 'Camera' ? `Camera ${a.tag}` : `${a.effect} ${a.tag}`,
+  };
+});
 // Play's look-through ends with the playback.
 effect(() => {
   if (!S.playing.value && previewing.peek()) previewing.value = false;
@@ -441,9 +515,14 @@ export function AnimatorPanel() {
   useEffect(() => {
     if (!a) return;
     const key = (e) => {
-      if (e.target?.closest?.('input, textarea, select') || e.ctrlKey || e.altKey) return;
-      if (e.key === 'g' || e.key === 'G') gizmoMode.value = 'translate';
-      if (e.key === 'r' || e.key === 'R') gizmoMode.value = 'rotate';
+      if (e.target?.closest?.('input, textarea, select') || S.dialog.peek()) return;
+      const act = actionOf(e, 'animator');
+      if (act === 'animMove') gizmoMode.value = 'translate';
+      else if (act === 'animTurn') gizmoMode.value = 'rotate';
+      else if (act === 'animGraph') {
+        e.preventDefault();
+        animView.value = animView.peek() === 'graph' ? 'keys' : 'graph';
+      }
     };
     addEventListener('keydown', key);
     return () => removeEventListener('keydown', key);
@@ -480,15 +559,32 @@ export function AnimatorPanel() {
         >
           {playingPreview ? 'Stop' : 'Play'}
         </Button>
+        <Button
+          icon="spline"
+          onClick={() => toggleHandles(picked)}
+          aria-pressed={Boolean(pk.hin || pk.hout)}
+          title={pk.hin || pk.hout ? `Take key ${picked + 1}'s handles away: straight through it again` : `Pen tool: handles on key ${picked + 1}, to drag in the view and bend the path through it`}
+        >
+          {pk.hin || pk.hout ? 'Remove handles' : 'Bend with handles'}
+        </Button>
         <span class="spacer" />
+        <Segmented
+          label="Editor"
+          value={animView.value}
+          onChange={(v) => (animView.value = v)}
+          options={[
+            { id: 'keys', label: 'Keys', icon: 'list', title: `The keys, in a table (${bindingOf('animGraph')} switches)` },
+            { id: 'graph', label: 'Graph', icon: 'graph', title: `The easing of each stretch, as curves you drag (${bindingOf('animGraph')} switches)` },
+          ]}
+        />
         {!camera && (
           <Segmented
             label="Gizmo"
             value={gizmoMode.value}
             onChange={(m) => (gizmoMode.value = m)}
             options={[
-              { id: 'translate', label: 'Move (G)' },
-              { id: 'rotate', label: 'Turn (R)' },
+              { id: 'translate', label: `Move (${bindingOf('animMove')})` },
+              { id: 'rotate', label: `Turn (${bindingOf('animTurn')})` },
             ]}
           />
         )}
@@ -519,7 +615,18 @@ export function AnimatorPanel() {
         </div>
       )}
 
-      <div class="key-table" role="table" aria-label="Keys" ref={table}>
+      {animView.value === 'graph' && (
+        <EaseGraph
+          a={a}
+          picked={picked}
+          onPick={(j) => {
+            animKey.value = j;
+            S.seek(w.start + a.keys[j].t);
+          }}
+          onKey={setKey}
+        />
+      )}
+      <div class="key-table" role="table" aria-label="Keys" ref={table} hidden={animView.value === 'graph'}>
         <div class={`key-row is-head ${camera ? 'is-camera' : ''}`} role="row">
           <span>#</span>
           <span>Time</span>
@@ -706,7 +813,10 @@ export async function runAnimation({ node, keys, smooth = true, easing = 'Linear
         rot: k.rot ?? base.rot,
         size: k.size ?? base.size,
         opacity: k.opacity ?? base.opacity,
-        ease: k.ease ?? ease,
+        ease: k.curve ? 'Custom' : (k.ease ?? ease),
+        ...(k.curve ? { curve: k.curve } : {}),
+        ...(k.hin ? { hin: k.hin } : {}),
+        ...(k.hout ? { hout: k.hout } : {}),
         shake: k.shake,
         turn: k.turn,
         cut: Boolean(k.cut),

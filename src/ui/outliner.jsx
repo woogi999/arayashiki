@@ -1,11 +1,22 @@
 // The Outliner: the moveset as a tree, like Blender's. Categories open to
 // their skills; the open skill opens to its branches.
+import { signal } from '@preact/signals';
 import * as S from '../store.js';
 import { Icon } from '../icons.jsx';
 import { IconButton, KindChip } from './controls.jsx';
 import { Area } from './area.jsx';
 
 const LABELS = { SKILL: 'Skills', SPECIAL: 'Special', AWAKENING: 'Awakening', MELEE: 'Melee', CHASE: 'Chase' };
+
+// Skills whose branches are folded away (the arrow folds the open skill's
+// branches; the skill stays picked).
+const folded = signal(new Set());
+function foldSkill(uid) {
+  const next = new Set(folded.peek());
+  if (next.has(uid)) next.delete(uid);
+  else next.add(uid);
+  folded.value = next;
+}
 
 function toggle(id) {
   const open = S.openCategories.value;
@@ -106,12 +117,14 @@ export function Outliner() {
                     const active = s.uid === S.skillUid.value;
                     const picked = S.skillSelection.value.includes(s.uid);
                     const separator = s.ADD === false && !s.DATA;
+                    const isFolded = folded.value.has(s.uid);
                     return (
                       <li key={s.uid}>
                         <button
                           type="button"
                           role="treeitem"
                           aria-selected={active}
+                          aria-expanded={separator ? undefined : active && !isFolded}
                           data-skill-uid={s.uid}
                           class={`tree-row depth-1 ${separator ? 'is-separator' : ''} ${picked && !active ? 'is-picked' : ''}`}
                           onClick={(e) => {
@@ -120,11 +133,20 @@ export function Outliner() {
                             S.pickSkill(s.uid, { toggle: e.ctrlKey || e.metaKey });
                           }}
                         >
-                          <Icon
-                            name={separator ? 'minus' : active ? 'chevron-down' : 'chevron-right'}
-                            size={12}
-                            class="tree-twisty"
-                          />
+                          {separator ? (
+                            <Icon name="minus" size={12} class="tree-twisty" />
+                          ) : (
+                            // The arrow folds or unfolds the branches; the click goes on to pick the skill.
+                            <span
+                              class="tree-twisty tree-fold"
+                              title={active && !isFolded ? 'Fold the branches away' : 'Show the branches'}
+                              onClick={() => {
+                                if (active || isFolded) foldSkill(s.uid);
+                              }}
+                            >
+                              <Icon name={active && !isFolded ? 'chevron-down' : 'chevron-right'} size={12} />
+                            </span>
+                          )}
                           <span class="tree-label">{String(s.NAME ?? '') || '(no name)'}</span>
                           {c.id === 'SKILL' && s.KEY !== undefined && !separator && (
                             <span class="key-badge" title={`Key ${s.KEY}`}>
@@ -132,7 +154,7 @@ export function Outliner() {
                             </span>
                           )}
                         </button>
-                        {active && !separator && <SkillBranches />}
+                        {active && !separator && !isFolded && <SkillBranches />}
                       </li>
                     );
                   })}

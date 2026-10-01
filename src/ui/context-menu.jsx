@@ -128,6 +128,7 @@ function nodeItems(index) {
   const animatable = node?.K_NAME === 'VISUAL' && ANIMATABLE.includes(node.EFFECT);
   return [
     animatable && item(`Animate (keyframes)…`, 'wand', () => command('animate').run(), { keys: bindingOf('animate') }),
+    node?.K_NAME === 'VISUAL' && cmd('continueVisual', 'Continue from ALT POSITION'),
     animatable && sep,
     cmd('duplicate'),
     cmd('selectAll'),

@@ -27,8 +27,8 @@ function loadConfig() {
     return { provider: 'anthropic', models: {}, bases: {}, effort: 'medium' };
   }
 }
-const config = signal(loadConfig());
-function setConfig(patch) {
+export const config = signal(loadConfig());
+export function setConfig(patch) {
   config.value = { ...config.value, ...patch };
   try {
     localStorage.setItem(KEY, JSON.stringify(config.value));
@@ -415,6 +415,11 @@ export function AssistantPanel() {
                     settings and download one (Qwen, Gemma, gpt-oss…). Ollama and LM Studio work too. The assistant can read and edit the open moveset, simulate it, look at the viewport, export videos and animate
                     cameras. Everything it changes can be undone with Ctrl+Z.
                   </p>
+                  {c.provider !== 'local' && (
+                    <Button icon="download" onClick={() => setConfig({ provider: 'local' })}>
+                      Run a free model on this PC
+                    </Button>
+                  )}
                   <p class="hint">
                     Using Claude Desktop, Cursor, VS Code or another AI app instead?{' '}
                     <button type="button" class="link" onClick={() => (S.dialog.value = 'connect-ai')}>

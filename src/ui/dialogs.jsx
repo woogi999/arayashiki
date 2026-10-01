@@ -1,5 +1,6 @@
 // The dialogs: bringing a code in, taking one out, the saved movesets, and
 // the library of real moves.
+import { Fragment } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 import * as S from '../store.js';
 import * as B from '../barmaker/state.js';
@@ -12,7 +13,7 @@ import {
   reindexRobloxCache,
   saveCodeFile,
 } from '../platform.js';
-import { ACTIONS, bindingOf, comboOf, custom, rebind, resetBinds } from '../keybinds.js';
+import { ACTIONS, GROUPS, bindingOf, clashesOf, comboOf, custom, rebind, resetBinds } from '../keybinds.js';
 import { appearance, BACKGROUNDS, setAppearance } from '../prefs.js';
 import { openUpdates, setUpdatePrefs, updatePrefs } from '../updates.js';
 import { startTour } from '../onboarding.js';
@@ -32,6 +33,8 @@ function Redirect({ to }) {
 const ManualDialog = lazy(() => import('./manual.jsx'), 'ManualDialog');
 const ChangelogDialog = lazy(() => import('./changelog.jsx'), 'ChangelogDialog');
 const ConnectDialog = lazy(() => import('../ai/connect.jsx'), 'ConnectDialog');
+const LocalModels = lazy(() => import('../ai/local-ui.jsx'), 'LocalModels');
+const assistantConfig = () => import('../ai/panel.jsx');
 const UpdatesDialog = lazy(() => import('./updates.jsx'), 'UpdatesDialog');
 const WelcomeDialog = lazy(() => import('./tour.jsx'), 'WelcomeDialog');
 const Tour = lazy(() => import('./tour.jsx'), 'Tour');
@@ -201,30 +204,47 @@ function KeybindsSettings() {
   void custom.value; // re-render when a binding changes
   return (
     <>
-      <p class="hint">Click a shortcut, then press the keys you want (Escape keeps the old one).</p>
+      <p class="hint">
+        Click a shortcut, then press the keys you want (Escape keeps the old one). Every command has one; clear any you
+        don’t want. A shortcut that another one also uses is marked.
+      </p>
       <div class="keybinds">
-        {ACTIONS.map((a) => (
-          <div class="keybind" key={a.id}>
-            <span>{a.label}</span>
-            <button
-              type="button"
-              class={`keybind-key ${waiting === a.id ? 'is-waiting' : ''}`}
-              onClick={() => setWaiting(a.id)}
-            >
-              {waiting === a.id ? 'Press keys…' : <kbd>{bindingOf(a.id)}</kbd>}
-            </button>
-            {bindingOf(a.id) !== a.def ? (
-              <IconButton
-                icon="x"
-                size={13}
-                label={`Back to ${a.def}`}
-                title={`Back to ${a.def}`}
-                onClick={() => rebind(a.id, null)}
-              />
-            ) : (
-              <span class="field-reset-space" />
-            )}
-          </div>
+        {GROUPS.map((g) => (
+          <Fragment key={g}>
+            <h4 class="section-title keybind-group">{g}</h4>
+            {ACTIONS.filter((a) => a.group === g).map((a) => {
+              const b = bindingOf(a.id);
+              const clash = clashesOf(a.id);
+              return (
+                <div class={`keybind ${clash.length ? 'is-clash' : ''}`} key={a.id}>
+                  <span>
+                    {a.label}
+                    {clash.length > 0 && <small class="keybind-clash">Also: {clash.map((c) => c.label).join(', ')}</small>}
+                  </span>
+                  <button
+                    type="button"
+                    class={`keybind-key ${waiting === a.id ? 'is-waiting' : ''}`}
+                    onClick={() => setWaiting(a.id)}
+                  >
+                    {waiting === a.id ? 'Press keys…' : b ? <kbd>{b}</kbd> : <span class="hint">None</span>}
+                  </button>
+                  {b !== a.def ? (
+                    <IconButton
+                      icon="undo"
+                      size={13}
+                      label={a.def ? `Back to ${a.def}` : 'Back to none'}
+                      title={a.def ? `Back to ${a.def}` : 'Back to none'}
+                      onClick={() => rebind(a.id, null)}
+                    />
+                  ) : b ? (
+                    <IconButton icon="x" size={13} label="No shortcut" title="No shortcut" onClick={() => rebind(a.id, '')} />
+                  ) : (
+                    <span class="field-reset-space" />
+                  )}
+                </div>
+              );
+            })}
+          </Fragment>
         ))}
       </div>
       <div class="modal-actions">
@@ -283,16 +303,50 @@ function AppearanceSettings() {
   );
 }
 
+// The built-in models, here as well as in the assistant's settings: what's
+// downloaded, what can be, and using one in the assistant.
+function LocalAi() {
+  const [cfg, setCfg] = useState(null);
+  useEffect(() => {
+    assistantConfig().then((m) => setCfg(m));
+  }, []);
+  if (!cfg) return <p class="hint">Loading…</p>;
+  const c = cfg.config.value;
+  return (
+    <>
+      <LocalModels
+        model={c.models.local ?? ''}
+        ctx={c.localCtx ?? 32768}
+        gpu={c.localGpu ?? true}
+        onModel={(file) => cfg.setConfig({ models: { ...cfg.config.peek().models, local: file } })}
+        onOptions={(patch) => cfg.setConfig(patch)}
+      />
+      <div class="modal-actions">
+        <span class="hint">
+          {c.provider === 'local' ? 'The assistant uses a model on this PC.' : 'The assistant uses another service now.'}
+        </span>
+        <span class="spacer" />
+        {c.provider !== 'local' && (
+          <Button icon="bot" onClick={() => cfg.setConfig({ provider: 'local' })}>
+            Use it in the assistant
+          </Button>
+        )}
+      </div>
+    </>
+  );
+}
+
 function AiSettings() {
   return (
     <>
       <h3 class="section-title">The assistant inside Arayashiki</h3>
       <p class="hint">
-        Chat with your own AI (Claude, ChatGPT, Gemini, OpenRouter), or a free one that runs on this PC: choose “On this PC”
-        in the assistant’s settings and download a model (Qwen, Gemma, gpt-oss and more). It
-        reads and edits the open moveset, simulates, takes screenshots, exports videos and animates cameras, and everything
-        it changes can be undone.
+        Chat with your own AI (Claude, ChatGPT, Gemini, OpenRouter), or a free one that runs on this PC (below). It reads
+        and edits the open moveset, simulates, takes screenshots, exports videos and animates cameras, and everything it
+        changes can be undone.
       </p>
+      <h3 class="section-title">Models on this PC (free)</h3>
+      {isDesktop ? <LocalAi /> : <p class="hint">Models on this PC run in the desktop app.</p>}
       <div class="modal-actions">
         <Button
           icon="bot"
@@ -371,12 +425,21 @@ function UpdatesSettings() {
   return (
     <>
       <p class="hint">
-        This is Arayashiki <span class="num">{__APP_VERSION__}</span>. New versions come out on GitHub; the app can fetch
-        and install them for you, and your movesets and settings stay as they are.
+        This is Arayashiki <span class="num">{__APP_VERSION__}</span>. New versions come out on GitHub. The app fetches
+        them in the background and installs them when it restarts, or the next time you open it; your movesets and
+        settings stay as they are.
       </p>
       <div class="prop-row">
         <span>Check for updates at launch</span>
         <Switch checked={p.auto} label="Check for updates at launch" onChange={(on) => setUpdatePrefs({ auto: on })} />
+      </div>
+      <div class="prop-row">
+        <span>Download updates by themselves</span>
+        <Switch
+          checked={p.download}
+          label="Download updates by themselves"
+          onChange={(on) => setUpdatePrefs({ download: on })}
+        />
       </div>
       {p.skipped && (
         <div class="prop-row">

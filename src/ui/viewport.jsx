@@ -5,6 +5,8 @@ import { signal } from '@preact/signals';
 import * as S from '../store.js';
 import { robloxImage, robloxMesh } from '../platform.js';
 import { IconButton, Toggle } from './controls.jsx';
+import { Icon } from '../icons.jsx';
+import { bindingOf } from '../keybinds.js';
 import { Area } from './area.jsx';
 import { lazy } from './lazy.jsx';
 
@@ -66,6 +68,47 @@ function CameraMenu() {
           Reset camera settings
         </button>
       </div>
+    </div>
+  );
+}
+
+// The tools down the view's left side, as Roblox Studio's (and Blender's
+// toolbar): click to pick, or a gizmo on the picked node's box or effect.
+const TOOLS = [
+  ['select', 'toolSelect', 'mouse-pointer', 'Select: click a box or effect to open its node'],
+  ['translate', 'toolMove', 'move', 'Move: drag the picked hitbox, projectile or effect (Ctrl snaps to half a stud)'],
+  ['scale', 'toolScale', 'scale', 'Scale: drag its handles to size it (Ctrl snaps)'],
+  ['rotate', 'toolRotate', 'rotate', 'Rotate: turn it (Ctrl snaps to 15°)'],
+];
+function ViewTools() {
+  if (S.animatorOpen.value || S.camPathOpen.value) return null;
+  const mode = S.editTool.value;
+  return (
+    <div class="view-tools" role="toolbar" aria-label="Tools">
+      {TOOLS.map(([id, action, icon, title]) => (
+        <button
+          type="button"
+          key={id}
+          class="view-tool"
+          aria-pressed={mode === id}
+          title={`${title} (${bindingOf(action)})`}
+          aria-label={title.split(':')[0]}
+          onClick={() => S.setEditTool(id)}
+        >
+          <Icon name={icon} size={16} />
+        </button>
+      ))}
+      <span class="view-tools-sep" />
+      <button
+        type="button"
+        class="view-tool"
+        aria-pressed={S.editSpace.value === 'local'}
+        title={`${S.editSpace.value === 'local' ? 'Local' : 'World'} axes: click for ${S.editSpace.value === 'local' ? 'world' : 'local'} (${bindingOf('toolSpace')})`}
+        aria-label="Local axes"
+        onClick={S.toggleEditSpace}
+      >
+        <Icon name="globe" size={16} />
+      </button>
     </div>
   );
 }
@@ -204,10 +247,11 @@ export function Viewport() {
       <div class="viewport" ref={host}>
         {state !== 'ready' && <p class="view-note">{state === 'loading' ? 'Loading the viewport…' : state}</p>}
         <Plates />
+        <ViewTools />
         <CameraMenu />
         <p class="view-hint">
           {S.camMode.value === 'free'
-            ? 'Click an effect to open its node · Right-drag to look · Middle-drag to pan · Wheel to zoom · WASD QE to fly · F to frame you · K to key the camera'
+            ? `Click an effect to open its node${S.editTool.value !== 'select' ? ', drag its handles to ' + { translate: 'move', scale: 'size', rotate: 'turn' }[S.editTool.value] + ' it' : ''} · Right-drag to look · Middle-drag to pan · Wheel to zoom · ${['flyForward', 'flyLeft', 'flyBack', 'flyRight'].map(bindingOf).join('')} ${bindingOf('flyDown')}${bindingOf('flyUp')} to fly · ${bindingOf('frameYou')} to frame you · ${bindingOf('cameraKey')} to key the camera`
             : `Camera: ${S.camMode.value === 'auto' ? 'Auto' : 'Recorded'} · pick Free to fly`}
         </p>
       </div>

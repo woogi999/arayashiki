@@ -22,6 +22,7 @@ import { requestExit } from './exit.js';
 import { startBridge } from './ai/bridge.js';
 import { loadAccount } from './account.js';
 import { checkOnLaunch } from './updates.js';
+import { installScrub } from './scrub.js';
 import { migrateLayout } from './ui/dock.jsx';
 import { welcomeOnFirstRun } from './onboarding.js';
 
@@ -65,3 +66,4 @@ loadAccount({ refresh: true });
 // quietly asks GitHub for a newer release (src/updates.js).
 welcomeOnFirstRun();
 checkOnLaunch();
+installScrub();

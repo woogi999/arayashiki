@@ -344,6 +344,47 @@ module('Unit | JJS skill export', function () {
     );
   });
 
+  test('Complex Separate: the container once, the meter in front, a trail when it drops', async function (assert) {
+    const skill = buildSkill({ style: 'separate', textures: [10, 11, 12], container: 5, trails: [20, 21, 22], position: '0, 1, 0' });
+    const data = program(skill);
+    const [cancelBox, box] = data.Line;
+    assert.deepEqual([cancelBox.EFFECT, box.EFFECT, box.TEXTURE, box['VISUAL TAG']], ['Cancel', 'Billboard', 5, 'BarBox'], 'the container, for good, when it starts');
+    assert.strictEqual(box.POSITION, '0, 1, 0', 'at the back');
+    const meter = data.Branch['2'].Line[0];
+    assert.deepEqual([meter.TEXTURE, meter.POSITION, meter['VISUAL TAG']], [12, '0, 1, -0.002', 'Bar2'], 'the meter a little in front');
+    assert.strictEqual(meter['ALT POSITION'], '0, -2, 0', 'its y kept by its ALT POSITION');
+    const checks = data.Branch['2'].Line.filter((n) => n.K_NAME === 'TAG' && n.CHECK);
+    assert.deepEqual(
+      checks.map((n) => [n.VALUE, n.BRANCH]),
+      [
+        ['1', 'Drop2'],
+        ['0', 'Drop2'],
+        ['<0', 'Drop2'],
+        ['>2', 'SafetyGreater'],
+      ],
+      'going down goes by the trail; up, straight there',
+    );
+    assert.deepEqual(
+      data.Branch['1'].Line.filter((n) => n.K_NAME === 'TAG' && n.CHECK).map((n) => [n.VALUE, n.BRANCH]),
+      [
+        ['2', '2'],
+        ['0', 'Drop1'],
+        ['<0', 'Drop1'],
+        ['>2', 'SafetyGreater'],
+      ],
+    );
+    const [cancelTrail, trail, then] = data.Branch.Drop2.Line;
+    assert.deepEqual([cancelTrail.EFFECT, cancelTrail['VISUAL TAG']], ['Cancel', 'BarTrail'], 'the last trail goes');
+    assert.deepEqual([trail.TEXTURE, trail.POSITION, trail.TIME, trail.OPACITY, trail['ALT OPACITY']], [22, '0, 1, -0.001', 0.4, 0, 1], 'the step it left flashes, between the two, and fades');
+    assert.strictEqual(then.BRANCH, '-', 'then on to the new step');
+    assert.strictEqual('Drop0' in data.Branch, false, 'nothing is under the empty step');
+
+    const plain = program(buildSkill({ style: 'separate', textures: [10, 11, 12], container: 5 }));
+    assert.strictEqual(Object.keys(plain.Branch).some((b) => b.startsWith('Drop')), false, 'no trail: no drops');
+    assert.strictEqual(plain.Branch['2'].Line.find((n) => n.VALUE === '0').BRANCH, '0');
+    assert.deepEqual(await decodeSkill(await encodeSkill(skill)), skill, 'the code decodes back to it');
+  });
+
   test('IDs are read however they are typed', function (assert) {
     assert.deepEqual(parseIds('123, 456\n 789 abc 10'), [
       '123',
