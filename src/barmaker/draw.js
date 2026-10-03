@@ -245,6 +245,16 @@ export const newFx = () => ({
   overlay: { on: false, color: '#FFFFFF', alpha: 50, blend: 'source-over' },
   fade: { on: false, from: 0, to: 100 },
   range: { on: false, from: 100, to: 100 },
+  // Stylising (the effects block below withFx).
+  halftone: { on: false, size: 14, angle: 45, shape: 'dots', tone: 'even', scale: 60, ink: 'own', color: '#000000', alpha: 100, under: 0 },
+  chroma: { on: false, amount: 6, angle: 0 },
+  glitch: { on: false, amount: 30, slices: 12, animate: true },
+  pixelate: { on: false, size: 8 },
+  blur: { on: false, amount: 4 },
+  scanlines: { on: false, gap: 6, alpha: 35, color: '#000000' },
+  bevel: { on: false, size: 10, depth: 70, angle: 135, highlight: '#FFFFFF', shade: '#000000' },
+  tilt: { on: false, tiltX: 30, tiltY: 0, distance: 2 },
+  extrude: { on: false, depth: 24, angle: 45, colour: 'own', shade: 45, color: '#000000', alpha: 100, fade: false },
 });
 
 const base = (type, name, extra) => ({
@@ -307,6 +317,10 @@ export const newBar = (extra = {}) =>
       position: 'outside',
       around: 'segments',
       march: 0,
+      // Its own corner roundness instead of the bar's (a square frame round
+      // a pill, or the other way round).
+      ownRadius: false,
+      radius: 0,
     },
     fillStroke: { on: false, color: '#FFFFFF', alpha: 100, width: 4 },
     innerShadow: {
@@ -406,6 +420,8 @@ export const newShape = (shape = 'rect', extra = {}) =>
     stroke: 0,
     strokeColor: '#000000',
     strokeAlpha: 100,
+    strokeOwnRadius: false,
+    strokeRadius: 0,
     ...extra,
   });
 
@@ -447,6 +463,11 @@ export const newJjs = () => ({
   // 'complex' (lag-proof, the default), 'separate' (Complex Separate: the
   // meter in layers) or 'legacy': see core/barskill.js.
   style: 'complex',
+  // Complex Separate's front (layers over the meter that never change) and
+  // extras (layers on some steps only): the front's image ID, and an image
+  // ID for each extra by its key ("extra:<from>-<to>", see separateParts).
+  frontId: '',
+  extraIds: {},
   // Complex Separate's other pictures: the container's image ID, one trail
   // image ID per step, how long a trail takes to fade, and their uploads
   // ({ fingerprint, items: { "container:0" | "meter:N" | "trail:N": { decalId, imageId } } }).
@@ -477,6 +498,8 @@ export const newDoc = (extra = {}) => ({
   frames: 20,
   background: { on: false, color: '#000000' },
   layers: [],
+  // Guides dragged out of the rulers: { axis: 'x' | 'y', at } in pixels.
+  guides: [],
   ...extra,
 });
 
@@ -510,6 +533,11 @@ export function normaliseDoc(raw) {
       ...(raw.jjs && typeof raw.jjs === 'object' ? raw.jjs : {}),
     },
     background: { ...fresh.background, ...raw.background },
+    guides: Array.isArray(raw.guides)
+      ? raw.guides
+          .filter((g) => (g?.axis === 'x' || g?.axis === 'y') && Number.isFinite(g.at))
+          .map((g) => ({ axis: g.axis, at: g.at }))
+      : [],
     layers: raw.layers
       .filter((l) => l && MAKERS[l.type])
       .map((l) => {
@@ -877,12 +905,9 @@ function linearGeometry(L) {
     outlinePath(ctx, grow, whole) {
       ctx.beginPath();
       const rects = whole ? [{ x: L.x, y: L.y, w: L.w, h: L.h }] : parts;
+      const r = L.stroke?.ownRadius ? Math.max(0, Number(L.stroke.radius) || 0) : radius;
       for (const p of rects)
-        outline(
-          ctx,
-          inset(p, -grow),
-          radius > 0 ? Math.max(0, radius + grow) : 0,
-        );
+        outline(ctx, inset(p, -grow), r > 0 ? Math.max(0, r + grow) : 0);
     },
     // How far the fill has come, as a shift along the bar, for patterns
     // that ride along with it.
@@ -1868,12 +1893,15 @@ function drawStroke(out, geo, L, env, mask) {
 
 // The parts a meter can be drawn in, one picture each ("render in layers",
 // and the Complex Separate skill, core/barskill.js): the container (the
-// track, its inner shadow and outline, and whatever else never changes),
-// the meter (the fill and all that comes with it), the leading edge on its
-// own, and the catch-up trail at the step's own level (shown behind the
-// meter for a moment when it goes down). 'meterLead' is the meter with its
-// leading edge, as the skill shows it.
-export const PARTS = ['container', 'meter', 'lead', 'trail'];
+// track, its inner shadow and outline, and every layer under the bars that
+// never changes), the meter (the fill and all that comes with it, and the
+// layers that change with the steps), the leading edge on its own, the
+// catch-up trail at the step's own level (shown behind the meter for a
+// moment when it goes down), the front (layers over the bars that never
+// change), and an extra for each set of steps that a layer shows on only
+// ("extra:<from>-<to>", shown on those steps and taken off the rest).
+// 'meterLead' is the meter with its leading edge, as the skill shows it.
+export const PARTS = ['container', 'meter', 'lead', 'trail', 'front'];
 const wants = (env, part) => !env.part || env.part === part || (env.part === 'meterLead' && (part === 'meter' || part === 'lead'));
 
 // Returns the filled part's shape (white where filled), for clipping.
@@ -1984,6 +2012,17 @@ function drawBar(out, L, env) {
   if (wants(env, 'container')) {
     if (L.innerShadow?.on) drawInnerShadow(out, mask, L.innerShadow, env);
     drawStroke(out, geo, L, env, mask);
+  } else if (env.part !== 'trail' && cov.parts.length && (L.innerShadow?.on || L.stroke?.on)) {
+    // Drawn in parts, the meter sits in front of the container and would
+    // hide the container's inner shadow and outline where it covers them:
+    // they're baked into the meter there, as they look all in one.
+    const over = blank(env);
+    if (L.innerShadow?.on) drawInnerShadow(over, mask, L.innerShadow, env);
+    drawStroke(over, geo, L, env, mask);
+    const cover = blank(env);
+    stamp(cover, out);
+    stamp(over, cover, 'destination-in');
+    stamp(out, over);
   }
   return shape;
 }
@@ -2021,6 +2060,8 @@ function drawShape(ctx, L) {
     ctx.fillStyle = paintStyle(ctx, L.fill, { box: L });
     ctx.fill();
   }
+  // The outline can round its corners on its own.
+  if (L.strokeOwnRadius && (L.shape ?? 'rect') === 'rect') shapePath(ctx, { ...L, radius: L.strokeRadius ?? 0 });
   if (L.stroke > 0) {
     ctx.lineWidth = L.stroke;
     ctx.lineJoin = 'round';
@@ -2074,7 +2115,61 @@ function renderLayer(L, env) {
 // Whether a layer that isn't a bar looks different from step to step: text
 // with a {percent} or the like in it, or a fade or range over the steps.
 function changesByStep(L) {
-  return (L.type === 'text' && /\{(percent|frame|frames|left)\}/.test(L.text ?? '')) || Boolean(L.fx?.fade?.on || L.fx?.range?.on);
+  return (L.type === 'text' && /\{(percent|frame|frames|left)\}/.test(L.text ?? '')) || Boolean(L.fx?.fade?.on || L.fx?.range?.on || (L.fx?.glitch?.on && L.fx.glitch.animate));
+}
+
+// Which part of a meter drawn in parts a layer that isn't a bar belongs to:
+// 'meter' if it changes with the steps, an extra if it only shows on some
+// (and is the same on all of them), else 'container' under the bars,
+// 'front' over them, and 'meter' between two bars (to keep their order).
+function roleOf(L, index, doc) {
+  if (changesByStep({ ...L, fx: { ...L.fx, range: { on: false } } })) return 'meter';
+  if (L.fx?.range?.on) return extraKey(L.fx.range);
+  const bars = doc.layers.map((l, i) => (l.type === 'bar' ? i : -1)).filter((i) => i >= 0);
+  if (!bars.length || index < bars[0]) return 'container';
+  if (index > bars.at(-1)) return 'front';
+  return 'meter';
+}
+
+const extraKey = (range) => `extra:${Math.round(range.from * 100) / 100}-${Math.round(range.to * 100) / 100}`;
+
+// The steps (0…frames) a range shows on, as layerAlpha has it.
+function stepsIn(range, frames) {
+  const out = [];
+  for (let k = 0; k <= frames; k++) {
+    const pct = frames ? (k / frames) * 100 : 0;
+    if (pct >= range.from - 1e-6 && pct <= range.to + 1e-6) out.push(k);
+  }
+  return out;
+}
+
+/**
+ * The pictures a meter drawn in parts needs besides the container, the
+ * meter and the trail: { front, extras: [{ key, label, steps, above }] }.
+ * `front` when layers over the bars never change; an extra for each set of
+ * steps that layers show on only (`above`: over the bars or not).
+ */
+export function separateParts(doc) {
+  const bars = doc.layers.map((l, i) => (l.type === 'bar' && l.visible ? i : -1)).filter((i) => i >= 0);
+  let front = false;
+  const extras = new Map();
+  doc.layers.forEach((L, i) => {
+    if (!L.visible || L.type === 'bar' || L.clip) return;
+    const role = roleOf(L, i, doc);
+    if (role === 'front') front = true;
+    if (!role.startsWith('extra:')) return;
+    const steps = stepsIn(L.fx.range, doc.frames);
+    if (!steps.length) return;
+    const above = bars.length > 0 && i > bars[0];
+    const was = extras.get(role);
+    extras.set(role, {
+      key: role,
+      label: `Steps ${steps[0]}${steps.length > 1 ? `–${steps.at(-1)}` : ''}`,
+      steps,
+      above: was ? was.above || above : above,
+    });
+  });
+  return { front, extras: [...extras.values()] };
 }
 
 /** Whether a design has a part to draw: 'lead' (a leading edge) or 'trail' (a catch-up trail). */
@@ -2095,12 +2190,21 @@ function layerAlpha(L, env) {
   return alpha;
 }
 
-// Effects that change the layer's own pixels: a colour laid over it, and
-// an outline round it.
+// Effects that change the layer's own pixels: the stylising ones (blur,
+// pixels, a bevel, halftone, scanlines, a glitch, colour fringes, a 3D
+// tilt), then a colour laid over it and an outline round it.
 function withFx(ctx, L, env) {
   const fx = L.fx;
   if (!fx) return ctx;
   let out = ctx;
+  if (fx.blur?.on && fx.blur.amount > 0) out = blurred(out, env, fx.blur.amount);
+  if (fx.pixelate?.on && fx.pixelate.size > 1) out = pixelated(out, env, fx.pixelate.size);
+  if (fx.bevel?.on) out = beveled(out, env, fx.bevel);
+  if (fx.halftone?.on) out = halftoned(out, env, fx.halftone);
+  if (fx.scanlines?.on) out = scanlined(out, env, fx.scanlines);
+  if (fx.glitch?.on && fx.glitch.amount > 0) out = glitched(out, env, fx.glitch, env.frame);
+  if (fx.chroma?.on && fx.chroma.amount > 0) out = aberrated(out, env, fx.chroma);
+  if (fx.tilt?.on) out = tilted(out, env, fx.tilt, L);
   if (fx.overlay?.on) {
     const tint = tinted(out, env, rgba(fx.overlay.color, fx.overlay.alpha));
     stamp(out, tint, fx.overlay.blend || 'source-over');
@@ -2118,9 +2222,12 @@ function withFx(ctx, L, env) {
   return out;
 }
 
-// Draws a finished layer, with its drop shadow and outer glow under it.
-function stampLayer(dst, src, L, env, alpha) {
+// Draws a finished layer, with its drop shadow, outer glow and extrusion
+// under it (unless `under` is false).
+function stampLayer(dst, src, L, env, alpha, under = true) {
   const fx = L.fx ?? {};
+  if (!under) return stamp(dst, src, L.blend, alpha);
+  if (fx.extrude?.on) drawExtrusion(dst, src, env, fx.extrude, alpha);
   if (fx.shadow?.on)
     shadowOf(
       dst,
@@ -2149,6 +2256,256 @@ function stampLayer(dst, src, L, env, alpha) {
   stamp(dst, src, L.blend, alpha);
 }
 
+// ─── Stylising effects ──────────────────────────────────────────────────
+// Effects that redraw a layer's pixels: halftone, chromatic aberration, a
+// glitch, pixels, blur, scanlines, a bevel, a tilt in 3D; and an extrusion
+// drawn under it (stampLayer). Sizes are in document pixels, so thumbnails
+// (env.scale) look the same, only smaller.
+
+// A small seeded random, so a glitch looks the same every time a step is drawn.
+function seeded(seed) {
+  let x = (seed * 2654435761) >>> 0 || 1;
+  return () => {
+    x ^= x << 13;
+    x ^= x >>> 17;
+    x ^= x << 5;
+    return ((x >>> 0) % 100000) / 100000;
+  };
+}
+
+function blurred(src, env, amount) {
+  const out = blank(env);
+  out.filter = `blur(${Math.max(0, amount) * env.scale}px)`;
+  out.drawImage(src.canvas, 0, 0);
+  out.filter = 'none';
+  return out;
+}
+
+function pixelated(src, env, size) {
+  const cell = Math.max(1, size * env.scale);
+  const W = src.canvas.width;
+  const H = src.canvas.height;
+  const small = document.createElement('canvas');
+  small.width = Math.max(1, Math.round(W / cell));
+  small.height = Math.max(1, Math.round(H / cell));
+  const sc = small.getContext('2d');
+  sc.imageSmoothingQuality = 'high';
+  sc.drawImage(src.canvas, 0, 0, small.width, small.height);
+  const out = blank(env);
+  out.imageSmoothingEnabled = false;
+  out.drawImage(small, 0, 0, W, H);
+  return out;
+}
+
+export const HALFTONE_SHAPES = ['dots', 'lines', 'squares'];
+
+// Printed dots (or lines, or squares) on a turned grid, each as big as the
+// layer is solid there; `tone` sizes them by how light or dark it is too.
+function halftoned(src, env, h) {
+  const W = src.canvas.width;
+  const H = src.canvas.height;
+  const cell = Math.max(2, h.size * env.scale);
+  const a = rad(h.angle ?? 45);
+  const D = Math.ceil(Math.hypot(W, H));
+  const n = Math.max(1, Math.ceil(D / cell));
+  const span = n * cell;
+  // The layer turned back by the grid's angle, one pixel per cell.
+  const small = document.createElement('canvas');
+  small.width = n;
+  small.height = n;
+  const sc = small.getContext('2d', { willReadFrequently: true });
+  sc.imageSmoothingQuality = 'high';
+  sc.scale(1 / cell, 1 / cell);
+  sc.translate(span / 2, span / 2);
+  sc.rotate(-a);
+  sc.translate(-W / 2, -H / 2);
+  sc.drawImage(src.canvas, 0, 0);
+  const px = sc.getImageData(0, 0, n, n).data;
+  const out = blank(env);
+  const under = clamp(h.under ?? 0, 0, 100) / 100;
+  if (under > 0) stamp(out, src, 'source-over', under);
+  out.translate(W / 2, H / 2);
+  out.rotate(a);
+  out.translate(-span / 2, -span / 2);
+  const ink = h.ink === 'own' ? null : rgba(h.color ?? '#000000', 100);
+  const scale = clamp(h.scale ?? 100, 0, 200) / 100;
+  out.globalAlpha = clamp(h.alpha ?? 100, 0, 100) / 100;
+  if (ink) out.fillStyle = ink;
+  for (let j = 0; j < n; j++)
+    for (let i = 0; i < n; i++) {
+      const k = (j * n + i) * 4;
+      const alpha = px[k + 3] / 255;
+      if (alpha < 0.02) continue;
+      const lum = (0.299 * px[k] + 0.587 * px[k + 1] + 0.114 * px[k + 2]) / 255;
+      const tone = h.tone === 'dark' ? 1 - lum : h.tone === 'light' ? lum : 1;
+      const v = alpha * tone * scale;
+      if (v <= 0.01) continue;
+      if (!ink) out.fillStyle = `rgb(${px[k]},${px[k + 1]},${px[k + 2]})`;
+      const cx = i * cell + cell / 2;
+      const cy = j * cell + cell / 2;
+      if (h.shape === 'lines') {
+        const t = Math.min(cell, cell * v);
+        out.fillRect(i * cell, cy - t / 2, cell + 0.5, t);
+      } else if (h.shape === 'squares') {
+        const s = Math.min(cell, cell * Math.sqrt(v));
+        out.fillRect(cx - s / 2, cy - s / 2, s, s);
+      } else {
+        out.beginPath();
+        out.arc(cx, cy, (cell / 2) * Math.sqrt(v) * 1.42, 0, Math.PI * 2);
+        out.fill();
+      }
+    }
+  out.setTransform(1, 0, 0, 1, 0, 0);
+  out.globalAlpha = 1;
+  return out;
+}
+
+// Red one way, blue the other, green where it was: a lens's colour fringes.
+function aberrated(src, env, c) {
+  const W = src.canvas.width;
+  const H = src.canvas.height;
+  const d = (c.amount ?? 6) * env.scale;
+  const dx = Math.round(Math.cos(rad(c.angle ?? 0)) * d);
+  const dy = Math.round(Math.sin(rad(c.angle ?? 0)) * d);
+  const data = src.getImageData(0, 0, W, H).data;
+  const out = blank(env);
+  const img = out.createImageData(W, H);
+  const o = img.data;
+  const at = (x, y) => (x < 0 || y < 0 || x >= W || y >= H ? -1 : (y * W + x) * 4);
+  for (let y = 0; y < H; y++)
+    for (let x = 0; x < W; x++) {
+      const r = at(x - dx, y - dy);
+      const g = (y * W + x) * 4;
+      const b = at(x + dx, y + dy);
+      const ar = r < 0 ? 0 : data[r + 3];
+      const ag = data[g + 3];
+      const ab = b < 0 ? 0 : data[b + 3];
+      const A = Math.max(ar, ag, ab);
+      if (!A) continue;
+      // Each channel as much as its own pixel covers, over the strongest.
+      o[g] = r < 0 ? 0 : (data[r] * ar) / A;
+      o[g + 1] = (data[g + 1] * ag) / A;
+      o[g + 2] = b < 0 ? 0 : (data[b + 2] * ab) / A;
+      o[g + 3] = A;
+    }
+  out.putImageData(img, 0, 0);
+  return out;
+}
+
+// Horizontal slices torn sideways, different every step if it animates.
+function glitched(src, env, g, frame) {
+  const W = src.canvas.width;
+  const H = src.canvas.height;
+  const rand = seeded(g.animate ? frame + 1 : 7);
+  const out = blank(env);
+  const slices = Math.max(1, Math.round(g.slices ?? 12));
+  const amount = (g.amount ?? 30) * env.scale;
+  let y = 0;
+  while (y < H) {
+    const h = Math.max(1, Math.round((H / slices) * (0.3 + rand() * 1.4)));
+    const torn = rand() < 0.55;
+    const shift = torn ? Math.round((rand() * 2 - 1) * amount) : 0;
+    out.drawImage(src.canvas, 0, y, W, h, shift, y, W, h);
+    y += h;
+  }
+  return out;
+}
+
+function scanlined(src, env, s) {
+  const out = blank(env);
+  stamp(out, src);
+  const gap = Math.max(2, (s.gap ?? 6) * env.scale);
+  out.globalCompositeOperation = 'source-atop';
+  out.fillStyle = rgba(s.color ?? '#000000', s.alpha ?? 35);
+  for (let y = 0; y < out.canvas.height; y += gap) out.fillRect(0, y, out.canvas.width, Math.max(1, gap / 2));
+  out.globalCompositeOperation = 'source-over';
+  return out;
+}
+
+// Light from `angle` (degrees, 135 is the top left) catching the edges on
+// its side, and shade on the far side: the layer looks raised.
+function beveled(src, env, b) {
+  const out = blank(env);
+  stamp(out, src);
+  const a = rad(b.angle ?? 135);
+  const size = Math.max(1, b.size ?? 10);
+  const depth = clamp(b.depth ?? 70, 0, 100);
+  const lx = -Math.cos(a);
+  const ly = Math.sin(a);
+  drawInnerShadow(out, src, { color: b.highlight ?? '#FFFFFF', alpha: depth, size, x: lx * size * 0.6, y: ly * size * 0.6 }, env);
+  drawInnerShadow(out, src, { color: b.shade ?? '#000000', alpha: depth, size, x: -lx * size * 0.6, y: -ly * size * 0.6 }, env);
+  // Kept to the layer's own shape and see-through-ness.
+  stamp(out, src, 'destination-in');
+  return out;
+}
+
+// The layer leaned back in 3D: `tiltX` turns it about the horizontal axis
+// (top away), `tiltY` about the vertical one (right away), seen through a
+// camera `distance` away (in picture widths). Drawn a row (column) at a time.
+function tilted(src, env, t, L) {
+  let cur = src;
+  const W = src.canvas.width;
+  const H = src.canvas.height;
+  const box = L.type === 'paint' ? { x: 0, y: 0, w: env.width, h: env.height } : L;
+  const cx = (box.x + box.w / 2) * env.scale;
+  const cy = (box.y + box.h / 2) * env.scale;
+  const f = Math.max(0.3, t.distance ?? 2) * Math.max(W, H);
+  const pass = (deg, rows) => {
+    const th = rad(deg);
+    if (Math.abs(th) < 1e-3) return;
+    const out = blank(env);
+    const n = rows ? H : W;
+    const c = rows ? cy : cx;
+    for (let i = 0; i < n; i++) {
+      const u = i + 0.5 - c; // from the axis, across it
+      const z = u * Math.sin(th);
+      const s = f / (f + z);
+      if (s <= 0) continue;
+      const at = c + u * Math.cos(th) * s;
+      const next = c + (u + 1) * Math.cos(th) * (f / (f + (u + 1) * Math.sin(th)));
+      const thick = Math.max(1, Math.abs(next - at) + 0.5);
+      if (rows) {
+        const w = W * s;
+        out.drawImage(cur.canvas, 0, i, W, 1, cx - cx * s, at, w, thick);
+      } else {
+        const h = H * s;
+        out.drawImage(cur.canvas, i, 0, 1, H, at, cy - cy * s, thick, h);
+      }
+    }
+    cur = out;
+  };
+  pass(t.tiltX ?? 0, true);
+  pass(t.tiltY ?? 0, false);
+  return cur;
+}
+
+// Copies of the layer stepped back along `angle`, darker the further they
+// go (or one colour): a block of depth under it, or a long flat shadow.
+function drawExtrusion(dst, src, env, e, alpha) {
+  const depth = Math.max(0, Math.min(400, e.depth ?? 24));
+  if (!depth) return;
+  const a = rad(e.angle ?? 45);
+  const dx = Math.cos(a) * env.scale;
+  const dy = Math.sin(a) * env.scale;
+  let side;
+  if (e.colour === 'own') {
+    side = blank(env);
+    side.filter = `brightness(${1 - clamp(e.shade ?? 45, 0, 100) / 100})`;
+    side.drawImage(src.canvas, 0, 0);
+    side.filter = 'none';
+  } else side = tinted(src, env, rgba(e.color ?? '#000000', 100));
+  // eslint-disable-next-line warp-drive/no-legacy-request-patterns -- a canvas state push, not a data request
+  dst.save();
+  dst.setTransform(1, 0, 0, 1, 0, 0);
+  const steps = Math.ceil(depth);
+  const strength = clamp(e.alpha ?? 100, 0, 100) / 100;
+  for (let k = steps; k >= 1; k--) {
+    dst.globalAlpha = alpha * strength * (e.fade ? 1 - (k - 1) / steps : 1);
+    dst.drawImage(side.canvas, dx * k, dy * k);
+  }
+  dst.restore();
+}
+
 /**
  * Draws `doc` as it looks on `frame` (0 is empty, doc.frames is full).
  *
@@ -2174,21 +2531,32 @@ export function render(doc, frame, options = {}) {
     out.fillRect(0, 0, out.canvas.width, out.canvas.height);
   }
   const layers = doc.layers;
+  // Drawn in parts, an extra's picture is the same on all its steps: it's
+  // drawn on one of them whatever step is asked for.
+  if (env.part?.startsWith('extra:')) {
+    const [from, to] = env.part.slice(6).split('-').map(Number);
+    const steps = stepsIn({ from, to }, doc.frames);
+    if (steps.length && !steps.includes(env.frame)) env.frame = steps[0];
+  }
+  const owns = (role) => env.part === role || (env.part === 'meterLead' && role === 'meter');
+  const barPart = !env.part || !(env.part === 'front' || env.part.startsWith('extra:'));
   let i = 0;
   while (i < layers.length) {
+    const index = i;
     const layer = layers[i++];
     // A clipped layer only shows inside the nearest unclipped one under it.
     const clipped = [];
     while (i < layers.length && layers[i].clip) clipped.push(layers[i++]);
     const alpha = layer.visible ? layerAlpha(layer, env) : 0;
     if (!alpha) continue;
-    // Drawn in parts: a bar draws its own parts; anything else goes with the
-    // container, unless it changes from step to step (it goes with the meter).
-    if (env.part && layer.type !== 'bar' && !wants(env, changesByStep(layer) ? 'meter' : 'container')) continue;
+    // Drawn in parts: a bar draws its own parts; anything else goes in the
+    // part it belongs to (roleOf).
+    const role = layer.type === 'bar' ? null : env.part ? roleOf(layer, index, doc) : null;
+    if (env.part && (layer.type === 'bar' ? !barPart : !owns(role))) continue;
     const { ctx: group, clipShape } = renderLayer(layer, env);
     // What's clipped to a bar shows with the part it shows through.
-    const through = layer.type === 'bar' ? (layer.clipTo === 'all' ? 'container' : 'meter') : changesByStep(layer) ? 'meter' : 'container';
-    const shown = (env.part && !wants(env, through) ? [] : clipped)
+    const through = layer.type === 'bar' ? (layer.clipTo === 'all' ? 'container' : 'meter') : role;
+    const shown = (env.part && (layer.type === 'bar' ? !wants(env, through) : !owns(through)) ? [] : clipped)
       .filter((c) => c.visible)
       .map((c) => [c, layerAlpha(c, env)])
       .filter(([, a]) => a > 0);
@@ -2202,7 +2570,11 @@ export function render(doc, frame, options = {}) {
         stamp(group, content, c.blend, a);
       }
     }
-    stampLayer(out, group, layer, env, alpha);
+    // A bar's meter in front of its container: the container carries the
+    // shadow, glow and extrusion under the whole bar, so the meter doesn't
+    // darken the track again.
+    const under = !(env.part && layer.type === 'bar' && env.part !== 'container' && layer.trackOn);
+    stampLayer(out, group, layer, env, alpha, under);
   }
   return out.canvas;
 }

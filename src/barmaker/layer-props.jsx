@@ -122,6 +122,24 @@ const SHINES = [
   { id: 'sheen', label: 'Sheen' },
   { id: 'shade', label: 'Shade' },
 ];
+const HALFTONE_SHAPES = [
+  { id: 'dots', label: 'Dots' },
+  { id: 'lines', label: 'Lines' },
+  { id: 'squares', label: 'Squares' },
+];
+const HALFTONE_TONES = [
+  { id: 'even', label: 'Even', title: 'Dots as big as the layer is solid' },
+  { id: 'dark', label: 'Darks', title: 'Bigger dots where it’s darker, like ink on paper' },
+  { id: 'light', label: 'Lights', title: 'Bigger dots where it’s lighter' },
+];
+const HALFTONE_INKS = [
+  { id: 'own', label: 'Its colours' },
+  { id: 'ink', label: 'One ink' },
+];
+const EXTRUDE_COLOURS = [
+  { id: 'own', label: 'Its colours, darker' },
+  { id: 'ink', label: 'One colour' },
+];
 const SHAPES = [
   { id: 'rect', label: 'Rectangle' },
   { id: 'ellipse', label: 'Ellipse' },
@@ -195,6 +213,61 @@ function LayerFx({ layer }) {
         {colourOf(layer, 'fx.overlay', 'Overlay')}
         <Blend value={fx.overlay.blend} path="fx.overlay.blend" />
       </Fx>
+      <h3 class="pb-divider">Stylise</h3>
+      <Fx title="Halftone" on={fx.halftone.on} onToggle={set('fx.halftone.on')} hint="Printed dots, lines or squares, like a comic page.">
+        <Picks title="Shape" options={HALFTONE_SHAPES} value={fx.halftone.shape} onPick={set('fx.halftone.shape')} />
+        <Slider label="Size" min="3" max="80" value={fx.halftone.size} onInput={f('fx.halftone.size')} />
+        <Slider label="Angle" unit="°" min="-90" max="90" value={fx.halftone.angle} onInput={f('fx.halftone.angle')} />
+        <Slider label="Dot size" unit="%" min="10" max="200" value={fx.halftone.scale} onInput={f('fx.halftone.scale')} />
+        <Picks title="Sized by" options={HALFTONE_TONES} value={fx.halftone.tone} onPick={set('fx.halftone.tone')} />
+        <Picks title="Colour" options={HALFTONE_INKS} value={fx.halftone.ink} onPick={set('fx.halftone.ink')} />
+        {fx.halftone.ink !== 'own' && <label class="pb-row"><span class="pb-row-label">Ink</span><ColourField label="Ink" value={fx.halftone.color} onChange={set('fx.halftone.color')} /></label>}
+        <Slider label="Under the dots" unit="%" min="0" max="100" value={fx.halftone.under} onInput={f('fx.halftone.under')} />
+      </Fx>
+      <Fx title="Chromatic aberration" on={fx.chroma.on} onToggle={set('fx.chroma.on')} hint="Red and blue pulled apart at the edges, like a cheap lens.">
+        <Slider label="Amount" unit="px" min="1" max="60" value={fx.chroma.amount} onInput={f('fx.chroma.amount')} />
+        <Slider label="Angle" unit="°" min="-180" max="180" value={fx.chroma.angle} onInput={f('fx.chroma.angle')} />
+      </Fx>
+      <Fx title="3D extrude" on={fx.extrude.on} onToggle={set('fx.extrude.on')} hint="Depth under the layer, so it stands out like a block (or a long flat shadow).">
+        <Slider label="Depth" unit="px" min="1" max="200" value={fx.extrude.depth} onInput={f('fx.extrude.depth')} />
+        <Slider label="Angle" unit="°" min="-180" max="180" value={fx.extrude.angle} onInput={f('fx.extrude.angle')} />
+        <Picks title="Sides" options={EXTRUDE_COLOURS} value={fx.extrude.colour} onPick={set('fx.extrude.colour')} />
+        {fx.extrude.colour === 'own' ? (
+          <Slider label="Darker by" unit="%" min="0" max="100" value={fx.extrude.shade} onInput={f('fx.extrude.shade')} />
+        ) : (
+          <label class="pb-row"><span class="pb-row-label">Sides</span><ColourField label="Sides" value={fx.extrude.color} onChange={set('fx.extrude.color')} /></label>
+        )}
+        <Slider label="Opacity" unit="%" min="0" max="100" value={fx.extrude.alpha} onInput={f('fx.extrude.alpha')} />
+        <Check label="Fades away (a long shadow)" checked={fx.extrude.fade} onChange={f('fx.extrude.fade')} />
+      </Fx>
+      <Fx title="Bevel" on={fx.bevel.on} onToggle={set('fx.bevel.on')} hint="Lit edges on one side and shade on the other: the layer looks raised.">
+        <Slider label="Size" min="1" max="60" value={fx.bevel.size} onInput={f('fx.bevel.size')} />
+        <Slider label="Strength" unit="%" min="0" max="100" value={fx.bevel.depth} onInput={f('fx.bevel.depth')} />
+        <Slider label="Light from" unit="°" min="-180" max="180" value={fx.bevel.angle} onInput={f('fx.bevel.angle')} />
+        <label class="pb-row"><span class="pb-row-label">Light</span><ColourField label="Light" value={fx.bevel.highlight} onChange={set('fx.bevel.highlight')} /></label>
+        <label class="pb-row"><span class="pb-row-label">Shade</span><ColourField label="Shade" value={fx.bevel.shade} onChange={set('fx.bevel.shade')} /></label>
+      </Fx>
+      <Fx title="Tilt in 3D" on={fx.tilt.on} onToggle={set('fx.tilt.on')} hint="Leans the layer back in perspective, about its middle.">
+        <Slider label="Lean back" unit="°" min="-80" max="80" value={fx.tilt.tiltX} onInput={f('fx.tilt.tiltX')} />
+        <Slider label="Turn" unit="°" min="-80" max="80" value={fx.tilt.tiltY} onInput={f('fx.tilt.tiltY')} />
+        <Slider label="Camera" min="0.3" max="6" step="0.1" value={fx.tilt.distance} onInput={f('fx.tilt.distance')} />
+      </Fx>
+      <Fx title="Glitch" on={fx.glitch.on} onToggle={set('fx.glitch.on')} hint="Slices torn sideways, like a broken signal.">
+        <Slider label="Amount" unit="px" min="1" max="200" value={fx.glitch.amount} onInput={f('fx.glitch.amount')} />
+        <Slider label="Slices" min="2" max="60" value={fx.glitch.slices} onInput={f('fx.glitch.slices')} />
+        <Check label="Changes every step" checked={fx.glitch.animate} onChange={f('fx.glitch.animate')} />
+      </Fx>
+      <Fx title="Scanlines" on={fx.scanlines.on} onToggle={set('fx.scanlines.on')} hint="Thin lines across it, like an old screen.">
+        {colourOf(layer, 'fx.scanlines', 'Lines')}
+        <Slider label="Spacing" min="2" max="40" value={fx.scanlines.gap} onInput={f('fx.scanlines.gap')} />
+      </Fx>
+      <Fx title="Pixelate" on={fx.pixelate.on} onToggle={set('fx.pixelate.on')} hint="Big square pixels.">
+        <Slider label="Pixel size" min="2" max="80" value={fx.pixelate.size} onInput={f('fx.pixelate.size')} />
+      </Fx>
+      <Fx title="Blur" on={fx.blur.on} onToggle={set('fx.blur.on')} hint="Softens the whole layer.">
+        <Slider label="Amount" unit="px" min="1" max="60" value={fx.blur.amount} onInput={f('fx.blur.amount')} />
+      </Fx>
+      <h3 class="pb-divider">Over the steps</h3>
       <Fx title="Fade with progress" on={fx.fade.on} onToggle={set('fx.fade.on')} hint="Fades the layer in (or out) as the bar fills.">
         <Slider label="When empty" unit="%" min="0" max="100" value={fx.fade.from} onInput={f('fx.fade.from')} />
         <Slider label="When full" unit="%" min="0" max="100" value={fx.fade.to} onInput={f('fx.fade.to')} />
@@ -481,6 +554,16 @@ function BarStroke({ layer }) {
         <Picks title="Sits" options={STROKE_POSITIONS} value={st.position} onPick={set('stroke.position')} />
         <Picks title="Around" options={STROKE_AROUND} value={st.around} onPick={set('stroke.around')} />
         <Picks title="Ends" options={CAPS} value={st.cap} onPick={set('stroke.cap')} />
+        {layer.shape === 'bar' && (
+          <>
+            <Check label="Its own roundness" checked={st.ownRadius} onChange={f('stroke.ownRadius')} />
+            {st.ownRadius ? (
+              <Slider label="Roundness" min="0" max={half(layer.w, layer.h) + 60} value={st.radius} onInput={f('stroke.radius')} />
+            ) : (
+              <p class="hint">Rounded like the bar (its Shape tab). Tick to round the outline on its own.</p>
+            )}
+          </>
+        )}
         <PaintField label="Colour" paint={st.paint} path="stroke.paint" onSet={setLayer} />
       </Fx>
       <Fx title="Fill outline" on={layer.fillStroke.on} onToggle={set('fillStroke.on')} hint="An edge round the filled part only, growing with it.">
@@ -503,6 +586,12 @@ function ShapeTab({ layer }) {
       </Fx>
       <Group title="Outline">
         <Slider label="Width" min="0" max="60" value={layer.stroke} onInput={f('stroke')} />
+        {layer.shape === 'rect' && (
+          <>
+            <Check label="Its own roundness" checked={layer.strokeOwnRadius} onChange={f('strokeOwnRadius')} />
+            {layer.strokeOwnRadius && <Slider label="Roundness" min="0" max={half(layer.w, layer.h)} value={layer.strokeRadius} onInput={f('strokeRadius')} />}
+          </>
+        )}
         <ColourAlpha
           label="Outline"
           color={layer.strokeColor}

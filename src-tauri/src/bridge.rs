@@ -13,8 +13,9 @@
 //   GET  /health
 //
 // `arayashiki.exe --mcp` is an MCP server over stdio for AI clients (Claude
-// Desktop, Cursor, VS Code…): it starts the app if it isn't running, then
-// passes each message to /mcp and prints the reply. No Node needed.
+// Desktop, Cursor, VS Code…): it answers the handshake and the tool list
+// itself, and passes tool calls to /mcp (starting the app if it isn't
+// running), printing the reply. No Node needed.
 
 use std::collections::HashMap;
 use std::io::{BufRead, BufReader, Read, Write};
@@ -302,7 +303,48 @@ fn error_reply(line: &str, message: &str) -> Option<String> {
     Some(serde_json::json!({ "jsonrpc": "2.0", "id": id, "error": { "code": -32603, "message": message } }).to_string())
 }
 
-/// Runs the stdio MCP server until stdin closes.
+const PROTOCOLS: &[&str] = &["2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05"];
+
+/// The instructions and tool list (lib/mcp-manifest.mjs writes it from
+/// agent/tool-defs.js), so the handshake never waits on the app.
+const MANIFEST: &str = include_str!("../mcp-manifest.json");
+
+/// The answer to a message that doesn't need the app (the handshake, the
+/// tool list, pings); None for a tool call, which goes to the app. A
+/// notification gets Some(None): nothing to print.
+fn answer_locally(line: &str) -> Option<Option<String>> {
+    let msg: serde_json::Value = serde_json::from_str(line).ok()?;
+    let method = msg.get("method")?.as_str()?;
+    let id = match msg.get("id") {
+        Some(id) if !id.is_null() => id.clone(),
+        _ => return Some(None), // a notification
+    };
+    let manifest: serde_json::Value = serde_json::from_str(MANIFEST).unwrap_or_default();
+    let result = match method {
+        "initialize" => {
+            let asked = msg.pointer("/params/protocolVersion").and_then(|v| v.as_str()).unwrap_or("");
+            let version = if PROTOCOLS.contains(&asked) { asked } else { PROTOCOLS[0] };
+            serde_json::json!({
+                "protocolVersion": version,
+                "capabilities": { "tools": { "listChanged": false } },
+                "serverInfo": { "name": "arayashiki", "title": "Arayashiki", "version": env!("CARGO_PKG_VERSION") },
+                "instructions": manifest["instructions"],
+            })
+        }
+        "ping" => serde_json::json!({}),
+        "tools/list" => serde_json::json!({ "tools": manifest["tools"] }),
+        "resources/list" => serde_json::json!({ "resources": [] }),
+        "resources/templates/list" => serde_json::json!({ "resourceTemplates": [] }),
+        "prompts/list" => serde_json::json!({ "prompts": [] }),
+        _ => return None,
+    };
+    Some(Some(serde_json::json!({ "jsonrpc": "2.0", "id": id, "result": result }).to_string()))
+}
+
+/// Runs the stdio MCP server until stdin closes. The handshake and the tool
+/// list are answered here at once; the app is only started (if it isn't
+/// open) for the first tool call, so an AI app starting up doesn't open
+/// Arayashiki's window, or time out waiting for it.
 pub fn run_mcp_proxy() {
     let Some(dir) = config_dir() else {
         eprintln!("No APPDATA folder");
@@ -317,23 +359,24 @@ pub fn run_mcp_proxy() {
         if line.is_empty() {
             continue;
         }
-        let mut attempt = 0;
-        let reply = loop {
-            attempt += 1;
-            if info.is_none() {
-                match connect(&dir) {
-                    Ok(i) => info = Some(i),
+        let reply = if let Some(local) = answer_locally(&line) {
+            local
+        } else {
+            let mut attempt = 0;
+            loop {
+                attempt += 1;
+                if info.is_none() {
+                    match connect(&dir) {
+                        Ok(i) => info = Some(i),
+                        Err(e) => break error_reply(&line, &e),
+                    }
+                }
+                match post(info.as_ref().unwrap(), "/mcp", &line) {
+                    Ok(body) => break if body.trim().is_empty() { None } else { Some(body) },
+                    // The app was closed (or restarted): connect again, once.
+                    Err(_) if attempt < 2 => info = None,
                     Err(e) => break error_reply(&line, &e),
                 }
-            }
-            match post(info.as_ref().unwrap(), "/mcp", &line) {
-                Ok(body) => break if body.trim().is_empty() { None } else { Some(body) },
-                // The app was closed (or restarted): connect again, once.
-                Err(e) if attempt < 2 => {
-                    let _ = e;
-                    info = None;
-                }
-                Err(e) => break error_reply(&line, &e),
             }
         };
         if let Some(reply) = reply {

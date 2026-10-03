@@ -7,14 +7,9 @@
 //
 // The tools load on the first request, so the window doesn't wait for them.
 import { isDesktop } from '../platform.js';
+import { APP_INSTRUCTIONS as INSTRUCTIONS } from '../../agent/tool-defs.js';
 
 const PROTOCOLS = ['2025-11-25', '2025-06-18', '2025-03-26', '2024-11-05'];
-const INSTRUCTIONS = [
-  'Arayashiki is a desktop app for Jujutsu Shenanigans (Roblox) Skill Builder skills; these tools work on it while it is open.',
-  'The app_* tools act on what the user has open: app_state first, then app_get_skills / app_put_skills to edit the moveset in place (every change is undoable with Ctrl+Z), app_simulate and app_playback to run it, app_screenshot to see it, app_export_video to render it, app_animate to keyframe a mesh or camera.',
-  'A "code" is the text JJS copies out (base64 of zstd JSON, starts "KLUv/"). To build a new move: search_library for the closest real move, get_library_move for its nodes, node_reference for fields, adapt, validate, then app_put_skills.',
-  "The simulator is a model of JJS's rules read from real exports, not the game: timings and damage are close, not exact. The handbook says what is confirmed and what is inferred.",
-].join('\n');
 
 let registry = null;
 const tools = () => (registry ??= import('./registry.js'));

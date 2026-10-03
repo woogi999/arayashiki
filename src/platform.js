@@ -20,6 +20,14 @@ const tauri = () =>
 
 const fetched = new Map(); // id → Promise<{ info, url } | null>
 
+// JJS's own effects' textures and meshes, shipped with the app
+// (lib/fetch-fx-assets.mjs), so the game's effects show without signing in.
+// Kept as files (no-inline), since a mesh is fetched and the page may only
+// fetch its own files.
+const shipped = (glob) => Object.fromEntries(Object.entries(glob).map(([p, url]) => [p.split('/').pop().split('.')[0], url]));
+const SHIPPED_IMAGES = shipped(import.meta.glob('./assets/jjs-fx-assets/*.png', { query: '?url&no-inline', import: 'default', eager: true }));
+const SHIPPED_MESHES = shipped(import.meta.glob('./assets/jjs-fx-assets/*.mesh', { query: '?url&no-inline', import: 'default', eager: true }));
+
 const validId = (id) => /^\d{1,20}$/.test(String(id ?? '').trim()) && String(id).trim() !== '0';
 
 /** Everything about an asset, and a URL for its file: { info, url } or null. */
@@ -42,6 +50,8 @@ export function robloxAsset(id) {
 
 /** A Roblox image ID (or a decal's) to a picture URL, or null. */
 export async function robloxImage(id) {
+  const own = SHIPPED_IMAGES[String(id ?? '').trim()];
+  if (own) return own;
   // The Vite dev server's stand-in (vite.config.js), in the plain browser.
   if (!isDesktop && import.meta.env?.DEV && validId(id)) return `/rbx-image/${String(id).trim()}`;
   const got = await robloxAsset(id);
@@ -64,6 +74,8 @@ export async function robloxSoundBytes(id) {
 
 /** A Roblox mesh's .mesh bytes (an ArrayBuffer), or null. */
 export async function robloxMesh(id) {
+  const own = SHIPPED_MESHES[String(id ?? '').trim()];
+  if (own) return fetch(own).then((r) => (r.ok ? r.arrayBuffer() : null)).catch(() => null);
   if (!isDesktop || !validId(id)) return null;
   const got = await robloxAsset(id);
   if (got?.info.mime !== 'application/x-roblox-mesh') return null;

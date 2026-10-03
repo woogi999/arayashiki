@@ -111,3 +111,11 @@ describe('MCP server', () => {
     }
   });
 });
+
+describe('the app MCP manifest', () => {
+  it('src-tauri/mcp-manifest.json matches agent/tool-defs.js (run node lib/mcp-manifest.mjs)', async () => {
+    const fs = await import('node:fs');
+    const { MANIFEST, manifestText } = await import('../lib/mcp-manifest.mjs');
+    assert.equal(fs.readFileSync(MANIFEST, 'utf8').replace(/\r\n/g, '\n'), manifestText());
+  });
+});

@@ -127,6 +127,8 @@ export const ACTIONS = [
   { id: 'barShape', group: 'Meter Maker', label: 'Tool: Shape', def: 'U', scope: 'bars' },
   { id: 'barText', group: 'Meter Maker', label: 'Tool: Text', def: 'T', scope: 'bars' },
   { id: 'barFit', group: 'Meter Maker', label: 'Fit the canvas in view', def: 'Ctrl+0', scope: 'bars' },
+  { id: 'barRulers', group: 'Meter Maker', label: 'Rulers and guides on / off', def: 'Ctrl+R', scope: 'bars' },
+  { id: 'barSnap', group: 'Meter Maker', label: 'Snapping on / off', def: 'Ctrl+;', scope: 'bars' },
   { id: 'barPrevStep', group: 'Meter Maker', label: 'Previous step', def: ',', scope: 'bars' },
   { id: 'barNextStep', group: 'Meter Maker', label: 'Next step', def: '.', scope: 'bars' },
 ];

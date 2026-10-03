@@ -10,6 +10,7 @@ import { Icon } from '../icons.jsx';
 import { Button, IconButton } from '../ui/controls.jsx';
 import { PROVIDERS, keyStatus, listModels, providerOf, resultsMessages, setKey, turn, userMessage } from './providers.js';
 import { TOOLS, callTool } from './registry.js';
+import { CLI_TOOLS, cliInstall, cliSignIn, cliSignOut, cliStatus, cliTurn } from './cli.js';
 import { isDesktop, openExternal } from '../platform.js';
 import { lazy } from '../ui/lazy.jsx';
 
@@ -52,6 +53,98 @@ const active = () => {
 const keys = signal({});
 const refreshKeys = () => keyStatus().then((k) => (keys.value = k ?? {}));
 
+// The subscription CLIs: installed? signed in? (by tool: claude, codex, gemini)
+const cliState = signal({});
+const refreshCli = (tool) =>
+  cliStatus(tool)
+    .then((st) => (cliState.value = { ...cliState.peek(), [tool]: st }))
+    .catch(() => {});
+
+/** Signing in with a subscription: install the CLI if needed, then sign in through it. */
+function CliAccount({ tool, model, onModel }) {
+  const info = CLI_TOOLS[tool];
+  const st = cliState.value[tool];
+  const [waiting, setWaiting] = useState(null); // 'install' | 'sign-in'
+  const [note, setNote] = useState(null);
+  useEffect(() => {
+    refreshCli(tool);
+  }, [tool]);
+  // While a sign-in or install window is open, watch for it to finish.
+  useEffect(() => {
+    if (!waiting) return;
+    const timer = setInterval(async () => {
+      await refreshCli(tool);
+      const now = cliState.peek()[tool];
+      if ((waiting === 'install' && now?.installed) || (waiting === 'sign-in' && now?.signedIn)) setWaiting(null);
+    }, 2000);
+    const stop = setTimeout(() => setWaiting(null), 10 * 60 * 1000);
+    return () => (clearInterval(timer), clearTimeout(stop));
+  }, [waiting, tool]);
+  const act = async (what, fn) => {
+    setNote(null);
+    try {
+      await fn();
+      setWaiting(what);
+    } catch (e) {
+      setNote(String(e?.message ?? e));
+    }
+  };
+  return (
+    <div class="ai-cli">
+      {!st ? (
+        <p class="hint">Looking for {info.name}…</p>
+      ) : !st.installed ? (
+        <>
+          <p class="hint">
+            Uses your {info.plan} instead of an API key, through {info.name}, {tool === 'claude' ? 'Anthropic’s' : tool === 'codex' ? 'OpenAI’s' : 'Google’s'} own app
+            (the way the Claude Code extension for VS Code works). It isn’t on this PC yet.
+          </p>
+          <Button variant="primary" icon="download" disabled={waiting === 'install'} onClick={() => act('install', () => cliInstall(tool))}>
+            {waiting === 'install' ? 'Installing… (see the window)' : `Install ${info.name}`}
+          </Button>
+        </>
+      ) : !st.signedIn ? (
+        <>
+          <p class="hint">
+            {info.name} is installed{st.version ? ` (${st.version})` : ''}. Sign in with your {info.plan}: a window opens and takes you to{' '}
+            {tool === 'claude' ? 'Claude’s' : tool === 'codex' ? 'ChatGPT’s' : 'Google’s'} sign-in page in your browser.
+            {tool === 'gemini' && ' In the window, pick “Sign in with Google”, then close it once you’re in.'}
+          </p>
+          <Button variant="primary" icon="user-round" disabled={waiting === 'sign-in'} onClick={() => act('sign-in', () => cliSignIn(tool))}>
+            {waiting === 'sign-in' ? 'Waiting for the sign-in…' : 'Sign in'}
+          </Button>
+        </>
+      ) : (
+        <>
+          <p class="hint ok">
+            Signed in{st.account ? ` as ${st.account}` : ''}
+            {st.plan ? ` (${st.plan})` : ''}, through {info.name}. Usage counts against your plan.
+          </p>
+          <div class="modal-actions">
+            <Button onClick={() => act(null, () => cliSignOut(tool).then(() => refreshCli(tool)))}>
+              Sign out
+            </Button>
+          </div>
+        </>
+      )}
+      {st?.installed && (
+        <label class="prop-row">
+          <span>Model</span>
+          <span class="ai-model">
+            <input class="input" list="ai-cli-models" placeholder={`${info.name}’s default`} value={model} onChange={(e) => onModel(e.currentTarget.value.trim())} />
+            <datalist id="ai-cli-models">
+              {info.models.map((m) => (
+                <option key={m} value={m} />
+              ))}
+            </datalist>
+          </span>
+        </label>
+      )}
+      {note && <p class="hint error">{note}</p>}
+    </div>
+  );
+}
+
 // ─── The conversation ───────────────────────────────────────────────────
 
 // What's shown: { role: 'user'|'assistant'|'tool'|'note', text, thinking?, name?, input?, result?, error?, image? }
@@ -81,12 +174,44 @@ const push = (m) => {
   return shown.value.length - 1;
 };
 
+// A subscription CLI keeps the conversation itself: only its session id is kept here.
+let cliSession = null;
+
+async function sendCli(text, c) {
+  push({ role: 'user', text });
+  busy.value = true;
+  const controller = new AbortController();
+  stopper = () => controller.abort();
+  try {
+    cliSession = await cliTurn({
+      tool: providerOf(c.provider).cli,
+      prompt: `${text}\n\n${contextLine()}`,
+      system: SYSTEM,
+      session: cliSession,
+      model: c.model,
+      signal: controller.signal,
+      ui: { push, update },
+    });
+  } catch (error) {
+    if (error?.name !== 'AbortError') push({ role: 'note', error: true, text: friendly(error) });
+    else push({ role: 'note', text: 'Stopped.' });
+  } finally {
+    // Tools still spinning when it ended didn't finish.
+    shown.value = shown.value.map((m) => (m.running ? { ...m, running: false, error: true, result: m.result || 'Not finished.' } : m));
+    busy.value = false;
+    stopper = null;
+  }
+}
+
 async function send(text) {
   const c = active();
   if (historyFor !== c.provider) {
     history = [];
+    cliSession = null;
     historyFor = c.provider;
   }
+  if (providerOf(c.provider).cli) return sendCli(text, c);
+  const mark = history.length;
   push({ role: 'user', text });
   history.push(userMessage(c, `${text}\n\n${contextLine()}`));
   busy.value = true;
@@ -150,6 +275,9 @@ async function send(text) {
 
 function friendly(error) {
   const m = String(error?.message ?? error);
+  const cli = providerOf(config.peek().provider).cli;
+  if (cli && /not logged in|log ?in|sign ?in|unauthori[sz]ed|401|expired/i.test(m)) return `${CLI_TOOLS[cli].name} isn’t signed in (or the sign-in expired): sign in again in the settings (gear). (${m.slice(0, 200)})`;
+  if (cli) return m.slice(0, 800);
   if (/401|authentication|invalid.*key|api key/i.test(m)) return `The service didn’t accept the key. Check it in the settings (gear). (${m.slice(0, 200)})`;
   if (/429|rate/i.test(m)) return `Too many requests for now: wait a moment and try again. (${m.slice(0, 200)})`;
   if (config.peek().provider === 'local') return m.slice(0, 800);
@@ -160,6 +288,7 @@ function friendly(error) {
 function clearChat() {
   shown.value = [];
   history = [];
+  cliSession = null;
 }
 
 // ─── The panel ──────────────────────────────────────────────────────────
@@ -207,6 +336,7 @@ function Settings({ onDone }) {
           ))}
         </select>
       </label>
+      {p.cli && <CliAccount tool={p.cli} model={c.models[c.provider] ?? ''} onModel={(m) => setConfig({ models: { ...c.models, [c.provider]: m } })} />}
       {p.builtin && (
         <LocalModels
           model={c.models.local ?? ''}
@@ -227,7 +357,7 @@ function Settings({ onDone }) {
           />
         </label>
       )}
-      {!p.builtin && (
+      {!p.builtin && !p.cli && (
       <label class="prop-row">
         <span>Model</span>
         <span class="ai-model">
@@ -259,7 +389,7 @@ function Settings({ onDone }) {
           </select>
         </label>
       )}
-      {!p.local && (
+      {!p.local && !p.cli && (
         <>
           <label class="prop-row">
             <span>API key {hasKey ? <span class="ok-dot" title="A key is saved">●</span> : null}</span>
@@ -379,9 +509,12 @@ export function AssistantPanel() {
     input.current?.focus();
   }, []);
   useEffect(() => {
+    if (p.cli) refreshCli(p.cli);
+  }, [p.cli]);
+  useEffect(() => {
     list.current?.scrollTo({ top: list.current.scrollHeight });
   }, [shown.value]);
-  const ready = isDesktop && (p.local || keys.value[c.provider]);
+  const ready = isDesktop && (p.cli ? cliState.value[p.cli]?.signedIn : p.local || keys.value[c.provider]);
   const go = () => {
     const t = text.trim();
     if (!t || busy.peek()) return;
@@ -394,7 +527,7 @@ export function AssistantPanel() {
         <Icon name="bot" size={15} />
         <strong>Assistant</strong>
         <button type="button" class="assistant-model" title="Change the AI" onClick={() => setSettings(!settings)}>
-          {c.models[c.provider] ?? p.model ?? p.label}
+          {c.models[c.provider] || p.model || p.label}
         </button>
         <span class="spacer" />
         <IconButton icon="trash-2" size={13} label="Clear the chat" onClick={clearChat} disabled={busy.value} />
@@ -411,7 +544,7 @@ export function AssistantPanel() {
                 <div class="assistant-intro">
                   <h3>Bring your own AI</h3>
                   <p class="hint">
-                    Pick the AI you use and paste its API key, or run a free model on this PC: pick “On this PC” in the
+                    Sign in with your Claude, ChatGPT or Google plan (no API key needed), paste an API key, or run a free model on this PC: pick “On this PC” in the
                     settings and download one (Qwen, Gemma, gpt-oss…). Ollama and LM Studio work too. The assistant can read and edit the open moveset, simulate it, look at the viewport, export videos and animate
                     cameras. Everything it changes can be undone with Ctrl+Z.
                   </p>

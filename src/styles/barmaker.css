@@ -146,6 +146,56 @@
   grid-area: view;
 }
 
+.pb-rulerframe {
+  display: grid;
+  flex: 1;
+  grid-template: 1fr / 1fr;
+  min-height: 0;
+  min-width: 0;
+}
+
+.pb-rulerframe.has-rulers {
+  grid-template: 18px 1fr / 18px 1fr;
+}
+
+.pb-rulerframe > .pb-canvas-area {
+  grid-row: -2;
+  grid-column: -2;
+}
+
+.pb-ruler {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #141414;
+  cursor: default;
+  touch-action: none;
+}
+
+.pb-ruler.is-top {
+  grid-row: 1;
+  grid-column: 2;
+  border-bottom: 1px solid #070707;
+  cursor: row-resize;
+}
+
+.pb-ruler.is-left {
+  grid-row: 2;
+  grid-column: 1;
+  border-right: 1px solid #070707;
+  cursor: col-resize;
+}
+
+.pb-ruler-corner {
+  grid-row: 1;
+  grid-column: 1;
+  padding: 0;
+  border: 0;
+  border-right: 1px solid #070707;
+  border-bottom: 1px solid #070707;
+  background: #141414;
+}
+
 .pb-canvas-area {
   display: grid;
   flex: 1;

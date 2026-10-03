@@ -143,24 +143,120 @@ function ToolOptions() {
 
 // ─── The picture ────────────────────────────────────────────────────────
 
+// Rulers along the top and left, in the picture's pixels, wherever it's
+// scrolled or zoomed to. Drag out of one for a guide.
+const RULER = 18;
+const TICK_STEPS = [1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000];
+
+function drawRuler(el, axis, area, box) {
+  if (!el || !area || !box) return;
+  const dpr = devicePixelRatio || 1;
+  const r = el.getBoundingClientRect();
+  const w = Math.max(1, Math.round(r.width * dpr));
+  const h = Math.max(1, Math.round(r.height * dpr));
+  if (el.width !== w) el.width = w;
+  if (el.height !== h) el.height = h;
+  const ctx = el.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, r.width, r.height);
+  const b = box.getBoundingClientRect();
+  const d = B.doc.value;
+  const along = axis === 'x';
+  // Screen pixels per picture pixel, and where picture 0 sits on the ruler.
+  const k = along ? b.width / d.width : b.height / d.height;
+  const zero = along ? b.left - r.left : b.top - r.top;
+  const len = along ? r.width : r.height;
+  const major = TICK_STEPS.find((s) => s * k >= 60) ?? 1000;
+  const minor = TICK_STEPS.slice()
+    .reverse()
+    .find((s) => s < major && major % s === 0 && s * k >= 6);
+  const from = Math.floor(-zero / k / (minor ?? major)) * (minor ?? major);
+  const to = (len - zero) / k;
+  ctx.strokeStyle = '#555';
+  ctx.fillStyle = '#8a8a8a';
+  ctx.font = '9px "IBM Plex Mono", monospace';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  for (let v = from; v <= to; v += minor ?? major) {
+    const at = Math.round(zero + v * k) + 0.5;
+    const big = v % major === 0;
+    const half = !big && minor && (v * 2) % major === 0;
+    const size = big ? RULER : half ? RULER * 0.45 : RULER * 0.25;
+    if (along) {
+      ctx.moveTo(at, RULER);
+      ctx.lineTo(at, RULER - size);
+    } else {
+      ctx.moveTo(RULER, at);
+      ctx.lineTo(RULER - size, at);
+    }
+    if (big) {
+      if (along) ctx.fillText(String(v), at + 3, 9);
+      else {
+        ctx.save();
+        ctx.translate(9, at + 3);
+        ctx.rotate(-Math.PI / 2);
+        ctx.textAlign = 'right';
+        ctx.fillText(String(v), 0, 0);
+        ctx.restore();
+      }
+    }
+  }
+  ctx.stroke();
+  // The picture's own extent, and its middle.
+  ctx.fillStyle = 'rgba(255,255,255,0.05)';
+  const full = (along ? d.width : d.height) * k;
+  if (along) ctx.fillRect(zero, 0, full, RULER);
+  else ctx.fillRect(0, zero, RULER, full);
+  ctx.fillStyle = '#ff3df2';
+  const mid = zero + full / 2;
+  if (along) ctx.fillRect(mid - 0.5, RULER - 4, 1, 4);
+  else ctx.fillRect(RULER - 4, mid - 0.5, 4, 1);
+  // Where the pointer is.
+  const p = B.pointerAt.value;
+  if (p) {
+    ctx.fillStyle = '#36c5f0';
+    const at = zero + (along ? p.x : p.y) * k;
+    if (along) ctx.fillRect(at - 0.5, 0, 1, RULER);
+    else ctx.fillRect(0, at - 0.5, RULER, 1);
+  }
+}
+
 function Workspace() {
   const canvas = useRef(null);
   const overlay = useRef(null);
+  const area = useRef(null);
+  const box = useRef(null);
+  const top = useRef(null);
+  const left = useRef(null);
+  const showRulers = B.rulers.value;
+  const redrawRulers = () => {
+    if (!B.rulers.peek()) return;
+    drawRuler(top.current, 'x', area.current, box.current);
+    drawRuler(left.current, 'y', area.current, box.current);
+  };
   useEffect(() => {
     B.bindCanvas(canvas.current);
     B.bindOverlay(overlay.current);
-    const watcher = new ResizeObserver(() => B.measure());
+    const watcher = new ResizeObserver(() => {
+      B.measure();
+      redrawRulers();
+    });
     watcher.observe(overlay.current);
+    watcher.observe(area.current);
     return () => {
       watcher.disconnect();
       B.bindCanvas(null);
       B.bindOverlay(null);
     };
   }, []);
+  // The rulers follow the zoom, the pointer and the picture's size.
+  useEffect(() => {
+    requestAnimationFrame(redrawRulers);
+  }, [showRulers, B.zoom.value, B.viewScale.value, B.pointerAt.value, B.doc.value.width, B.doc.value.height]);
   const { width, height } = B.doc.value;
   const z = B.zoom.value;
   // Fits the workspace either way round, from its container's size.
-  const box = z
+  const fit = z
     ? { width: `${width * z}px`, height: `${height * z}px` }
     : { aspectRatio: `${width}/${height}`, width: `min(calc(100cqw - 40px), calc((100cqh - 40px) * ${width / height}))` };
   const drop = (event) => {
@@ -169,27 +265,39 @@ function Workspace() {
     B.addPictures([...(event.dataTransfer?.files ?? [])]);
   };
   return (
-    <div
-      class={`pb-canvas-area ${B.dragging.value ? 'is-dragging' : ''}`}
-      onDragOver={(e) => {
-        e.preventDefault();
-        B.dragging.value = true;
-      }}
-      onDragLeave={() => (B.dragging.value = false)}
-      onDrop={drop}
-      onWheel={B.wheel}
-    >
-      <div class="pb-canvas-box checker" style={box}>
-        <canvas class="pb-canvas" ref={canvas} />
-        <canvas
-          class="pb-overlay"
-          data-tool={B.tool.value}
-          ref={overlay}
-          onPointerDown={B.pointerDown}
-          onPointerMove={B.pointerMove}
-          onPointerUp={B.pointerUp}
-          onPointerCancel={B.pointerUp}
-        />
+    <div class={`pb-rulerframe ${showRulers ? 'has-rulers' : ''}`}>
+      {showRulers && (
+        <>
+          <button type="button" class="pb-ruler-corner" title="Hide the rulers (Ctrl+R)" aria-label="Hide the rulers" onClick={B.toggleRulers} />
+          <canvas class="pb-ruler is-top" ref={top} title="Drag down for a guide" onPointerDown={(e) => B.startGuide('y', e)} />
+          <canvas class="pb-ruler is-left" ref={left} title="Drag right for a guide" onPointerDown={(e) => B.startGuide('x', e)} />
+        </>
+      )}
+      <div
+        ref={area}
+        class={`pb-canvas-area ${B.dragging.value ? 'is-dragging' : ''}`}
+        onScroll={redrawRulers}
+        onDragOver={(e) => {
+          e.preventDefault();
+          B.dragging.value = true;
+        }}
+        onDragLeave={() => (B.dragging.value = false)}
+        onDrop={drop}
+        onWheel={B.wheel}
+      >
+        <div class="pb-canvas-box checker" ref={box} style={fit}>
+          <canvas class="pb-canvas" ref={canvas} />
+          <canvas
+            class="pb-overlay"
+            data-tool={B.tool.value}
+            ref={overlay}
+            onPointerDown={B.pointerDown}
+            onPointerMove={B.pointerMove}
+            onPointerUp={B.pointerUp}
+            onPointerCancel={B.pointerUp}
+            onPointerLeave={() => (B.pointerAt.value = null)}
+          />
+        </div>
       </div>
     </div>
   );
@@ -703,6 +811,28 @@ function SkillExport() {
               />
             </label>
           )}
+          {B.separate.value && B.sepParts.value.front && (
+            <label class="pb-num">
+              <span>Front (what’s over the meter and never changes)</span>
+              <input type="text" class="input num" spellcheck={false} placeholder="One image ID" value={j.frontId} onInput={(e) => B.setJjs('frontId', e.currentTarget.value)} />
+            </label>
+          )}
+          {B.separate.value &&
+            B.sepParts.value.extras.map((x) => (
+              <label class="pb-num" key={x.key}>
+                <span>
+                  {x.label}: shown on {x.steps.length === 1 ? 'that step' : 'those steps'} only ({x.above ? 'over' : 'under'} the meter)
+                </span>
+                <input
+                  type="text"
+                  class="input num"
+                  spellcheck={false}
+                  placeholder="One image ID"
+                  value={j.extraIds?.[x.key] ?? ''}
+                  onInput={(e) => B.setJjs('extraIds', { ...(j.extraIds ?? {}), [x.key]: e.currentTarget.value })}
+                />
+              </label>
+            ))}
           {B.separate.value && <span class="pb-ids-label">Meter, one per step</span>}
           <textarea
             class="input num pb-ids"
@@ -798,7 +928,7 @@ function SkillExport() {
             {j.style === 'legacy'
               ? 'Legacy shows the step again and again, every wait: simple, but it can lag.'
               : j.style === 'separate'
-                ? `Complex Separate draws the meter in layers, each its own billboard a thousandth of a stud apart in z (the more negative, the further in front): the container (background and outline) once, at the back, for good; then only the meter is swapped as the tag changes.${B.wantsTrail.value ? ' When it goes down, the step it left flashes its catch-up trail behind the meter and fades.' : ' Turn on a bar’s catch-up trail (Fill) to flash it behind the meter when it goes down.'}`
+                ? `Complex Separate draws the meter in layers, each its own billboard a thousandth of a stud apart in z (the more negative, the further in front): the container (background, outline, and the layers under the bar that never change) once, at the back, for good; then only the meter is swapped as the tag changes, with the bar’s inner shadow and outline baked in where it covers them.${B.sepParts.value.front ? ' Layers over the bar that never change are the front, shown once in front of the meter.' : ''}${B.sepParts.value.extras.length ? ` ${B.sepParts.value.extras.length === 1 ? 'A layer shown on some steps only is its own picture' : 'Layers shown on some steps only are pictures of their own'}, drawn on those steps and taken off the rest.` : ''}${B.wantsTrail.value ? ' When it goes down, the step it left flashes its catch-up trail behind the meter and fades.' : ' Turn on a bar’s catch-up trail (Fill) to flash it behind the meter when it goes down.'}`
                 : 'Complex shows each step once and keeps it, cancelling the others by their visual tags, then loops on its checks: lag-proof, and far too many nodes to build by hand.'}
           </p>
           <div class="prop-row">

@@ -1372,6 +1372,18 @@ export const TEMPLATES = [
       },
     ],
     build: autoSheath,
+    // What the Templates dialog's 3D preview wears (src/ui/sheath-preview.js):
+    // the weapon sheathed (and the scabbard, always) and drawn.
+    sheathPreview: (v) => {
+      const weapon = { mesh: id(v.mesh), texture: id(v.texture), size: Number(v.scale) || 0.12 };
+      const scabbard = v.scabbard
+        ? [{ mesh: id(v.scabbardMesh), texture: id(v.scabbardTexture), size: Number(v.scale) || 0.12, part: v.holsterPart, position: text(v.scabbardPosition, '0, 0, 0'), rotation: text(v.scabbardRotation, '0, 0, 0') }]
+        : [];
+      return {
+        sheathed: [...scabbard, { ...weapon, part: v.holsterPart, position: text(v.holsterPosition, '0, 0, 0'), rotation: text(v.holsterRotation, '0, 0, 0') }],
+        drawn: [...scabbard, { ...weapon, part: v.handPart, position: text(v.handPosition, '0, 0, 0'), rotation: text(v.handRotation, '0, 0, 0') }],
+      };
+    },
   },
   {
     id: 'accurate-m1s',

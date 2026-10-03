@@ -9,7 +9,7 @@
 
 import { z } from 'zod';
 import * as T from '../../agent/tools-core.js';
-import { APP_TOOLS, ENGINE_TOOLS } from '../../agent/tool-defs.js';
+import { APP_TOOLS, ENGINE_TOOLS, OPEN_IN_APP, inputSchemaOf } from '../../agent/tool-defs.js';
 import { decodeMoveset, encodeMoveset, newUid } from '../../core/format.js';
 import * as S from '../store.js';
 import { robloxDescribe } from '../platform.js';
@@ -299,30 +299,21 @@ const assetInfo = async ({ ids, select, ...input }) => {
   return { assets: await Promise.all(list.map(async (id) => ({ id, ...((await robloxDescribe(id)) ?? { error: 'Roblox could not be reached.' }) }))) };
 };
 
-const schemaOf = (shape) => {
-  const s = z.toJSONSchema(z.object(shape), { target: 'draft-7', io: 'input', unrepresentable: 'any' });
-  delete s.$schema;
-  return s;
-};
-
 export const TOOLS = [
   ...ENGINE_TOOLS.map((t) => ({
     ...t,
     kind: 'engine',
-    inputSchema: schemaOf(t.shape),
+    inputSchema: inputSchemaOf(t.shape),
     validate: z.object(t.shape),
     call: async (args) => json(t.name === 'asset_info' ? await assetInfo(args) : await t.run(T, args)),
   })),
   {
-    name: 'open_in_app',
-    title: 'Open skills as the moveset',
-    description: 'Opens skills (or a code) in the app as the whole moveset, replacing what is open (undoable). To change part of the moveset, use app_put_skills.',
-    shape: { code: z.string().optional(), skills: z.array(z.record(z.string(), z.any())).optional(), name: z.string().optional() },
+    ...OPEN_IN_APP,
     kind: 'app',
     call: async (args) => json(await T.openInApp(args)),
   },
   ...APP_TOOLS.map((t) => ({ ...t, kind: 'app', call: (args) => APP[t.name](args ?? {}) })),
-].map((t) => ({ ...t, inputSchema: t.inputSchema ?? schemaOf(t.shape), validate: t.validate ?? z.object(t.shape) }));
+].map((t) => ({ ...t, inputSchema: t.inputSchema ?? inputSchemaOf(t.shape), validate: t.validate ?? z.object(t.shape) }));
 
 const byName = new Map(TOOLS.map((t) => [t.name, t]));
 

@@ -247,7 +247,7 @@ function poseIndex(anim) {
 }
 
 function resetPose(r) {
-  for (const limb of [r.rightArm, r.leftArm, r.rightLeg, r.leftLeg]) limb.rotation.set(0, 0, 0);
+  for (const limb of [r.head, r.rightArm, r.leftArm, r.rightLeg, r.leftLeg]) limb.rotation.set(0, 0, 0);
   r.body.rotation.set(0, 0, 0);
   r.body.position.set(0, 0, 0);
 }
@@ -488,6 +488,10 @@ export function mountSkillScene(host, { textureUrl = async () => null, meshData 
   let editReady = false;
   let editState = null; // { branch, index, mode, space, onEdit, onEnd }
   let editDrag = null; // the frame at the drag's start
+  // The impact frame's pose tool (see Posing, below).
+  let pose = null;
+  let poseState = null; // { who, part, mode: 'rotate' | 'ik' | 'move', onPose(pose), onPick(who, part) }
+  let poseDrag = null;
   let track = null; // the auto camera's track for this run, made when first needed
   // A camera to look through while editing one (the animator's preview):
   // t → { position, quaternion, fov } or null. It comes before any mode.
@@ -586,10 +590,12 @@ export function mountSkillScene(host, { textureUrl = async () => null, meshData 
       if (e.kind === 'ANIM') POSES[poseIndex(e.node.ANIM_USE)](r, Math.sin(p * Math.PI), p);
       if (e.kind === 'STATE' && e.node.STATE === 'Stun' && e.who === 'target') r.body.rotation.x = -0.25;
     }
+    for (const who of ['user', 'target']) applyPose(who, people[who]);
     // Ragdolled: the loose parts, where the baked ragdoll has them.
     for (const who of ['user', 'target']) {
       const r = people[who];
-      const frame = ragdollFrame(baked, who, t);
+      // A posed rig stays a rig.
+      const frame = pose?.[who] ? null : ragdollFrame(baked, who, t);
       const ok = frame && Object.values(frame).every((v) => v.every(Number.isFinite));
       r.body.visible = !ok;
       r.ragdoll.group.visible = Boolean(ok);
@@ -1435,7 +1441,7 @@ export function mountSkillScene(host, { textureUrl = async () => null, meshData 
   /** Puts the gizmo on the picked node's box or effect (unless it's being dragged). */
   function placeEdit() {
     if (!editReady || editDrag) return;
-    const e = editState && editState.mode !== 'select' && !playing && !previewCamera ? editEvent() : null;
+    const e = editState && editState.mode !== 'select' && !playing && !previewCamera && !poseState ? editEvent() : null;
     const f = e && editFrame(e);
     if (!f || (editState.mode === 'rotate' && !f.turns) || (editState.mode === 'scale' && !f.scales)) {
       editGizmo.detach();
@@ -1500,6 +1506,140 @@ export function mountSkillScene(host, { textureUrl = async () => null, meshData 
   }
   editReady = true;
 
+  // ─── Posing (the impact frame's pose tool) ─────────────────────────────
+  // JJS's animations aren't public, so the stand-in poses can't show a hit
+  // the way the game does: for an impact frame, both rigs can be posed by
+  // hand, as in Blender. A pose overrides the rig at every time while it's
+  // set: { user?, target? }, each { joints: { part: [qx, qy, qz, qw] },
+  // move: [x, y, z], turn: radians }. Joints turn about Roblox's Motor6D
+  // points (the neck, shoulders, hips); the torso turns about the waist,
+  // carrying everything with it. An arm or leg can be posed by its end
+  // instead (IK): drag the hand or foot and the limb points at it.
+  const WAIST = new Vector3(0, 2, 0);
+  const LIMB_TIP = new Vector3(0, -2, 0);
+  const LIMBS = new Set(['Right Arm', 'Left Arm', 'Right Leg', 'Left Leg']);
+  const pivotOf = (r, part) =>
+    ({ Head: r.head, Torso: r.body, 'Right Arm': r.rightArm, 'Left Arm': r.leftArm, 'Right Leg': r.rightLeg, 'Left Leg': r.leftLeg })[part];
+
+  /** Puts the pose (if any) over what place() worked out for `r`. */
+  function applyPose(who, r) {
+    const p = pose?.[who];
+    if (!p) return;
+    if (p.move) r.root.position.add(new Vector3(...p.move));
+    if (p.turn) r.root.rotation.y += p.turn;
+    for (const [part, q] of Object.entries(p.joints ?? {})) {
+      const pivot = pivotOf(r, part);
+      if (!pivot || !q) continue;
+      pivot.quaternion.set(...q);
+      // The torso turns about the waist, not the feet.
+      if (part === 'Torso') pivot.position.copy(WAIST).sub(WAIST.clone().applyQuaternion(pivot.quaternion));
+    }
+  }
+
+  const poseProxy = new Object3D();
+  scene.add(poseProxy);
+  const poseGizmo = new TransformControls(camera, renderer.domElement);
+  poseGizmo.setSize(0.75);
+  const poseHelper = poseGizmo.getHelper();
+  poseHelper.visible = false;
+  scene.add(poseHelper);
+  poseGizmo.addEventListener('change', () => ready && render());
+
+  /** The gizmo on the picked joint: at the joint, turned as it is (or at the limb's end, for IK). */
+  function placePose() {
+    if (poseDrag) return;
+    const r = poseState && people[poseState.who];
+    if (!r || !poseState.part) {
+      poseGizmo.detach();
+      poseHelper.visible = false;
+      return;
+    }
+    const { part, mode } = poseState;
+    r.root.updateMatrixWorld(true);
+    if (mode === 'move') {
+      poseProxy.position.copy(r.root.position);
+      poseProxy.quaternion.setFromAxisAngle(new Vector3(0, 1, 0), r.root.rotation.y);
+      poseGizmo.setMode('translate');
+      poseGizmo.setSpace('world');
+    } else if (mode === 'ik' && LIMBS.has(part)) {
+      const pivot = pivotOf(r, part);
+      poseProxy.position.copy(pivot.localToWorld(LIMB_TIP.clone()));
+      poseProxy.quaternion.identity();
+      poseGizmo.setMode('translate');
+      poseGizmo.setSpace('world');
+    } else {
+      const pivot = pivotOf(r, part);
+      poseProxy.position.copy(part === 'Torso' ? r.root.localToWorld(WAIST.clone()) : pivot.getWorldPosition(new Vector3()));
+      pivot.getWorldQuaternion(poseProxy.quaternion);
+      poseGizmo.setMode('rotate');
+      poseGizmo.setSpace('local');
+    }
+    poseProxy.updateMatrixWorld();
+    poseGizmo.attach(poseProxy);
+    poseHelper.visible = true;
+  }
+
+  const setJoint = (who, part, q) => {
+    pose = { ...pose, [who]: { ...pose?.[who], joints: { ...pose?.[who]?.joints, [part]: q.toArray().map((v) => Math.round(v * 1e5) / 1e5) } } };
+  };
+
+  poseGizmo.addEventListener('dragging-changed', (ev) => {
+    poseDrag = ev.value ? { who: poseState?.who, part: poseState?.part } : null;
+    if (!ev.value) {
+      poses.clear();
+      show(time);
+      placePose();
+      poseState?.onPose?.(pose);
+    }
+  });
+  poseGizmo.addEventListener('objectChange', () => {
+    if (!poseDrag || !poseState) return;
+    const { who, part, mode } = poseState;
+    const r = people[who];
+    poseProxy.updateMatrixWorld();
+    if (mode === 'move') {
+      // Where the rig is with no move, to measure the move from.
+      const was = new Vector3(...(pose?.[who]?.move ?? [0, 0, 0]));
+      const base = r.root.position.clone().sub(was);
+      const move = poseProxy.position.clone().sub(base).toArray().map((v) => Math.round(v * 1000) / 1000);
+      pose = { ...pose, [who]: { ...pose?.[who], move } };
+    } else if (mode === 'ik' && LIMBS.has(part)) {
+      // Point the limb at the handle, turning it as little as it can.
+      const pivot = pivotOf(r, part);
+      const parent = pivot.parent;
+      parent.updateMatrixWorld(true);
+      const shoulder = pivot.getWorldPosition(new Vector3());
+      const want = poseProxy.position.clone().sub(shoulder);
+      if (want.lengthSq() < 1e-6) return;
+      const parentQ = parent.getWorldQuaternion(new Quaternion());
+      const wantLocal = want.normalize().applyQuaternion(parentQ.clone().invert());
+      const nowLocal = new Vector3(0, -1, 0).applyQuaternion(pivot.quaternion);
+      const q = new Quaternion().setFromUnitVectors(nowLocal, wantLocal).multiply(pivot.quaternion);
+      setJoint(who, part, q);
+    } else {
+      const pivot = pivotOf(r, part);
+      const parentQ = pivot.parent.getWorldQuaternion(new Quaternion());
+      setJoint(who, part, parentQ.invert().multiply(poseProxy.quaternion));
+    }
+    poses.clear();
+    show(time);
+  });
+
+  /** The pose tool: { who, part, mode, onPose, onPick } (null: off). */
+  function setPoseTool(next) {
+    poseState = next;
+    placePose();
+    placeEdit();
+    show(time);
+  }
+  /** The pose the rigs take while it's set (null: none). */
+  function setPose(next) {
+    pose = next && (next.user || next.target) ? next : null;
+    poses.clear();
+    show(time);
+    placePose();
+  }
+
   // ─── Picking ──────────────────────────────────────────────────────────
 
   const ray = new Raycaster();
@@ -1542,7 +1682,7 @@ export function mountSkillScene(host, { textureUrl = async () => null, meshData 
   const onDown = (ev) => {
     if (ev.button !== 0) return;
     downAt = [ev.clientX, ev.clientY];
-    if (!animState?.onDrag || gizmo3d.axis || editGizmo.axis || previewCamera) return;
+    if (!animState?.onDrag || gizmo3d.axis || editGizmo.axis || poseGizmo.axis || previewCamera) return;
     rayFrom(ev);
     const hit = ray.intersectObjects(animGroup.children.slice(1), false).find((h) => h.object.userData.animHandle || h.object.userData.animKey != null);
     if (!hit) return;
@@ -1560,14 +1700,15 @@ export function mountSkillScene(host, { textureUrl = async () => null, meshData 
     if (ev.button !== 0 || !downAt) return;
     const moved = Math.hypot(ev.clientX - downAt[0], ev.clientY - downAt[1]);
     downAt = null;
-    if (moved > 4 || gizmoDragging || gizmo3d.axis || editDrag || editGizmo.axis) return;
+    if (moved > 4 || gizmoDragging || gizmo3d.axis || editDrag || editGizmo.axis || poseDrag || poseGizmo.axis) return;
     rayFrom(ev);
     const additive = ev.ctrlKey || ev.metaKey;
     if (animState) {
       const key = ray.intersectObjects(animGroup.children.slice(1), false)[0];
       if (key) return onPick({ kind: 'anim-key', index: key.object.userData.animKey });
     }
-    const hits = ray.intersectObjects([fx, user.root, target.root, user.ragdoll.group, target.ragdoll.group], true);
+    // Posing, only the rigs can be clicked.
+    const hits = ray.intersectObjects(poseState ? [user.root, target.root] : [fx, user.root, target.root, user.ragdoll.group, target.ragdoll.group], true);
     for (const h of hits) {
       if (!h.object.visible) continue;
       const e = h.object.userData.event;
@@ -1577,8 +1718,10 @@ export function mountSkillScene(host, { textureUrl = async () => null, meshData 
       if (!o) continue;
       const inside = (r) => Boolean(r.root.getObjectById(o.id) || r.ragdoll.group.getObjectById(o.id));
       const who = inside(user) ? 'user' : inside(target) ? 'target' : null;
+      if (who && poseState) return poseState.onPick?.(who, o.userData.part);
       if (who) return onPick({ kind: 'character', who, part: o.userData.part, additive });
     }
+    if (poseState) return poseState.onPick?.(null, null);
     onPick({ kind: 'none', additive });
   };
   renderer.domElement.addEventListener('pointerdown', onDown, true);
@@ -1757,6 +1900,8 @@ export function mountSkillScene(host, { textureUrl = async () => null, meshData 
     silhouettes,
     setAnimOverlay,
     setEditTool,
+    setPose,
+    setPoseTool,
     /** Whether a right-drag (look) or middle-drag (pan) is going on. */
     get navigating() {
       return controls.dragging;
@@ -1813,6 +1958,7 @@ export function mountSkillScene(host, { textureUrl = async () => null, meshData 
       gizmo.dispose();
       gizmo3d.dispose();
       editGizmo.dispose();
+      poseGizmo.dispose();
       removeEventListener('keydown', snapKeys);
       removeEventListener('keyup', snapKeys);
       renderer.domElement.removeEventListener('pointerdown', onDown, true);

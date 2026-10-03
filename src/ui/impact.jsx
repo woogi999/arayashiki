@@ -2,7 +2,7 @@
 // menus, and the search): a procedural impact frame (src/impact.js) drawn
 // from the moment, picked from presets or edited, uploaded to Roblox, and
 // put into the skill there as Overlay VISUALs, a moment each.
-import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import { signal } from '@preact/signals';
 import * as S from '../store.js';
 import { account } from '../account.js';
@@ -10,11 +10,72 @@ import { saveBlob, uploadDecal } from '../platform.js';
 import { insertAt, lineTimes } from '../animator.js';
 import { DEFAULTS, PRESETS, cameraAtTime, drawFrames, impactNodes, optionsOf } from '../impact.js';
 import { Icon } from '../icons.jsx';
-import { Button, Modal, Segmented, Switch } from './controls.jsx';
+import { Button, IconButton, Modal, Segmented, Switch } from './controls.jsx';
 
 // Where it goes: { t (seconds into the skill run), local (into the open
 // branch's line), label }.
 const at = signal(null);
+
+// Posing the rigs for the frame (scene.setPose): kept while the app is open,
+// so a pose isn't lost going back and forth. `posing` is the pose tool being
+// up, with the dialog folded away so the view can be worked in.
+const pose = signal(null);
+const posing = signal(false);
+const posePick = signal(null); // { who, part }
+const poseMode = signal('ik');
+const posePreview = signal(true);
+const PART_NAMES = { Head: 'Head', Torso: 'Torso', 'Right Arm': 'Right arm', 'Left Arm': 'Left arm', 'Right Leg': 'Right leg', 'Left Leg': 'Left leg' };
+const MIRROR = { 'Right Arm': 'Left Arm', 'Left Arm': 'Right Arm', 'Right Leg': 'Left Leg', 'Left Leg': 'Right Leg', Head: 'Head', Torso: 'Torso' };
+const POSE_MODES = [
+  { id: 'ik', label: 'Reach (IK)', title: 'Drag the hand or foot: the arm or leg points at it' },
+  { id: 'rotate', label: 'Turn', title: 'Turn the joint: neck, shoulder, hip or waist' },
+  { id: 'move', label: 'Move body', title: 'Move the whole character' },
+];
+
+/** The pose tool on the scene as it stands now (or off). */
+function poseTool() {
+  const scene = S.sceneNow();
+  if (!scene?.setPoseTool) return;
+  if (!posing.value) return scene.setPoseTool(null);
+  const pick = posePick.value;
+  scene.setPoseTool({
+    who: pick?.who ?? null,
+    part: poseMode.value === 'move' ? (pick ? 'Torso' : null) : (pick?.part ?? null),
+    mode: poseMode.value,
+    onPose: (next) => (pose.value = next),
+    onPick: (who, part) => (posePick.value = who ? { who, part } : null),
+  });
+}
+
+/** A joint's pose copied onto the other side, mirrored (left for right). */
+function mirrorPick() {
+  const pick = posePick.value;
+  const q = pick && pose.value?.[pick.who]?.joints?.[pick.part];
+  if (!q || MIRROR[pick.part] === pick.part) return;
+  const [x, y, z, w] = q;
+  const other = MIRROR[pick.part];
+  const mine = pose.value[pick.who];
+  pose.value = { ...pose.value, [pick.who]: { ...mine, joints: { ...mine.joints, [other]: [x, -y, -z, w] } } };
+  S.sceneNow()?.setPose(pose.value);
+}
+
+function resetPick(all) {
+  const pick = posePick.value;
+  if (all || !pick) pose.value = null;
+  else {
+    const mine = { ...pose.value?.[pick.who] };
+    if (poseMode.value === 'move') {
+      delete mine.move;
+      delete mine.turn;
+    } else if (mine.joints) {
+      const { [pick.part]: _gone, ...rest } = mine.joints;
+      mine.joints = rest;
+    }
+    pose.value = { ...pose.value, [pick.who]: mine };
+  }
+  S.sceneNow()?.setPose(pose.value);
+  poseTool();
+}
 const r3 = (v) => Math.round(v * 1000) / 1000;
 
 /** Opens the dialog for the playhead, or for node `index` of the open branch. */
@@ -49,6 +110,17 @@ const WHO = [
   { id: 'none', label: 'None', title: 'Nobody: the background alone' },
 ];
 const SHAPES = { '16:9': 16 / 9, '16:10': 16 / 10, '21:9': 21 / 9, '4:3': 4 / 3 };
+const BODIES = [
+  { id: 'solid', label: 'Solid', title: 'Flat ink silhouettes' },
+  { id: 'smear', label: 'Smear', title: 'Torn into streaks rushing out of the hit' },
+  { id: 'edges', label: 'Edges', title: 'Soft streaks off their edges, like pencil' },
+  { id: 'rim', label: 'Rim lit', title: 'Dark, lit along the side facing the hit' },
+  { id: 'glow', label: 'Glow', title: 'Glowing streaky outlines, a colour each' },
+];
+// The preview is drawn smaller (it's redrawn as you change things); the
+// pictures that go to Roblox are drawn full size.
+const PREVIEW_WIDTH = 640;
+const FULL_WIDTH = 1024;
 
 function Colour({ label, value, onChange, optional }) {
   return (
@@ -109,31 +181,62 @@ const canvasBlob = (c) => new Promise((done) => c.toBlob(done, 'image/png'));
 export function ImpactDialog() {
   const where = at.value;
   const [data, setData] = useState(null);
-  const [preset, setPreset] = useState('anime');
-  const [opts, setOpts] = useState(() => optionsOf('anime'));
+  const [preset, setPreset] = useState('smear');
+  const [opts, setOpts] = useState(() => optionsOf('smear'));
   const [shape, setShape] = useState(SHAPES[S.aspect.peek()] ? S.aspect.peek() : '16:9');
   const [editing, setEditing] = useState(false);
   const [ids, setIds] = useState('');
   const [busy, setBusy] = useState(null);
   const [note, setNote] = useState(null);
   const [flash, setFlash] = useState(-1);
-  const close = () => (S.dialog.value = null);
+  const close = () => {
+    posing.value = false;
+    const scene = S.sceneNow();
+    scene?.setPoseTool?.(null);
+    scene?.setPose?.(null);
+    S.dialog.value = null;
+  };
+  // The rigs take the pose while the dialog is up.
+  useEffect(() => {
+    S.sceneNow()?.setPose?.(pose.peek());
+    return () => {
+      S.sceneNow()?.setPoseTool?.(null);
+      S.sceneNow()?.setPose?.(null);
+    };
+  }, []);
+  useEffect(() => {
+    poseTool();
+  }, [posing.value, posePick.value, poseMode.value]);
   const set = (patch) => {
     setOpts((o) => ({ ...o, ...patch }));
     setPreset('custom');
   };
 
   // The characters as JJS's screen will have them at that moment.
+  const moment = (width) => S.sceneNow()?.silhouettes(where.t, { width, height: Math.round(width / SHAPES[shape]) });
   useEffect(() => {
     let gone = false;
-    const scene = S.sceneNow();
-    if (!scene || !where) return;
-    const width = 1024;
-    scene.silhouettes(where.t, { width, height: Math.round(width / SHAPES[shape]) }).then((d) => !gone && setData(d));
-    return () => (gone = true);
-  }, [where?.t, shape]);
+    if (!S.sceneNow() || !where) return;
+    // A moment after the pose stops changing.
+    const timer = setTimeout(() => moment(PREVIEW_WIDTH).then((d) => !gone && setData(d)), pose.value ? 150 : 0);
+    return () => {
+      gone = true;
+      clearTimeout(timer);
+    };
+  }, [where?.t, shape, pose.value]);
 
-  const frames = useMemo(() => (data ? drawFrames(opts, data) : []), [data, opts]);
+  // Redrawn a moment after the last change, not on every step of a slider.
+  const [frames, setFrames] = useState([]);
+  useEffect(() => {
+    if (!data) return;
+    const timer = setTimeout(() => setFrames(drawFrames(opts, data)), 90);
+    return () => clearTimeout(timer);
+  }, [data, opts]);
+  /** The pictures at full size, for Roblox or a file. */
+  const fullFrames = async () => {
+    const d = await moment(FULL_WIDTH);
+    return d ? drawFrames(opts, d) : frames;
+  };
   const camera = cameraAtTime(S.run.peek(), where?.t ?? 0);
   const big = useRef(null);
   useEffect(() => {
@@ -175,10 +278,12 @@ export function ImpactDialog() {
     setNote(null);
     try {
       const got = [];
-      for (const [i, c] of frames.entries()) {
-        setBusy(`Uploading frame ${i + 1} of ${frames.length}…`);
+      setBusy('Drawing them full size…');
+      const full = await fullFrames();
+      for (const [i, c] of full.entries()) {
+        setBusy(`Uploading frame ${i + 1} of ${full.length}…`);
         const { imageId } = await uploadDecal(await canvasBlob(c), {
-          name: `Impact frame ${i + 1}/${frames.length}`,
+          name: `Impact frame ${i + 1}/${full.length}`,
           description: "An impact frame, made with Arayashiki's impact frame maker.",
         });
         got.push(imageId);
@@ -195,16 +300,26 @@ export function ImpactDialog() {
   async function savePictures() {
     const { zipSync } = await import('fflate');
     const entries = {};
-    for (const [i, c] of frames.entries())
+    const full = await fullFrames();
+    for (const [i, c] of full.entries())
       entries[`impact_${i + 1}.png`] = new Uint8Array(await (await canvasBlob(c)).arrayBuffer());
     const zip = new Blob([zipSync(entries, { level: 0 })], { type: 'application/zip' });
     const saved = await saveBlob(zip, 'impact-frame.zip', 'Zip archive');
-    if (saved) setNote(`Saved ${frames.length} pictures. Upload them, paste their image IDs below, and insert.`);
+    if (saved) setNote(`Saved ${full.length} pictures. Upload them, paste their image IDs below, and insert.`);
   }
 
   const typed = String(ids).match(/\d+/g) ?? [];
   const signedIn = account.value?.signedIn;
   if (!where) return null;
+  if (posing.value)
+    return (
+      <PoseBar
+        where={where}
+        frame={frames[0]}
+        onDone={() => (posing.value = false)}
+        onClose={close}
+      />
+    );
   return (
     <Modal title="Insert impact frame" class="modal-wide modal-impact" onClose={close}>
       <div class="imp">
@@ -256,6 +371,15 @@ export function ImpactDialog() {
               Custom
             </button>
           </div>
+          <Button
+            icon="person-standing"
+            onClick={() => {
+              S.seek(where.t);
+              posing.value = true;
+            }}
+          >
+            {pose.value ? 'Pose the fighters (posed)' : 'Pose the fighters'}
+          </Button>
           <div class="prop-row">
             <span>Who’s in it</span>
             <Segmented
@@ -296,6 +420,27 @@ export function ImpactDialog() {
           </button>
           {editing && (
             <div class="imp-edit">
+              <div class="prop-row">
+                <span>Bodies</span>
+                <Segmented label="Bodies" options={BODIES} value={opts.body} onChange={(body) => set({ body })} />
+              </div>
+              {(opts.body === 'smear' || opts.body === 'edges' || opts.body === 'glow') && (
+                <Range label="Smear length" value={opts.smear} min={0} max={150} unit="%" onChange={(smear) => set({ smear })} />
+              )}
+              {opts.body === 'smear' && <Range label="Torn up" value={opts.breakup} min={0} max={100} onChange={(breakup) => set({ breakup })} />}
+              {opts.body === 'glow' && (
+                <>
+                  <Colour label="Your glow" value={opts.userColour} onChange={(userColour) => set({ userColour })} />
+                  <Colour label="Enemy’s glow" value={opts.targetColour} onChange={(targetColour) => set({ targetColour })} />
+                </>
+              )}
+              <Range label="Focus lines" value={opts.focusLines} min={0} max={500} onChange={(focusLines) => set({ focusLines })} />
+              <Range label="Line width" value={opts.lineWidth} min={1} max={30} unit="px" onChange={(lineWidth) => set({ lineWidth })} />
+              <Range label="Clear round the hit" value={opts.clear} min={0} max={60} unit="%" onChange={(clear) => set({ clear })} />
+              <Range label="Streaks" value={opts.streaks} min={0} max={100} onChange={(streaks) => set({ streaks })} />
+              <Range label="Flare" value={opts.flare} min={0} max={100} onChange={(flare) => set({ flare })} />
+              <Range label="Zoom blur" value={opts.zoom} min={0} max={100} onChange={(zoom) => set({ zoom })} />
+              <Range label="Ink levels" value={opts.posterize} min={0} max={6} onChange={(posterize) => set({ posterize })} />
               <Colour label="Background" value={opts.background} onChange={(background) => set({ background })} />
               <Colour
                 label="Gradient to"
@@ -318,13 +463,6 @@ export function ImpactDialog() {
                 max={20}
                 unit="px"
                 onChange={(outline) => set({ outline })}
-              />
-              <Range
-                label="Speed lines"
-                value={opts.speedLines}
-                min={0}
-                max={400}
-                onChange={(speedLines) => set({ speedLines })}
               />
               <Range
                 label="Screentone"
@@ -366,10 +504,6 @@ export function ImpactDialog() {
                 max={100}
                 onChange={(vignette) => set({ vignette })}
               />
-              <label class="prop-row">
-                <span>Starburst</span>
-                <Switch checked={opts.burst} label="Starburst" onChange={(burst) => set({ burst })} />
-              </label>
               <label class="prop-row">
                 <span>Scanlines</span>
                 <Switch checked={opts.scanlines} label="Scanlines" onChange={(scanlines) => set({ scanlines })} />
@@ -438,5 +572,60 @@ export function ImpactDialog() {
         </div>
       </div>
     </Modal>
+  );
+}
+
+/**
+ * The pose tool, over the view: the dialog folds into this bar so the rigs
+ * can be clicked and dragged. A small preview of the frame can stay up.
+ */
+function PoseBar({ where, frame, onDone, onClose }) {
+  const preview = useRef(null);
+  useEffect(() => {
+    const c = preview.current;
+    if (!c || !frame) return;
+    c.width = frame.width;
+    c.height = frame.height;
+    c.getContext('2d').drawImage(frame, 0, 0);
+  }, [frame, posePreview.value]);
+  useEffect(() => {
+    const key = (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        if (posePick.value) posePick.value = null;
+        else onDone();
+      }
+    };
+    addEventListener('keydown', key);
+    return () => removeEventListener('keydown', key);
+  }, []);
+  const pick = posePick.value;
+  const who = pick ? (pick.who === 'user' ? 'You' : 'Dummy') : null;
+  return (
+    <>
+      <div class="imp-posebar" role="toolbar" aria-label="Pose the fighters">
+        <strong>Posing at {where.t}s</strong>
+        <span class="imp-posepick">
+          {pick ? `${who} · ${poseMode.value === 'move' ? 'whole body' : PART_NAMES[pick.part] ?? pick.part}` : 'Click a body part on you or the dummy'}
+        </span>
+        <Segmented label="Pose tool" options={POSE_MODES} value={poseMode.value} onChange={(m) => (poseMode.value = m)} />
+        <Button variant="ghost" icon="copy" disabled={!pick || MIRROR[pick.part] === pick.part || poseMode.value === 'move'} title="Copy this joint’s pose to the other side, mirrored" onClick={mirrorPick}>
+          Mirror
+        </Button>
+        <Button variant="ghost" icon="undo" disabled={!pick} title="Put this joint (or the body’s place) back" onClick={() => resetPick(false)}>
+          Reset
+        </Button>
+        <Button variant="ghost" icon="trash-2" disabled={!pose.value} title="Put both back as the skill has them" onClick={() => resetPick(true)}>
+          Reset all
+        </Button>
+        <Switch checked={posePreview.value} label="Show the impact frame" onChange={(on) => (posePreview.value = on)} />
+        <span class="hint">Preview</span>
+        <Button variant="primary" icon="check" onClick={onDone}>
+          Back to the frame
+        </Button>
+        <IconButton icon="x" label="Close" onClick={onClose} />
+      </div>
+      {posePreview.value && frame && <canvas ref={preview} class="imp-posepreview" aria-label="The impact frame with this pose" />}
+    </>
   );
 }

@@ -7,7 +7,7 @@ import { encodeMoveset } from '../../core/format.js';
 import { TEMPLATES, defaultsOf } from '../../core/templates.js';
 import { robloxImage } from '../platform.js';
 import { Icon } from '../icons.jsx';
-import { Button, Modal } from './controls.jsx';
+import { Button, Modal, Segmented } from './controls.jsx';
 
 const close = () => (S.dialog.value = null);
 
@@ -141,6 +141,65 @@ function BarPreview({ preview }) {
   );
 }
 
+// The auto-sheathing template's 3D preview: the weapon where the skill puts
+// it, sheathed, drawn, or both (the other state see-through).
+const SHEATH_VIEWS = [
+  { id: 'sheathed', label: 'Sheathed' },
+  { id: 'drawn', label: 'Drawn' },
+  { id: 'both', label: 'Both' },
+];
+function SheathPreview({ preview }) {
+  const host = useRef(null);
+  const scene = useRef(null);
+  const [view, setView] = useState('both');
+  const [missing, setMissing] = useState(0);
+  useEffect(() => {
+    let gone = false;
+    import('./sheath-preview.js').then(({ mountSheathScene }) => {
+      if (!gone) {
+        scene.current = mountSheathScene(host.current);
+        setView((v) => v); // draw once it's up
+      }
+    });
+    return () => {
+      gone = true;
+      scene.current?.dispose();
+    };
+  }, []);
+  const key = JSON.stringify(preview);
+  useEffect(() => {
+    let stale = false;
+    (async () => {
+      for (let i = 0; i < 40 && !scene.current && !stale; i++) await new Promise((r) => setTimeout(r, 50));
+      if (stale || !scene.current) return;
+      const items =
+        view === 'both'
+          ? [...preview.sheathed, ...preview.drawn.filter((d) => !preview.sheathed.some((s) => JSON.stringify(s) === JSON.stringify(d))).map((d) => ({ ...d, ghost: true }))]
+          : preview[view];
+      const n = await scene.current.update(items);
+      if (!stale) setMissing(n);
+    })();
+    return () => (stale = true);
+  }, [key, view]);
+  return (
+    <fieldset class="tpl-section">
+      <legend>Preview</legend>
+      <div class="pb-bar3d">
+        <div class="pb-bar3d-view" ref={host} />
+        <div class="pb-bar3d-bar">
+          <Segmented label="Weapon" options={SHEATH_VIEWS} value={view} onChange={setView} />
+          <Button onClick={() => scene.current?.resetCamera()}>Reset view</Button>
+        </div>
+        <p class="hint">
+          Where the weapon sits on an R6 body, sheathed and drawn, at these positions and rotations (“Both” shows the drawn
+          one see-through). Drag to look around.
+          {missing ? ` ${missing} mesh${missing === 1 ? '' : 'es'} couldn’t be loaded: a grey dot marks where it goes.` : ''}
+        </p>
+      </div>
+    </fieldset>
+  );
+}
+
 // The template to open on (the universal search picks one).
 export const templateToOpen = { id: null };
 
@@ -259,6 +318,7 @@ export function TemplatesDialog() {
               </fieldset>
             ))}
             {preview && <BarPreview preview={preview} />}
+            {template.sheathPreview && <SheathPreview preview={template.sheathPreview(current)} />}
             {error ? (
               <p class="error">{error}</p>
             ) : (

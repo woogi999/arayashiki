@@ -15,9 +15,11 @@
 mod account;
 mod ai;
 mod bridge;
+mod cli;
 mod files;
 mod fonts;
 mod install;
+mod kit;
 mod local;
 mod roblox;
 mod updates;
@@ -327,14 +329,60 @@ fn quit_app(app: tauri::AppHandle) {
     app.exit(0);
 }
 
+/// `--fetch-assets <folder> <id>…`: fetches Roblox assets the way the app
+/// does (its saved copies, Roblox's own cache, the signed-in account) and
+/// copies each into `folder` as `<id>.<ext>`, printing a JSON line per asset.
+/// No window: lib/fetch-fx-assets.mjs gathers the game's effect assets with
+/// it, to ship them in the app (src/assets/jjs-fx-assets).
+fn fetch_assets_cli(rest: &[String]) {
+    let Some((out, ids)) = rest.split_first() else {
+        eprintln!("Usage: arayashiki --fetch-assets <folder> <id>...");
+        return;
+    };
+    let out = std::path::PathBuf::from(out);
+    let _ = std::fs::create_dir_all(&out);
+    let (Some(config), Some(cache)) = (bridge::config_dir(), std::env::var_os("LOCALAPPDATA")) else {
+        eprintln!("No APPDATA folder");
+        return;
+    };
+    let cache = std::path::PathBuf::from(cache).join("dev.woogi.skillbuildersim").join("assets");
+    let account = Arc::new(Account::new(config));
+    let assets = Assets::new(cache.clone(), account);
+    tauri::async_runtime::block_on(async {
+        for id in ids {
+            let line = match assets.fetch(id, 0).await {
+                Ok(info) => {
+                    let copied = info.file.as_ref().filter(|f| !f.is_empty()).and_then(|file| {
+                        let ext = std::path::Path::new(file).extension()?.to_string_lossy().to_string();
+                        let to = out.join(format!("{id}.{ext}"));
+                        std::fs::copy(cache.join(file), &to).ok().map(|_| to.to_string_lossy().to_string())
+                    });
+                    serde_json::json!({ "id": id, "file": copied, "mime": info.mime, "source": info.source, "via": info.via, "pointsTo": info.points_to, "error": info.error })
+                }
+                Err(e) => serde_json::json!({ "id": id, "error": e }),
+            };
+            println!("{line}");
+        }
+    });
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let args: Vec<String> = std::env::args().collect();
+    if let Some(i) = args.iter().position(|a| a == "--fetch-assets") {
+        fetch_assets_cli(&args[i + 1..]);
+        return;
+    }
     // An MCP server over stdio for AI apps: no window, it talks to the
     // running app (starting it if needed) through the bridge.
     if args.iter().any(|a| a == "--mcp") {
+        // Alongside, so the handshake never waits on it.
+        std::thread::spawn(kit::ensure);
         bridge::run_mcp_proxy();
         return;
+    }
+    if args.iter().any(|a| a == "--install") {
+        kit::ensure();
     }
     // Setting up, removing, or updating itself before any window opens.
     if install::at_launch(&args) || updates::at_launch(&args) {
@@ -363,6 +411,8 @@ pub fn run() {
         .manage(Pending(Mutex::new(request_from_args(&args))))
         .setup(|app| {
             roblox::forget_old_key();
+            // The docs for AI agents next to an installed exe (kit.rs).
+            std::thread::spawn(kit::ensure);
             // Closing asks the UI first, so it can offer to save.
             if let Some(window) = app.get_webview_window("main") {
                 let w = window.clone();
@@ -380,6 +430,7 @@ pub fn run() {
             app.manage(assets.clone());
             app.manage(files::Streams::default());
             app.manage(local::SharedLocal::default());
+            app.manage(cli::SharedRuns::default());
             // The bridge AI tools reach the app by (bridge.rs).
             let shared_bridge: bridge::SharedBridge = Default::default();
             app.manage(shared_bridge.clone());
@@ -436,6 +487,12 @@ pub fn run() {
             ai::ai_clients,
             ai::connect_ai_client,
             ai::app_exe_path,
+            cli::ai_cli_status,
+            cli::ai_cli_sign_in,
+            cli::ai_cli_sign_out,
+            cli::ai_cli_install,
+            cli::ai_cli_run,
+            cli::ai_cli_cancel,
             updates::update_check,
             updates::update_download,
             updates::update_install,

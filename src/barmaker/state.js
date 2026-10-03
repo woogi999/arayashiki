@@ -15,6 +15,7 @@ import {
   drawingFingerprint,
   frameName,
   hasPart,
+  separateParts,
   newBar,
   newDoc,
   newImage,
@@ -134,9 +135,13 @@ export const separate = computed(() => jjs.value.style === 'separate');
 export const wantsTrail = computed(() => hasPart(doc.value, 'trail'));
 export const containerIds = computed(() => parseIds(jjs.value.containerId));
 export const trailIds = computed(() => parseIds(jjs.value.trailIds));
+// Complex Separate's front and extras (draw.js separateParts), and their IDs.
+export const sepParts = computed(() => separateParts(doc.value));
+export const frontIds = computed(() => parseIds(jjs.value.frontId));
+const extraIdOf = (key) => parseIds(jjs.value.extraIds?.[key])[0] ?? null;
 /** How many pictures the skill needs uploaded: the steps, or (separate) the container, the meter's steps and the trail's. */
 export const uploadCount = computed(() =>
-  separate.value ? 1 + pictures.value + (wantsTrail.value ? pictures.value : 0) : pictures.value,
+  separate.value ? 1 + (sepParts.value.front ? 1 : 0) + sepParts.value.extras.length + pictures.value + (wantsTrail.value ? pictures.value : 0) : pictures.value,
 );
 // The picture export: everything in one picture per step, or in layers
 // (container, meter, leading edge, trail: a folder of each).
@@ -281,9 +286,28 @@ function drawSelection() {
   if (!c) return;
   const ctx = c.getContext('2d');
   ctx.clearRect(0, 0, c.width, c.height);
+  const k = unit();
+  // Guides, and the lines a drag is snapping to.
+  if (!playing.value) {
+    const line = (g, colour) => {
+      ctx.beginPath();
+      if (g.axis === 'x') {
+        ctx.moveTo(g.at, 0);
+        ctx.lineTo(g.at, c.height);
+      } else {
+        ctx.moveTo(0, g.at);
+        ctx.lineTo(c.width, g.at);
+      }
+      ctx.lineWidth = k;
+      ctx.strokeStyle = colour;
+      ctx.stroke();
+    };
+    if (rulers.value) for (const g of doc.value.guides ?? []) line(g, 'rgba(54,197,240,0.85)');
+    if (guideDraft) line(guideDraft, '#36c5f0');
+    for (const g of snapLines) line(g, '#ff3df2');
+  }
   const layer = selected.value;
   if (!layer || layer.type === 'paint' || playing.value || tool.value !== 'move') return;
-  const k = unit();
   ctx.save();
   ctx.translate(layer.x + layer.w / 2, layer.y + layer.h / 2);
   ctx.rotate((layer.rotation * Math.PI) / 180);
@@ -305,6 +329,170 @@ function drawSelection() {
     ctx.strokeRect((sx * layer.w) / 2 - s / 2, (sy * layer.h) / 2 - s / 2, s, s);
   }
   ctx.restore();
+}
+
+// ─── Rulers, guides and snapping ────────────────────────────────────────
+// As in an image editor: rulers along the top and left (Ctrl+R), guides
+// dragged out of them, and a moved, resized or drawn layer snapping to the
+// picture's middle and edges, the guides, and other layers' edges and
+// middles (Ctrl+; turns it off; holding Alt lets go for one drag).
+
+const readFlag = (key, fallback) => {
+  try {
+    const v = localStorage.getItem(key);
+    return v === null ? fallback : v === '1';
+  } catch {
+    return fallback;
+  }
+};
+const keepFlag = (key, on) => {
+  try {
+    localStorage.setItem(key, on ? '1' : '0');
+  } catch {
+    // not kept
+  }
+};
+export const rulers = signal(readFlag('pb-rulers', true));
+export const snapping = signal(readFlag('pb-snap', true));
+// Where the pointer is on the picture, for the rulers' marks (null: off it).
+export const pointerAt = signal(null);
+let snapLines = [];
+let guideDraft = null;
+
+export function toggleRulers() {
+  rulers.value = !rulers.value;
+  keepFlag('pb-rulers', rulers.value);
+  drawSelection();
+}
+export function toggleSnapping() {
+  snapping.value = !snapping.value;
+  keepFlag('pb-snap', snapping.value);
+  status.value = snapping.value ? 'Snapping on' : 'Snapping off';
+}
+export function clearGuides() {
+  if (!doc.value.guides?.length) return;
+  change({ ...doc.value, guides: [] });
+}
+
+const SNAP_PX = 7;
+
+// What a dragged layer can snap to, along each axis.
+function snapTargets(skipId) {
+  const d = doc.value;
+  const xs = [
+    { at: d.width / 2, weight: 2 },
+    { at: 0, weight: 1 },
+    { at: d.width, weight: 1 },
+  ];
+  const ys = [
+    { at: d.height / 2, weight: 2 },
+    { at: 0, weight: 1 },
+    { at: d.height, weight: 1 },
+  ];
+  for (const g of d.guides ?? []) (g.axis === 'x' ? xs : ys).push({ at: g.at, weight: 1.5 });
+  for (const l of d.layers) {
+    if (l.id === skipId || !l.visible || l.type === 'paint') continue;
+    // A turned layer offers its middle only.
+    const xsOf = l.rotation ? [l.x + l.w / 2] : [l.x, l.x + l.w / 2, l.x + l.w];
+    const ysOf = l.rotation ? [l.y + l.h / 2] : [l.y, l.y + l.h / 2, l.y + l.h];
+    for (const at of xsOf) xs.push({ at, weight: 1 });
+    for (const at of ysOf) ys.push({ at, weight: 1 });
+  }
+  return { xs, ys };
+}
+
+// The nearest target to any of `points` (positions on one axis), within
+// reach: the shift that lines them up, and where. Middles win close calls.
+function nearest(points, targets, reach) {
+  let best = null;
+  for (const p of points)
+    for (const t of targets) {
+      const d = t.at - p;
+      const score = Math.abs(d) / t.weight;
+      if (Math.abs(d) <= reach && (!best || score < best.score)) best = { shift: d, at: t.at, score };
+    }
+  return best;
+}
+
+const snapsNow = (event) => snapping.value && !event?.altKey;
+
+// Snaps a box being moved by its left, middle and right (top, middle, bottom).
+function snapBox(box, skipId, event) {
+  snapLines = [];
+  if (!snapsNow(event)) return box;
+  const reach = SNAP_PX * unit();
+  const { xs, ys } = snapTargets(skipId);
+  const sx = nearest([box.x, box.x + box.w / 2, box.x + box.w], xs, reach);
+  const sy = nearest([box.y, box.y + box.h / 2, box.y + box.h], ys, reach);
+  if (sx) snapLines.push({ axis: 'x', at: sx.at });
+  if (sy) snapLines.push({ axis: 'y', at: sy.at });
+  return { ...box, x: box.x + (sx?.shift ?? 0), y: box.y + (sy?.shift ?? 0) };
+}
+
+// Snaps a point (a corner being dragged, the start of a new shape).
+function snapPoint(p, skipId, event) {
+  snapLines = [];
+  if (!snapsNow(event)) return p;
+  const reach = SNAP_PX * unit();
+  const { xs, ys } = snapTargets(skipId);
+  const sx = nearest([p.x], xs, reach);
+  const sy = nearest([p.y], ys, reach);
+  if (sx) snapLines.push({ axis: 'x', at: sx.at });
+  if (sy) snapLines.push({ axis: 'y', at: sy.at });
+  return { x: p.x + (sx?.shift ?? 0), y: p.y + (sy?.shift ?? 0) };
+}
+
+// The guide under a point, if any (only while the rulers show).
+function guideAt(p) {
+  if (!rulers.value) return -1;
+  const reach = 5 * unit();
+  return (doc.value.guides ?? []).findIndex((g) => Math.abs((g.axis === 'x' ? p.x : p.y) - g.at) <= reach);
+}
+
+const onPicture = (p) => p.x >= 0 && p.y >= 0 && p.x <= doc.value.width && p.y <= doc.value.height;
+
+// A guide being placed snaps to the middle and the layers' edges.
+function snapGuide(axis, at, event) {
+  if (!snapsNow(event)) return at;
+  const { xs, ys } = snapTargets(null);
+  const hit = nearest([at], axis === 'x' ? xs : ys, SNAP_PX * unit());
+  return hit ? Math.round(hit.at) : at;
+}
+
+/**
+ * Drags a guide: a new one out of a ruler (`axis` 'x' is a vertical guide,
+ * from the left ruler), or the one at `index`. Let go off the picture and
+ * it's gone.
+ */
+export function startGuide(axis, event, index = -1) {
+  if (!overlay || event.button > 0) return;
+  event.preventDefault();
+  let taken = false;
+  const move = (e) => {
+    const p = toDoc(e);
+    pointerAt.value = p;
+    guideDraft = { axis, at: snapGuide(axis, Math.round(axis === 'x' ? p.x : p.y), e) };
+    if (index >= 0 && !taken) {
+      // Lifted out of the guides while it's being moved.
+      taken = true;
+      remember();
+      commit({ ...doc.value, guides: doc.value.guides.filter((_, i) => i !== index) });
+    }
+    drawSelection();
+  };
+  const up = (e) => {
+    removeEventListener('pointermove', move);
+    removeEventListener('pointerup', up);
+    const draft = guideDraft;
+    guideDraft = null;
+    if (draft && onPicture(toDoc(e))) {
+      if (!taken) remember();
+      commit({ ...doc.value, guides: [...(doc.value.guides ?? []), draft] });
+    }
+    drawSelection();
+  };
+  addEventListener('pointermove', move);
+  addEventListener('pointerup', up);
 }
 
 // The strip of every step, redone a moment after you stop changing things.
@@ -338,11 +526,16 @@ function feedBar() {
   // Complex Separate is three billboards a thousandth apart: the container,
   // the trail (this step's own: it's what flashes when the meter leaves it),
   // and the meter in front.
+  const sp = separate.value ? sepParts.value : null;
+  const extrasHere = (above) => (sp?.extras ?? []).filter((e) => e.above === above && e.steps.includes(at)).map((e) => ({ canvas: render(d, at, { resolve, part: e.key }), z: above ? -0.0025 : -0.0005 }));
   const layers = separate.value
     ? [
         { canvas: render(d, at, { resolve, part: 'container' }), z: 0 },
+        ...extrasHere(false),
         ...(wantsTrail.value ? [{ canvas: render(d, at, { resolve, part: 'trail' }), z: -0.001 }] : []),
         { canvas: render(d, at, { resolve, part: 'meterLead' }), z: -0.002 },
+        ...extrasHere(true),
+        ...(sp.front ? [{ canvas: render(d, at, { resolve, part: 'front' }), z: -0.003 }] : []),
       ]
     : null;
   barScene?.update({
@@ -777,12 +970,16 @@ export function pointerDown(event) {
   }
   if (t === 'shape') {
     const kind = shapeKind.value;
-    const layer = makeShape(kind, { x: p.x, y: p.y, w: 1, h: 1 });
+    const start = snapPoint(p, null, event);
+    const layer = makeShape(kind, { x: start.x, y: start.y, w: 1, h: 1 });
     addLayer(layer);
-    drag = { kind: 'create', shape: kind, id: layer.id, start: p };
+    drag = { kind: 'create', shape: kind, id: layer.id, start };
     return;
   }
   const handle = handleAt(p);
+  // A guide (when no corner handle is under the pointer): moved, or dragged off to remove it.
+  const guide = handle ? -1 : guideAt(p);
+  if (guide >= 0) return startGuide(doc.value.guides[guide].axis, event, guide);
   if (handle) {
     const layer = selected.value;
     drag = {
@@ -802,9 +999,10 @@ export function pointerDown(event) {
 
 export function pointerMove(event) {
   if (!overlay) return;
+  pointerAt.value = toDoc(event);
   if (brushStroke) return strokeTo(toDoc(event));
   if (!drag) return;
-  const p = toDoc(event);
+  let p = toDoc(event);
   const layer = doc.value.layers.find((l) => l.id === drag.id);
   if (!layer) return;
   if (drag.remembered === false) {
@@ -812,10 +1010,10 @@ export function pointerMove(event) {
     drag.remembered = true;
   }
   if (drag.kind === 'move') {
-    const x = Math.round(drag.from.x + p.x - drag.start.x);
-    const y = Math.round(drag.from.y + p.y - drag.start.y);
-    commit(patchLayer(drag.id, { x, y }));
+    const box = snapBox({ x: drag.from.x + p.x - drag.start.x, y: drag.from.y + p.y - drag.start.y, w: layer.w, h: layer.h }, layer.id, layer.rotation ? { altKey: true } : event);
+    commit(patchLayer(drag.id, { x: Math.round(box.x), y: Math.round(box.y) }));
   } else if (drag.kind === 'create') {
+    p = snapPoint(p, drag.id, event);
     let w = Math.abs(p.x - drag.start.x);
     let h = Math.abs(p.y - drag.start.y);
     // Rings are round; Shift makes anything square.
@@ -829,6 +1027,7 @@ export function pointerMove(event) {
     commit(patchLayer(drag.id, shaped(drag.shape, box)));
   } else {
     // The opposite corner stays put, whatever the rotation.
+    if (!layer.rotation) p = snapPoint(p, layer.id, event);
     const a = (-layer.rotation * Math.PI) / 180;
     const dx = p.x - drag.fixed.x;
     const dy = p.y - drag.fixed.y;
@@ -856,6 +1055,10 @@ export function pointerUp() {
   if (brushStroke) return endStroke();
   const was = drag;
   drag = null;
+  if (snapLines.length) {
+    snapLines = [];
+    drawSelection();
+  }
   // A click with the shape tool, not a drag: a shape you can see.
   if (was?.kind === 'create') {
     const layer = doc.value.layers.find((l) => l.id === was.id);
@@ -972,6 +1175,8 @@ export function onKey(event) {
   if (action === 'open') return act(() => openDialog('open'));
   if (action === 'export') return act(() => openDialog('export'));
   if (action === 'barFit') return act(() => zoomTo(0));
+  if (action === 'barRulers') return act(toggleRulers);
+  if (action === 'barSnap') return act(toggleSnapping);
   if (action === 'barPrevStep') return act(() => showFrame(frame.value - 1));
   if (action === 'barNextStep') return act(() => showFrame(frame.value + 1));
   if (action === 'play') {
@@ -1066,8 +1271,14 @@ export const saveZip = () =>
     const d = doc.value;
     const entries = {};
     if (layeredExport.value) {
-      const box = await canvasBlob(render(d, 0, { resolve, part: 'container' }));
-      entries[`${exportName.value || 'progress'}_container.png`] = new Uint8Array(await box.arrayBuffer());
+      const once = async (part, suffix) => {
+        const blob = await canvasBlob(render(d, 0, { resolve, part }));
+        entries[`${exportName.value || 'progress'}_${suffix}.png`] = new Uint8Array(await blob.arrayBuffer());
+      };
+      await once('container', 'container');
+      const sp = separateParts(d);
+      if (sp.front) await once('front', 'front');
+      for (const e of sp.extras) await once(e.key, `steps-${e.steps[0]}-${e.steps.at(-1)}`);
       for (const [part, folder] of layeredParts(d))
         for (let k = 0; k <= d.frames; k++) {
           const blob = await canvasBlob(render(d, k, { resolve, part }));
@@ -1140,6 +1351,8 @@ function skillsNow() {
   if (ids.length !== pictures.value) return null;
   const j = jjs.value;
   if (separate.value && (containerIds.value.length !== 1 || (wantsTrail.value && trailIds.value.length !== pictures.value))) return null;
+  const sp = separate.value ? sepParts.value : null;
+  if (sp && ((sp.front && frontIds.value.length !== 1) || sp.extras.some((e) => !extraIdOf(e.key)))) return null;
   return buildSkill({
     textures: ids,
     name: j.name.trim() || doc.value.name,
@@ -1158,6 +1371,8 @@ function skillsNow() {
     container: separate.value ? containerIds.value[0] : null,
     trails: separate.value && wantsTrail.value ? trailIds.value : null,
     trailTime: j.trailTime,
+    front: sp?.front ? frontIds.value[0] : null,
+    extras: sp ? sp.extras.map((e) => ({ id: extraIdOf(e.key), steps: e.steps, above: e.above })) : [],
   });
 }
 
@@ -1168,6 +1383,8 @@ function missing() {
   if (jjsIds.value.length !== n) parts.push(`${n} meter image IDs, one per step from 0 (empty) to ${doc.value.frames} (full); there are ${jjsIds.value.length}`);
   if (separate.value && containerIds.value.length !== 1) parts.push('the container’s image ID');
   if (separate.value && wantsTrail.value && trailIds.value.length !== n) parts.push(`${n} trail image IDs; there are ${trailIds.value.length}`);
+  if (separate.value && sepParts.value.front && frontIds.value.length !== 1) parts.push('the front’s image ID');
+  for (const e of separate.value ? sepParts.value.extras : []) if (!extraIdOf(e.key)) parts.push(`the image ID for what shows on steps ${e.label.slice(6)}`);
   return parts.length ? `The skill needs ${parts.join(', and ')}.` : null;
 }
 
@@ -1179,7 +1396,7 @@ export async function refreshSkill() {
   copied.value = false;
   const skills = skillsNow();
   if (!skills) {
-    const any = jjsIds.value.length || containerIds.value.length || trailIds.value.length;
+    const any = jjsIds.value.length || containerIds.value.length || trailIds.value.length || frontIds.value.length;
     batch(() => {
       skillCode.value = '';
       skillNote.value = any ? missing() : null;
@@ -1289,6 +1506,8 @@ async function uploadLayered() {
   const items = was?.fingerprint === fingerprint ? { ...was.items } : {};
   const jobs = [
     { key: 'container:0', part: 'container', frame: 0, label: 'Container' },
+    ...(sepParts.value.front ? [{ key: 'front:0', part: 'front', frame: 0, label: 'Front' }] : []),
+    ...sepParts.value.extras.map((e) => ({ key: e.key, part: e.key, frame: e.steps[0], label: e.label })),
     ...Array.from({ length: d.frames + 1 }, (_, k) => ({ key: `meter:${k}`, part: 'meterLead', frame: k, label: `Meter ${k}` })),
     ...(wantsTrail.value ? Array.from({ length: d.frames + 1 }, (_, k) => ({ key: `trail:${k}`, part: 'trail', frame: k, label: `Trail ${k}` })) : []),
   ];
@@ -1305,7 +1524,7 @@ async function uploadLayered() {
       show();
       const blob = await canvasBlob(render(d, job.frame, { resolve, part: job.part }));
       const { decalId, imageId, moderation } = await uploadDecal(blob, {
-        name: `${d.name} ${job.label}${job.part === 'container' ? '' : `/${d.frames}`}`,
+        name: `${d.name} ${job.label}${job.part === 'meterLead' || job.part === 'trail' ? `/${d.frames}` : ''}`,
         description: `${job.label} of a meter in layers, made with Arayashiki's Meter Maker.`,
       });
       Object.assign(row, { decalId, imageId, moderation, state: 'done' });
@@ -1316,6 +1535,8 @@ async function uploadLayered() {
     const ids = (prefix) => Array.from({ length: d.frames + 1 }, (_, k) => items[`${prefix}:${k}`]?.imageId).join('\n');
     let next = setIn(doc.value, ['jjs', 'ids'], ids('meter'));
     next = setIn(next, ['jjs', 'containerId'], String(items['container:0'].imageId));
+    if (items['front:0']) next = setIn(next, ['jjs', 'frontId'], String(items['front:0'].imageId));
+    next = setIn(next, ['jjs', 'extraIds'], Object.fromEntries(sepParts.value.extras.map((e) => [e.key, String(items[e.key]?.imageId ?? '')])));
     if (wantsTrail.value) next = setIn(next, ['jjs', 'trailIds'], ids('trail'));
     commit(next);
     await refreshSkill();

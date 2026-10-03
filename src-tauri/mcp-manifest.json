@@ -1,0 +1,1207 @@
+{
+ "instructions": "Arayashiki is a desktop app for Jujutsu Shenanigans (Roblox) Skill Builder skills; these tools work on it (the app starts if it is closed).\nThe app_* tools act on what the user has open: app_state first, then app_get_skills / app_put_skills to edit the moveset in place (every change is undoable with Ctrl+Z), app_simulate and app_playback to run it, app_screenshot to see it, app_export_video to render it, app_animate to keyframe a mesh or camera.\nA \"code\" is the text JJS copies out (base64 of zstd JSON, starts \"KLUv/\"). To build a new move: search_library for the closest real move, get_library_move for its nodes, node_reference for fields, adapt, validate, then app_put_skills.\nThe simulator is a model of JJS's rules read from real exports, not the game: timings and damage are close, not exact. The handbook says what is confirmed and what is inferred.\nReference docs (the handbook, the move library, the game data) are also on disk next to the app, in its install folder: read AGENTS.md there first.",
+ "tools": [
+  {
+   "name": "decode",
+   "title": "Read a moveset code",
+   "description": "What is in a Skill Builder code. detail \"overview\" (default): one row per skill (category, name, key, cooldown, branches, node count, props). \"text\": every skill as a readable node listing. \"json\": the skills themselves with DATA parsed, to edit and pass to encode.",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "code": {
+      "description": "A Skill Builder code (\"KLUv/…\"), or a path to a .txt file holding one.",
+      "type": "string"
+     },
+     "skills": {
+      "description": "Skills as objects (e.g. from decode detail \"json\"); DATA may be an object or a JSON string.",
+      "type": "array",
+      "items": {
+       "type": "object",
+       "propertyNames": {
+        "type": "string"
+       },
+       "additionalProperties": {}
+      }
+     },
+     "skill": {
+      "description": "One skill object.",
+      "type": "object",
+      "propertyNames": {
+       "type": "string"
+      },
+      "additionalProperties": {}
+     },
+     "detail": {
+      "type": "string",
+      "enum": [
+       "overview",
+       "text",
+       "json"
+      ]
+     }
+    }
+   },
+   "annotations": {
+    "title": "Read a moveset code",
+    "readOnlyHint": true
+   }
+  },
+  {
+   "name": "describe",
+   "title": "Read one skill node by node",
+   "description": "A skill as readable text: its line and every branch, one line per node with its index, effects folded into \"fx:\" lines (fold false lists every effect on its own line). Without select and with several skills, describes them all.",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "code": {
+      "description": "A Skill Builder code (\"KLUv/…\"), or a path to a .txt file holding one.",
+      "type": "string"
+     },
+     "skills": {
+      "description": "Skills as objects (e.g. from decode detail \"json\"); DATA may be an object or a JSON string.",
+      "type": "array",
+      "items": {
+       "type": "object",
+       "propertyNames": {
+        "type": "string"
+       },
+       "additionalProperties": {}
+      }
+     },
+     "skill": {
+      "description": "One skill object.",
+      "type": "object",
+      "propertyNames": {
+       "type": "string"
+      },
+      "additionalProperties": {}
+     },
+     "select": {
+      "description": "Which skill: its NAME, \"CATEGORY:NAME\" (e.g. \"MELEE:1\") or its index.",
+      "type": [
+       "string",
+       "number"
+      ]
+     },
+     "branches": {
+      "description": "Only show these branches.",
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "fold": {
+      "type": "boolean"
+     }
+    }
+   },
+   "annotations": {
+    "title": "Read one skill node by node",
+    "readOnlyHint": true
+   }
+  },
+  {
+   "name": "simulate",
+   "title": "Play a skill in the simulator",
+   "description": "Runs one skill against a training dummy 5 studs ahead and reports what happened: hits and damage, the branches each side ran, states, tags, projectiles, where both ended up, warnings, and a timed log (each line says which branch and node index fired). detail \"events\" adds every timed event; \"full\" adds positions 10 times a second.",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "code": {
+      "description": "A Skill Builder code (\"KLUv/…\"), or a path to a .txt file holding one.",
+      "type": "string"
+     },
+     "skills": {
+      "description": "Skills as objects (e.g. from decode detail \"json\"); DATA may be an object or a JSON string.",
+      "type": "array",
+      "items": {
+       "type": "object",
+       "propertyNames": {
+        "type": "string"
+       },
+       "additionalProperties": {}
+      }
+     },
+     "skill": {
+      "description": "One skill object.",
+      "type": "object",
+      "propertyNames": {
+       "type": "string"
+      },
+      "additionalProperties": {}
+     },
+     "select": {
+      "description": "Which skill: its NAME, \"CATEGORY:NAME\" (e.g. \"MELEE:1\") or its index.",
+      "type": [
+       "string",
+       "number"
+      ]
+     },
+     "conditions": {
+      "description": "Your character: in the air, jumping, holding the key, awakened, awakening bar 0–100.",
+      "type": "object",
+      "properties": {
+       "AIR": {
+        "type": "boolean"
+       },
+       "JUMP": {
+        "type": "boolean"
+       },
+       "HOLD": {
+        "type": "boolean"
+       },
+       "ULT": {
+        "type": "boolean"
+       },
+       "BAR": {
+        "type": "number"
+       }
+      }
+     },
+     "hits": {
+      "description": "\"auto\": hits when the dummy is inside the box (default). \"always\" or \"never\" force it.",
+      "type": "string",
+      "enum": [
+       "auto",
+       "always",
+       "never"
+      ]
+     },
+     "start": {
+      "description": "Start from this branch instead of the skill's own line.",
+      "type": "string"
+     },
+     "seed": {
+      "description": "For RANDOM branches.",
+      "type": "number"
+     },
+     "distance": {
+      "description": "Studs from you to the dummy (default 5).",
+      "type": "number"
+     },
+     "wall": {
+      "description": "Studs to a wall in front (default none), for BRANCH COLLIDED.",
+      "type": "number"
+     },
+     "maxTime": {
+      "description": "Seconds to cut off a skill that never ends (default 12).",
+      "type": "number"
+     },
+     "detail": {
+      "type": "string",
+      "enum": [
+       "summary",
+       "events",
+       "full"
+      ]
+     }
+    }
+   },
+   "annotations": {
+    "title": "Play a skill in the simulator",
+    "readOnlyHint": true
+   }
+  },
+  {
+   "name": "validate",
+   "title": "Check skills for mistakes",
+   "description": "Checks skills as JJS would read them: unreadable programs (error), branch names that go nowhere and look like typos (warning), fields of the wrong type (warning), unknown kinds (info, kept as is), that the code round-trips losslessly, and (simulate true, default) the simulator's warnings such as loops without a WAIT.",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "code": {
+      "description": "A Skill Builder code (\"KLUv/…\"), or a path to a .txt file holding one.",
+      "type": "string"
+     },
+     "skills": {
+      "description": "Skills as objects (e.g. from decode detail \"json\"); DATA may be an object or a JSON string.",
+      "type": "array",
+      "items": {
+       "type": "object",
+       "propertyNames": {
+        "type": "string"
+       },
+       "additionalProperties": {}
+      }
+     },
+     "skill": {
+      "description": "One skill object.",
+      "type": "object",
+      "propertyNames": {
+       "type": "string"
+      },
+      "additionalProperties": {}
+     },
+     "simulate": {
+      "type": "boolean"
+     }
+    }
+   },
+   "annotations": {
+    "title": "Check skills for mistakes",
+    "readOnlyHint": true
+   }
+  },
+  {
+   "name": "encode",
+   "title": "Write a moveset code",
+   "description": "Skills to a code JJS's Skill Builder imports. Pass skills (e.g. edited output of decode detail \"json\") or one skill. Unknown kinds and fields pass through untouched; JJS's quirks (empty Branch/Prop as [], 1e38) are written as JJS writes them.",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "code": {
+      "description": "A Skill Builder code (\"KLUv/…\"), or a path to a .txt file holding one.",
+      "type": "string"
+     },
+     "skills": {
+      "description": "Skills as objects (e.g. from decode detail \"json\"); DATA may be an object or a JSON string.",
+      "type": "array",
+      "items": {
+       "type": "object",
+       "propertyNames": {
+        "type": "string"
+       },
+       "additionalProperties": {}
+      }
+     },
+     "skill": {
+      "description": "One skill object.",
+      "type": "object",
+      "propertyNames": {
+       "type": "string"
+      },
+      "additionalProperties": {}
+     }
+    }
+   },
+   "annotations": {
+    "title": "Write a moveset code",
+    "readOnlyHint": true
+   }
+  },
+  {
+   "name": "node_reference",
+   "title": "Node kinds and their fields",
+   "description": "The node schema. With kind (a K_NAME like \"HITBOX\" or a palette label like \"VELOCITY\"): its fields with types, defaults and hints, plus a new node as the palette makes it. Without: every kind in one line, the branch conditions, the Prop flags and the skill categories.",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "kind": {
+      "type": "string"
+     }
+    }
+   },
+   "annotations": {
+    "title": "Node kinds and their fields",
+    "readOnlyHint": true
+   }
+  },
+  {
+   "name": "skill_template",
+   "title": "An empty skill",
+   "description": "A new, empty skill of a category (SKILL, SPECIAL, AWAKENING, MELEE, CHASE), with the fields the builder gives it.",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "category": {
+      "type": "string"
+     },
+     "name": {
+      "type": "string"
+     }
+    }
+   },
+   "annotations": {
+    "title": "An empty skill",
+    "readOnlyHint": true
+   }
+  },
+  {
+   "name": "build_template",
+   "title": "Build a ready-made skill",
+   "description": "Ready-made skills from a form: a meter (one picture per step of a tag), an auto-sheathing weapon, accurate M1s, an accurate dash, percentage damage. Each is lifted node for node from a real export. No id: the templates with every field and default. With an id and values: the skills it builds and their import-ready code.",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "string"
+     },
+     "values": {
+      "description": "Field values by key; the rest keep their defaults.",
+      "type": "object",
+      "propertyNames": {
+       "type": "string"
+      },
+      "additionalProperties": {}
+     }
+    }
+   },
+   "annotations": {
+    "title": "Build a ready-made skill",
+    "readOnlyHint": true
+   }
+  },
+  {
+   "name": "search_library",
+   "title": "Find a real move to build from",
+   "description": "Searches 37 real moves (M1 strings, dashes, leaps and slams, grabs, barrages, projectiles, counters, passives…) by what they do, e.g. \"launch\", \"grab slam\", \"projectile wall\", \"resource bar\". Every word must match. No query lists them all. Build new moves from the closest one.",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "query": {
+      "type": "string"
+     },
+     "limit": {
+      "type": "number"
+     }
+    }
+   },
+   "annotations": {
+    "title": "Find a real move to build from",
+    "readOnlyHint": true
+   }
+  },
+  {
+   "name": "get_library_move",
+   "title": "One library move",
+   "description": "A library move by slug: part \"about\" (what it does, how, what to reuse it for), \"nodes\" (every node), \"code\" (import-ready) or \"all\" (default).",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "slug": {
+      "type": "string"
+     },
+     "part": {
+      "type": "string",
+      "enum": [
+       "all",
+       "about",
+       "nodes",
+       "code"
+      ]
+     }
+    },
+    "required": [
+     "slug"
+    ]
+   },
+   "annotations": {
+    "title": "One library move",
+    "readOnlyHint": true
+   }
+  },
+  {
+   "name": "handbook",
+   "title": "Look something up in the handbook",
+   "description": "The JJS Skill Builder handbook: the code format, every node and field, how programs run, patterns, confirmed vs inferred rules. No query: the table of contents. A query (e.g. \"LAST HIT\", \"PROJECTILE\", \"Req conditions\"): the best-matching sections, the top one in full.",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "query": {
+      "type": "string"
+     },
+     "limit": {
+      "type": "number"
+     },
+     "max_chars": {
+      "type": "number"
+     }
+    }
+   },
+   "annotations": {
+    "title": "Look something up in the handbook",
+    "readOnlyHint": true
+   }
+  },
+  {
+   "name": "asset_info",
+   "title": "What Roblox asset IDs are",
+   "description": "Names Roblox assets: for each ID (a SFX ID, a TEXTURE…) its name, type (Audio, Image, Decal…), creator, and whether it downloads without signing in. Pass `ids`, or a skill (code/skills + select) to name every asset it uses.",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "ids": {
+      "type": "array",
+      "items": {
+       "type": [
+        "string",
+        "number"
+       ]
+      }
+     },
+     "code": {
+      "description": "A Skill Builder code (\"KLUv/…\"), or a path to a .txt file holding one.",
+      "type": "string"
+     },
+     "skills": {
+      "description": "Skills as objects (e.g. from decode detail \"json\"); DATA may be an object or a JSON string.",
+      "type": "array",
+      "items": {
+       "type": "object",
+       "propertyNames": {
+        "type": "string"
+       },
+       "additionalProperties": {}
+      }
+     },
+     "skill": {
+      "description": "One skill object.",
+      "type": "object",
+      "propertyNames": {
+       "type": "string"
+      },
+      "additionalProperties": {}
+     },
+     "select": {
+      "description": "Which skill: its NAME, \"CATEGORY:NAME\" (e.g. \"MELEE:1\") or its index.",
+      "type": [
+       "string",
+       "number"
+      ]
+     }
+    }
+   },
+   "annotations": {
+    "title": "What Roblox asset IDs are",
+    "readOnlyHint": true,
+    "openWorldHint": true
+   }
+  },
+  {
+   "name": "game_assets",
+   "title": "JJS’s own animations and sounds",
+   "description": "Finds Jujutsu Shenanigans’ own animations and sounds by words in their path (\"gojo chase\", \"black flash\", \"block\"), with their Roblox IDs, read from the game. Animations the Skill Builder can play come with their ANIM_USE [set, n]; pass anim_use to name one.",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "query": {
+      "description": "Words that must all appear in the path, e.g. \"itadori divergent\".",
+      "type": "string"
+     },
+     "kind": {
+      "type": "string",
+      "enum": [
+       "animation",
+       "sound"
+      ]
+     },
+     "anim_use": {
+      "description": "An ANIM_USE [set, n] to name.",
+      "minItems": 2,
+      "maxItems": 2,
+      "type": "array",
+      "items": {
+       "type": "number"
+      }
+     },
+     "limit": {
+      "type": "number"
+     }
+    }
+   },
+   "annotations": {
+    "title": "JJS’s own animations and sounds",
+    "readOnlyHint": true
+   }
+  },
+  {
+   "name": "open_in_app",
+   "title": "Open skills as the moveset",
+   "description": "Opens skills (or a code) in the app as the whole moveset, replacing what is open (undoable). To change part of the moveset, use app_put_skills.",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "code": {
+      "type": "string"
+     },
+     "skills": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "propertyNames": {
+        "type": "string"
+       },
+       "additionalProperties": {}
+      }
+     },
+     "name": {
+      "type": "string"
+     }
+    }
+   },
+   "annotations": {
+    "title": "Open skills as the moveset",
+    "readOnlyHint": false
+   }
+  },
+  {
+   "name": "app_state",
+   "title": "What the app has open",
+   "description": "The desktop app right now: the moveset (name, file, unsaved changes, every skill with its category, name and node count), the open skill, branch and node, the playhead, the simulation settings and result summary, and the camera. Start here when working with what the user sees.",
+   "inputSchema": {
+    "type": "object",
+    "properties": {}
+   },
+   "annotations": {
+    "title": "What the app has open",
+    "readOnlyHint": true
+   }
+  },
+  {
+   "name": "app_get_skills",
+   "title": "The open moveset’s skills",
+   "description": "The skills in the app as JSON (DATA parsed), all of them or one (select). Edit them and hand them back with app_put_skills.",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "select": {
+      "description": "One skill (NAME, \"CATEGORY:NAME\" or index); omit for all.",
+      "type": [
+       "string",
+       "number"
+      ]
+     }
+    }
+   },
+   "annotations": {
+    "title": "The open moveset’s skills",
+    "readOnlyHint": true
+   }
+  },
+  {
+   "name": "app_put_skills",
+   "title": "Put skills into the app",
+   "description": "Puts skills into the open moveset as one undoable change (the user can Ctrl+Z it). mode \"merge\" (default): a skill with the same category and NAME is replaced in place, the rest are added. \"append\": all added. \"replace\": the whole moveset becomes these. Each is validated first; errors stop it, warnings come back. The first one is opened and simulated.",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "skills": {
+      "description": "Skills (DATA as an object or JSON string).",
+      "type": "array",
+      "items": {
+       "type": "object",
+       "propertyNames": {
+        "type": "string"
+       },
+       "additionalProperties": {}
+      }
+     },
+     "code": {
+      "description": "Or a Skill Builder code.",
+      "type": "string"
+     },
+     "mode": {
+      "type": "string",
+      "enum": [
+       "merge",
+       "append",
+       "replace"
+      ]
+     },
+     "name": {
+      "description": "With mode \"replace\": the moveset’s name.",
+      "type": "string"
+     }
+    }
+   },
+   "annotations": {
+    "title": "Put skills into the app",
+    "readOnlyHint": false
+   }
+  },
+  {
+   "name": "app_delete_skills",
+   "title": "Delete skills from the app",
+   "description": "Deletes skills from the open moveset (undoable).",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "select": {
+      "type": "array",
+      "items": {
+       "type": [
+        "string",
+        "number"
+       ]
+      },
+      "description": "Skills: NAME, \"CATEGORY:NAME\" or index."
+     }
+    },
+    "required": [
+     "select"
+    ]
+   },
+   "annotations": {
+    "title": "Delete skills from the app",
+    "readOnlyHint": false
+   }
+  },
+  {
+   "name": "app_select",
+   "title": "Open a skill, branch or node",
+   "description": "Shows a skill (and a branch, and a node by index) in the app, as if the user clicked it.",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "skill": {
+      "description": "A skill in the open moveset: NAME, \"CATEGORY:NAME\" or index. Default: the one open in the app.",
+      "type": [
+       "string",
+       "number"
+      ]
+     },
+     "branch": {
+      "description": "\"\" for the default line.",
+      "type": "string"
+     },
+     "node": {
+      "description": "A node index in that branch.",
+      "type": "number"
+     }
+    }
+   },
+   "annotations": {
+    "title": "Open a skill, branch or node",
+    "readOnlyHint": false
+   }
+  },
+  {
+   "name": "app_simulate",
+   "title": "Simulate in the app",
+   "description": "Sets the app’s simulation (conditions, hits, distance, wall, the dummy blocking…) and runs the open skill (or select), returning the result like simulate. The user sees it in the viewport and timeline.",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "select": {
+      "description": "A skill in the open moveset: NAME, \"CATEGORY:NAME\" or index. Default: the one open in the app.",
+      "type": [
+       "string",
+       "number"
+      ]
+     },
+     "conditions": {
+      "description": "Your character: in the air, jumping, holding the key, awakened, awakening bar 0–100.",
+      "type": "object",
+      "properties": {
+       "AIR": {
+        "type": "boolean"
+       },
+       "JUMP": {
+        "type": "boolean"
+       },
+       "HOLD": {
+        "type": "boolean"
+       },
+       "ULT": {
+        "type": "boolean"
+       },
+       "BAR": {
+        "type": "number"
+       }
+      }
+     },
+     "hits": {
+      "description": "\"auto\": hits when the dummy is inside the box (default). \"always\" or \"never\" force it.",
+      "type": "string",
+      "enum": [
+       "auto",
+       "always",
+       "never"
+      ]
+     },
+     "distance": {
+      "type": "number"
+     },
+     "wall": {
+      "description": "Studs to a wall in front; null for none.",
+      "type": [
+       "number",
+       "null"
+      ]
+     },
+     "dummy": {
+      "type": "object",
+      "properties": {
+       "present": {
+        "type": "boolean"
+       },
+       "block": {
+        "type": "boolean"
+       },
+       "counter": {
+        "type": "boolean"
+       },
+       "evasive": {
+        "type": "boolean"
+       }
+      }
+     },
+     "detail": {
+      "type": "string",
+      "enum": [
+       "summary",
+       "events",
+       "full"
+      ]
+     }
+    }
+   },
+   "annotations": {
+    "title": "Simulate in the app",
+    "readOnlyHint": false
+   }
+  },
+  {
+   "name": "app_playback",
+   "title": "Play, pause or seek",
+   "description": "Controls playback in the app: play, pause, restart, or seek to a time (seconds). speed sets the playback rate (0.25 = quarter speed).",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "action": {
+      "type": "string",
+      "enum": [
+       "play",
+       "pause",
+       "restart",
+       "seek"
+      ]
+     },
+     "time": {
+      "type": "number"
+     },
+     "speed": {
+      "type": "number"
+     }
+    },
+    "required": [
+     "action"
+    ]
+   },
+   "annotations": {
+    "title": "Play, pause or seek",
+    "readOnlyHint": false
+   }
+  },
+  {
+   "name": "app_view",
+   "title": "Set up the viewport",
+   "description": "Viewport options: follow, hitboxes, sounds, the dummy shown, the camera mode (\"free\", \"auto\", \"path\"), the auto camera (angle: three-quarter, side, front, behind, low, high, top, orbit; framing: tight, medium, wide; subject: both, you, dummy; smooth 0–1; punch, shake 0–1, dutch degrees, fov), and whether the skill’s own camera blocks take over.",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "follow": {
+      "type": "boolean"
+     },
+     "hitboxes": {
+      "type": "boolean"
+     },
+     "sounds": {
+      "type": "boolean"
+     },
+     "dummy": {
+      "type": "boolean"
+     },
+     "camera": {
+      "type": "string",
+      "enum": [
+       "free",
+       "auto",
+       "path"
+      ]
+     },
+     "auto": {
+      "type": "object",
+      "propertyNames": {
+       "type": "string"
+      },
+      "additionalProperties": {}
+     },
+     "skillCamera": {
+      "type": "boolean"
+     }
+    }
+   },
+   "annotations": {
+    "title": "Set up the viewport",
+    "readOnlyHint": false
+   }
+  },
+  {
+   "name": "app_camera_keys",
+   "title": "The recorded camera path",
+   "description": "The camera keys the \"path\" camera flies through ({ t, p: [x,y,z], q: [x,y,z,w] quaternion, fov }, world space, y up). action \"list\"; \"add\" (a key at time from where the user’s camera is now); \"set\" (replace all with keys); \"clear\".",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "action": {
+      "type": "string",
+      "enum": [
+       "list",
+       "add",
+       "set",
+       "clear"
+      ]
+     },
+     "time": {
+      "type": "number"
+     },
+     "keys": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "t": {
+         "type": "number"
+        },
+        "p": {
+         "minItems": 3,
+         "maxItems": 3,
+         "type": "array",
+         "items": {
+          "type": "number"
+         }
+        },
+        "q": {
+         "minItems": 4,
+         "maxItems": 4,
+         "type": "array",
+         "items": {
+          "type": "number"
+         }
+        },
+        "fov": {
+         "type": "number"
+        }
+       },
+       "required": [
+        "t",
+        "p",
+        "q"
+       ]
+      }
+     }
+    },
+    "required": [
+     "action"
+    ]
+   },
+   "annotations": {
+    "title": "The recorded camera path",
+    "readOnlyHint": false
+   }
+  },
+  {
+   "name": "app_screenshot",
+   "title": "Take a screenshot",
+   "description": "Draws the open skill at a moment (time, default the playhead) and returns the picture, so you can see what the user sees. Also saves it to Pictures\\Arayashiki when save is true (a thumbnail, say).",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "time": {
+      "type": "number"
+     },
+     "width": {
+      "description": "Default 960 (1280 when saving).",
+      "type": "number"
+     },
+     "height": {
+      "description": "Default 540 (720 when saving).",
+      "type": "number"
+     },
+     "background": {
+      "description": "\"scene\" (the room, default), \"transparent\" (alpha in PNG, GIF, MOV or WebM; MP4 renders it on black), \"green\" (a #00FF00 chroma key) or a colour like \"#202020\" (also a chroma key colour).",
+      "type": "string"
+     },
+     "camera": {
+      "description": "\"view\": what the viewport shows (default); \"auto\": the cinematic auto camera; \"path\": the recorded camera keys.",
+      "type": "string",
+      "enum": [
+       "view",
+       "auto",
+       "path"
+      ]
+     },
+     "hitboxes": {
+      "type": "boolean"
+     },
+     "save": {
+      "type": "boolean"
+     }
+    }
+   },
+   "annotations": {
+    "title": "Take a screenshot",
+    "readOnlyHint": true
+   }
+  },
+  {
+   "name": "app_export_video",
+   "title": "Export a video",
+   "description": "Renders the open skill (or select) to VideosArayashiki, with its sounds: format mp4, mov, webm, gif or png (a PNG sequence folder); fps; speed (1 real time, 0.5 or 0.25 slow motion); size; background (transparent needs mov, webm, gif or png); camera; time range; quality or a bitrate in Mbps. Returns where it went.",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "select": {
+      "description": "A skill in the open moveset: NAME, \"CATEGORY:NAME\" or index. Default: the one open in the app.",
+      "type": [
+       "string",
+       "number"
+      ]
+     },
+     "format": {
+      "type": "string",
+      "enum": [
+       "mp4",
+       "mov",
+       "webm",
+       "gif",
+       "png"
+      ]
+     },
+     "fps": {
+      "type": "number"
+     },
+     "speed": {
+      "type": "number"
+     },
+     "width": {
+      "type": "number"
+     },
+     "height": {
+      "type": "number"
+     },
+     "background": {
+      "description": "\"scene\" (the room, default), \"transparent\" (alpha in PNG, GIF, MOV or WebM; MP4 renders it on black), \"green\" (a #00FF00 chroma key) or a colour like \"#202020\" (also a chroma key colour).",
+      "type": "string"
+     },
+     "camera": {
+      "description": "\"view\": what the viewport shows (default); \"auto\": the cinematic auto camera; \"path\": the recorded camera keys.",
+      "type": "string",
+      "enum": [
+       "view",
+       "auto",
+       "path"
+      ]
+     },
+     "hitboxes": {
+      "type": "boolean"
+     },
+     "from": {
+      "type": "number"
+     },
+     "to": {
+      "type": "number"
+     },
+     "quality": {
+      "type": "string",
+      "enum": [
+       "low",
+       "medium",
+       "high",
+       "best"
+      ]
+     },
+     "bitrate": {
+      "description": "Target video bitrate in Mbps (VBR); omit to encode by quality.",
+      "type": "number"
+     },
+     "audio": {
+      "description": "Include the skill’s sounds (default true).",
+      "type": "boolean"
+     }
+    }
+   },
+   "annotations": {
+    "title": "Export a video",
+    "readOnlyHint": false
+   }
+  },
+  {
+   "name": "app_animate",
+   "title": "Keyframe a VISUAL",
+   "description": "Writes a keyframed animation for a VISUAL (a Mesh/Block/Sphere/Cylinder/Wedge part effect, or a Camera) into the open branch as a chain of VISUAL nodes, splitting WAITs so each piece fires on time. node: the index of the VISUAL to animate (its effect, part and look are kept). keys: [{ t (seconds from the node), pos [x left, y up, z forward] on the body part, rot [degrees, as ROTATION], size, opacity }], at least two. For a Camera, rot [0, 0, 0] looks the way the character faces and [0, 180, 0] looks back at them; positive y turns toward their left, negative x looks down (a camera 10 studs behind and 4 up looking at them: pos [0, 4, -10], rot [-15, 0, 0]). Each key can also have shake (studs) and turn (degrees): how hard the camera shakes there, easing to the next key’s, so a shake can build and die away; shakeFreq is shakes a second (default 14). cut: true on a key makes a jump cut (it holds the key before until then, and is at the cut key at once). ease on a key (\"Quad Out\") is how it eases to the next; curve [x1, y1, x2, y2] instead is a custom easing (a cubic Bézier, as CSS’s), written as a few blocks of JJS easings that follow it. hin and hout ([x, y, z] studs, offsets from the key’s pos) are Bézier handles that bend the path through the key, as a pen tool’s. smooth runs a curve through the keys. A Camera is written as few blocks as it can (one per stretch between keys, eased with the key’s easing, unless a curve or shake needs more), in whole frames, back to back so no two Camera blocks overlap, with a STATE DirectionLock on the user for its whole length (lock: false leaves it out). weave (seconds into the skill) weaves the chain in from then, each piece going in between the nodes already there at its moment. (shake: { amount, turn, freq, from, to } is the older single shake; it is put on the keys.)",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "node": {
+      "type": "number"
+     },
+     "keys": {
+      "minItems": 2,
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "t": {
+         "type": "number"
+        },
+        "pos": {
+         "minItems": 3,
+         "maxItems": 3,
+         "type": "array",
+         "items": {
+          "type": "number"
+         }
+        },
+        "rot": {
+         "minItems": 3,
+         "maxItems": 3,
+         "type": "array",
+         "items": {
+          "type": "number"
+         }
+        },
+        "size": {
+         "type": "number"
+        },
+        "opacity": {
+         "type": "number"
+        },
+        "shake": {
+         "type": "number"
+        },
+        "turn": {
+         "type": "number"
+        },
+        "cut": {
+         "type": "boolean"
+        },
+        "ease": {
+         "type": "string"
+        },
+        "curve": {
+         "minItems": 4,
+         "maxItems": 4,
+         "type": "array",
+         "items": {
+          "type": "number"
+         }
+        },
+        "hin": {
+         "minItems": 3,
+         "maxItems": 3,
+         "type": "array",
+         "items": {
+          "type": "number"
+         }
+        },
+        "hout": {
+         "minItems": 3,
+         "maxItems": 3,
+         "type": "array",
+         "items": {
+          "type": "number"
+         }
+        }
+       },
+       "required": [
+        "t",
+        "pos"
+       ]
+      }
+     },
+     "smooth": {
+      "type": "boolean"
+     },
+     "easing": {
+      "type": "string"
+     },
+     "hold": {
+      "type": "number"
+     },
+     "shakeFreq": {
+      "type": "number"
+     },
+     "shake": {
+      "type": "object",
+      "properties": {
+       "amount": {
+        "type": "number"
+       },
+       "turn": {
+        "type": "number"
+       },
+       "freq": {
+        "type": "number"
+       },
+       "from": {
+        "type": "number"
+       },
+       "to": {
+        "type": "number"
+       }
+      }
+     },
+     "weave": {
+      "type": "number"
+     },
+     "lock": {
+      "type": "boolean"
+     }
+    },
+    "required": [
+     "node",
+     "keys"
+    ]
+   },
+   "annotations": {
+    "title": "Keyframe a VISUAL",
+    "readOnlyHint": false
+   }
+  },
+  {
+   "name": "app_undo",
+   "title": "Undo or redo",
+   "description": "Undoes (or redoes) the last change to the moveset in the app.",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "redo": {
+      "type": "boolean"
+     },
+     "steps": {
+      "type": "number"
+     }
+    }
+   },
+   "annotations": {
+    "title": "Undo or redo",
+    "readOnlyHint": false
+   }
+  },
+  {
+   "name": "app_save",
+   "title": "Save the moveset",
+   "description": "Saves the open moveset to its .txt (or asks the user where, the first time).",
+   "inputSchema": {
+    "type": "object",
+    "properties": {}
+   },
+   "annotations": {
+    "title": "Save the moveset",
+    "readOnlyHint": false
+   }
+  },
+  {
+   "name": "app_notify",
+   "title": "Tell the user something",
+   "description": "Shows a short message in the app’s status bar.",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "message": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "message"
+    ]
+   },
+   "annotations": {
+    "title": "Tell the user something",
+    "readOnlyHint": true
+   }
+  }
+ ]
+}

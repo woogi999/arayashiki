@@ -126,6 +126,8 @@ import {
   ChartSpline,
   CopyPlus,
   ImageUp,
+  Ruler,
+  Magnet,
 } from 'lucide-preact';
 
 const ICONS = {
@@ -154,6 +156,8 @@ const ICONS = {
   'rotate-cw': RotateCw,
   'rotate-ccw': RotateCcw,
   'zoom-in': ZoomIn,
+  ruler: Ruler,
+  magnet: Magnet,
   'zoom-out': ZoomOut,
   'file-archive': FileArchive,
   'sword': Sword,

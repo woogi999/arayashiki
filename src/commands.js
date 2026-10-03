@@ -95,6 +95,9 @@ export const COMMANDS = [
   // Workspaces and windows
   { id: 'toSkills', title: 'Go to the Skill Builder', group: 'Workspace', icon: 'swords', keywords: 'skills workspace builder', run: toSkills },
   { id: 'toMeter', title: 'Go to the Meter Maker', group: 'Workspace', icon: 'battery', keywords: 'meter progress bar maker workspace', run: () => ((S.workspace.value = 'bars'), (S.showStart.value = false)) },
+  { id: 'barRulers', title: 'Rulers and guides on / off', group: 'Meter Maker', icon: 'ruler', keywords: 'ruler rulers guides guide lines photoshop measure meter', when: () => S.workspace.peek() === 'bars', run: () => B.toggleRulers(), checked: () => B.rulers.peek() },
+  { id: 'barSnap', title: 'Snapping on / off', group: 'Meter Maker', icon: 'magnet', keywords: 'snap snapping center centre align middle guides meter', when: () => S.workspace.peek() === 'bars', run: () => B.toggleSnapping(), checked: () => B.snapping.peek() },
+  { id: 'barClearGuides', title: 'Clear the guides', group: 'Meter Maker', icon: 'trash-2', keywords: 'remove delete guides lines ruler meter', when: () => S.workspace.peek() === 'bars' && Boolean(B.doc.peek().guides?.length), run: () => B.clearGuides() },
   { id: 'resetLayout', title: 'Reset the panel layout', group: 'Workspace', icon: 'layout', keywords: 'panels dock layout default reset workspace', run: () => resetLayout() },
   { id: 'saveLayout', title: 'Save the panel layout…', group: 'Workspace', icon: 'save', keywords: 'panels dock layout workspace save keep preset', run: dialog('save-layout') },
   { id: 'search', title: 'Search everything', group: 'Help', icon: 'command', keywords: 'search find command palette', run: () => import('./ui/search.jsx').then((m) => m.openSearch()) },

@@ -341,3 +341,38 @@ export const APP_TOOLS = [
     readOnly: true,
   },
 ];
+
+// The app's own `open_in_app` (the Node server has its own, which starts
+// the app with a file).
+export const OPEN_IN_APP = {
+  name: 'open_in_app',
+  title: 'Open skills as the moveset',
+  description: 'Opens skills (or a code) in the app as the whole moveset, replacing what is open (undoable). To change part of the moveset, use app_put_skills.',
+  shape: { code: z.string().optional(), skills: z.array(z.record(z.string(), z.any())).optional(), name: z.string().optional() },
+};
+
+// What `arayashiki.exe --mcp` tells an AI app when it connects.
+export const APP_INSTRUCTIONS = [
+  'Arayashiki is a desktop app for Jujutsu Shenanigans (Roblox) Skill Builder skills; these tools work on it (the app starts if it is closed).',
+  'The app_* tools act on what the user has open: app_state first, then app_get_skills / app_put_skills to edit the moveset in place (every change is undoable with Ctrl+Z), app_simulate and app_playback to run it, app_screenshot to see it, app_export_video to render it, app_animate to keyframe a mesh or camera.',
+  'A "code" is the text JJS copies out (base64 of zstd JSON, starts "KLUv/"). To build a new move: search_library for the closest real move, get_library_move for its nodes, node_reference for fields, adapt, validate, then app_put_skills.',
+  "The simulator is a model of JJS's rules read from real exports, not the game: timings and damage are close, not exact. The handbook says what is confirmed and what is inferred.",
+  'Reference docs (the handbook, the move library, the game data) are also on disk next to the app, in its install folder: read AGENTS.md there first.',
+].join('\n');
+
+export const inputSchemaOf = (shape) => {
+  const s = z.toJSONSchema(z.object(shape), { target: 'draft-7', io: 'input', unrepresentable: 'any' });
+  delete s.$schema;
+  return s;
+};
+
+/** The app's MCP tool list, as `tools/list` answers it. */
+export function mcpListing() {
+  return [...ENGINE_TOOLS, OPEN_IN_APP, ...APP_TOOLS].map((t) => ({
+    name: t.name,
+    title: t.title,
+    description: t.description,
+    inputSchema: inputSchemaOf(t.shape),
+    annotations: { title: t.title, readOnlyHint: Boolean(t.readOnly), ...(t.openWorld ? { openWorldHint: true } : {}) },
+  }));
+}

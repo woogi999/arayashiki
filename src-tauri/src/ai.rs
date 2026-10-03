@@ -9,7 +9,7 @@
 //     `connect_ai_client` writes the app into the client's MCP settings,
 //     pointing at `arayashiki.exe --mcp` (src-tauri/src/bridge.rs).
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use serde::Serialize;
 use serde_json::{json, Value};
@@ -162,10 +162,41 @@ fn appdata() -> Option<PathBuf> {
     std::env::var_os("APPDATA").map(PathBuf::from)
 }
 
-/// Where each client keeps its MCP servers, and the key they go under.
+/// Claude Desktop's settings folders. The Microsoft Store build (MSIX)
+/// reads %LOCALAPPDATA%\Packages\Claude_…\LocalCache\Roaming\Claude, never
+/// %APPDATA%\Claude; the classic installer reads %APPDATA%\Claude. Every one
+/// that's there, the Store's first; %APPDATA%'s when there's none.
+fn claude_desktop_dirs() -> Vec<PathBuf> {
+    let mut out = Vec::new();
+    if let Some(packages) = std::env::var_os("LOCALAPPDATA").map(|d| PathBuf::from(d).join("Packages")) {
+        if let Ok(entries) = std::fs::read_dir(packages) {
+            for e in entries.flatten() {
+                let name = e.file_name().to_string_lossy().to_string();
+                if name.starts_with("Claude_") || name.starts_with("AnthropicPBC.Claude_") {
+                    out.push(e.path().join("LocalCache").join("Roaming").join("Claude"));
+                }
+            }
+        }
+    }
+    if let Some(d) = appdata().map(|d| d.join("Claude")) {
+        if d.exists() || out.is_empty() {
+            out.push(d);
+        }
+    }
+    out
+}
+
+/// Where each client keeps its MCP servers (every file it might read), and
+/// the key they go under.
+fn client_configs(client: &str) -> Vec<(PathBuf, &'static str)> {
+    if client == "claude-desktop" {
+        return claude_desktop_dirs().into_iter().map(|d| (d.join("claude_desktop_config.json"), "mcpServers")).collect();
+    }
+    client_config(client).into_iter().collect()
+}
+
 fn client_config(client: &str) -> Option<(PathBuf, &'static str)> {
     Some(match client {
-        "claude-desktop" => (appdata()?.join("Claude").join("claude_desktop_config.json"), "mcpServers"),
         "cursor" => (home()?.join(".cursor").join("mcp.json"), "mcpServers"),
         "vscode" => (appdata()?.join("Code").join("User").join("mcp.json"), "servers"),
         "vscode-insiders" => (appdata()?.join("Code - Insiders").join("User").join("mcp.json"), "servers"),
@@ -199,6 +230,14 @@ pub struct ClientInfo {
     config: Option<String>,
 }
 
+fn has_server(path: &Path, key: &str) -> bool {
+    std::fs::read_to_string(path)
+        .ok()
+        .and_then(|t| serde_json::from_str::<Value>(&t).ok())
+        .map(|v| v.get(key).and_then(|s| s.get("arayashiki")).is_some())
+        .unwrap_or(false)
+}
+
 /// Which AI clients look installed, and which already have Arayashiki.
 #[tauri::command]
 pub fn ai_clients() -> Vec<ClientInfo> {
@@ -213,24 +252,57 @@ pub fn ai_clients() -> Vec<ClientInfo> {
                 .map(|t| t.contains("[mcp_servers.arayashiki]"))
                 .unwrap_or(false);
             (p, installed, connected)
-        } else if let Some((p, key)) = client_config(id) {
-            let installed = p.parent().map(|d| d.exists()).unwrap_or(false) || p.exists();
-            let connected = std::fs::read_to_string(&p)
-                .ok()
-                .and_then(|t| serde_json::from_str::<Value>(&t).ok())
-                .map(|v| v.get(key).and_then(|s| s.get("arayashiki")).is_some())
-                .unwrap_or(false);
-            (Some(p), installed, connected)
         } else {
-            (None, false, false)
+            let configs = client_configs(id);
+            let installed = if id == "claude-code" {
+                home().map(|h| h.join(".claude").exists()).unwrap_or(false)
+            } else {
+                configs.iter().any(|(p, _)| p.exists() || p.parent().map(|d| d.exists()).unwrap_or(false))
+            };
+            // Connected only when every file the app might read has it.
+            let connected = !configs.is_empty() && configs.iter().all(|(p, key)| has_server(p, key));
+            (configs.first().map(|(p, _)| p.clone()), installed, connected)
         };
         out.push(ClientInfo { id: id.into(), installed, connected, config: path.map(|p| p.to_string_lossy().to_string()) });
     }
     out
 }
 
-/// Adds Arayashiki to a client's MCP settings (a backup of the file is kept
-/// next to it). Returns the file it changed.
+/// Adds Arayashiki to one JSON settings file (a backup is kept next to it).
+fn add_to_json(path: &Path, key: &str, server: Value) -> Result<(), String> {
+    let mut config: Value = if path.exists() {
+        let text = std::fs::read_to_string(path).map_err(|e| e.to_string())?;
+        if text.trim().is_empty() {
+            json!({})
+        } else {
+            let parsed = serde_json::from_str(&text).map_err(|_| {
+                format!("{} has comments or isn't plain JSON, so it wasn't touched. Add Arayashiki to it by hand (the steps are below).", path.display())
+            })?;
+            let _ = std::fs::write(path.with_extension("json.bak"), &text);
+            parsed
+        }
+    } else {
+        std::fs::create_dir_all(path.parent().ok_or("Bad path")?).map_err(|e| e.to_string())?;
+        json!({})
+    };
+    let obj = config.as_object_mut().ok_or("The settings file isn't a JSON object")?;
+    let servers = obj.entry(key).or_insert_with(|| json!({}));
+    servers.as_object_mut().ok_or("Its server list isn't a JSON object")?.insert("arayashiki".into(), server);
+    std::fs::write(path, serde_json::to_string_pretty(&config).map_err(|e| e.to_string())?).map_err(|e| e.to_string())
+}
+
+/// Claude Code also gets Arayashiki's skill (~/.claude/skills/arayashiki),
+/// so it knows when to reach for the tools.
+fn install_claude_skill() {
+    if let Some(dir) = home().map(|h| h.join(".claude").join("skills").join("arayashiki")) {
+        if std::fs::create_dir_all(&dir).is_ok() {
+            let _ = std::fs::write(dir.join("SKILL.md"), include_str!("../../docs/ai/installed/SKILL.md"));
+        }
+    }
+}
+
+/// Adds Arayashiki to a client's MCP settings (a backup of each file is
+/// kept next to it). Returns the files it changed.
 #[tauri::command]
 pub fn connect_ai_client(client: String) -> Result<String, String> {
     let exe = exe_path()?;
@@ -252,34 +324,32 @@ pub fn connect_ai_client(client: String) -> Result<String, String> {
         std::fs::write(&path, text).map_err(|e| e.to_string())?;
         return Ok(path.to_string_lossy().to_string());
     }
-    let (path, key) = client_config(&client).ok_or_else(|| format!("Unknown client {client}"))?;
-    let mut config: Value = if path.exists() {
-        let text = std::fs::read_to_string(&path).map_err(|e| e.to_string())?;
-        if text.trim().is_empty() {
-            json!({})
+    let configs = client_configs(&client);
+    if configs.is_empty() {
+        return Err(format!("Unknown client {client}"));
+    }
+    let mut done = Vec::new();
+    let mut failed = None;
+    for (path, key) in configs {
+        let server = if key == "servers" {
+            json!({ "type": "stdio", "command": exe, "args": ["--mcp"] })
+        } else if client == "claude-code" {
+            json!({ "type": "stdio", "command": exe, "args": ["--mcp"], "env": {} })
         } else {
-            let parsed = serde_json::from_str(&text).map_err(|_| {
-                format!("{} has comments or isn't plain JSON, so it wasn't touched. Add Arayashiki to it by hand (the steps are below).", path.display())
-            })?;
-            let _ = std::fs::write(path.with_extension("json.bak"), &text);
-            parsed
+            json!({ "command": exe, "args": ["--mcp"] })
+        };
+        match add_to_json(&path, key, server) {
+            Ok(()) => done.push(path.to_string_lossy().to_string()),
+            Err(e) => failed = Some(e),
         }
-    } else {
-        std::fs::create_dir_all(path.parent().ok_or("Bad path")?).map_err(|e| e.to_string())?;
-        json!({})
-    };
-    let server = if key == "servers" {
-        json!({ "type": "stdio", "command": exe, "args": ["--mcp"] })
-    } else if client == "claude-code" {
-        json!({ "type": "stdio", "command": exe, "args": ["--mcp"], "env": {} })
-    } else {
-        json!({ "command": exe, "args": ["--mcp"] })
-    };
-    let obj = config.as_object_mut().ok_or("The settings file isn't a JSON object")?;
-    let servers = obj.entry(key).or_insert_with(|| json!({}));
-    servers.as_object_mut().ok_or("Its server list isn't a JSON object")?.insert("arayashiki".into(), server);
-    std::fs::write(&path, serde_json::to_string_pretty(&config).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?;
-    Ok(path.to_string_lossy().to_string())
+    }
+    if client == "claude-code" {
+        install_claude_skill();
+    }
+    match (done.is_empty(), failed) {
+        (true, Some(e)) => Err(e),
+        _ => Ok(done.join(" and ")),
+    }
 }
 
 /// This app's own path, for instructions shown to the user.

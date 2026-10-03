@@ -31,11 +31,17 @@
 // goes down, the step it came from flashes its trail behind the meter,
 // fading away, so you see how much was lost:
 //
-//   start     the container, for ever; set the tag; go to "-"
+//   start     the container (and the front), for ever; set the tag; go to "-"
 //   "<step>"  as Complex, but the meter only; a lower step goes by
 //             "Drop<step>" instead of straight there
 //   "Drop<step>"  Cancel the last trail; this step's trail, fading out over
 //             the trail time; go to "-", which finds the new step
+//
+// Layers that never change are in the container (under the meter) or the
+// front (over it), drawn once. A layer shown on some steps only (a "FULL!"
+// on the last) is an extra: each step's branch shows it (Cancel, then
+// show, so it never piles up) if it's on that step, and takes it off if
+// not, so it's drawn only when it's needed.
 //
 // Legacy (the first version): each step shows its billboard for a moment and
 // goes back to "-", which checks again and shows it again, for ever:
@@ -74,10 +80,10 @@ export function billboardAlt(position) {
   return `0, ${y ? -2 * y : 0}, 0`;
 }
 
-// The same "x, y, z" moved `dz` in z (a billboard's layer), to the thousandth.
+// The same "x, y, z" moved `dz` in z (a billboard's layer), to a ten-thousandth.
 export function layerAt(position, dz) {
   const [x, y, z] = vec3(position);
-  const r = (v) => Math.round(v * 1000) / 1000;
+  const r = (v) => Math.round(v * 10000) / 10000;
   return `${r(x)}, ${r(y)}, ${r(z + dz)}`;
 }
 
@@ -194,6 +200,10 @@ const nudge = (tag, value) => ({
  * container    separate: the container's image ID (shown once, at the back)
  * trails       separate: one trail image ID per step, or null for no trail
  * trailTime    separate: how long a trail takes to fade, in seconds
+ * front        separate: the front's image ID (the layers over the meter
+ *              that never change), shown once in front of it; or null
+ * extras       separate: [{ id, steps: [step…], above }], pictures shown on
+ *              those steps only, over the meter (above) or under it
  * checkEvery   complex: the wait between checks of the tag, in seconds
  * showFor      legacy: how long each billboard is shown for, in seconds
  * waitFor      legacy: the wait before the tag is checked again, in seconds
@@ -301,6 +311,8 @@ function buildBar({
   container = null,
   trails = null,
   trailTime = 0.4,
+  front = null,
+  extras = [],
 }) {
   const top = textures.length - 1;
   const steps = textures.map((_, i) => String(i));
@@ -332,8 +344,13 @@ function buildBar({
     return withHelpers(name, tag, start, top, branches, regen);
   }
   if (style === 'separate') {
-    // Back to front, a thousandth apart: container, trail, meter.
+    // Back to front: container (0), extras under the meter (-0.0005), trail
+    // (-0.001), meter (-0.002), extras over it (-0.0025), front (-0.003).
     const withTrail = Array.isArray(trails) && trails.length === textures.length;
+    const extraTag = (n) => `${tag}X${n}`;
+    const shownExtras = (Array.isArray(extras) ? extras : [])
+      .filter((e) => e && String(e.id ?? '').trim() !== '' && Array.isArray(e.steps))
+      .map((e, n) => ({ id: Number(e.id), steps: e.steps.map(Number), visualTag: extraTag(n), position: layerAt(position, e.above ? -0.0025 : -0.0005) }));
     const trailTag = `${tag}Trail`;
     const drop = withTrail ? (step) => (step > 0 ? `Drop${step}` : null) : null;
     Object.assign(
@@ -345,6 +362,12 @@ function buildBar({
         checkEvery,
         show: { size, position: layerAt(position, -0.002), clientSided },
         drop,
+        // Each step shows the extras that are on it and takes off the rest.
+        also: (step) =>
+          shownExtras.flatMap((e) => [
+            visual(e.id, { size, position: e.position, time: FOREVER, clientSided, effect: 'Cancel', visualTag: e.visualTag }),
+            ...(e.steps.includes(step) ? [visual(e.id, { size, position: e.position, time: FOREVER, clientSided, visualTag: e.visualTag })] : []),
+          ]),
       }),
     );
     if (withTrail)
@@ -363,6 +386,13 @@ function buildBar({
       visual(box, { size, position: layerAt(position, 0), time: FOREVER, clientSided, effect: 'Cancel', visualTag: boxTag }),
       visual(box, { size, position: layerAt(position, 0), time: FOREVER, clientSided, visualTag: boxTag }),
     ];
+    const frontTag = `${tag}Front`;
+    const top3 = front != null && String(front).trim() !== '' ? Number(front) : null;
+    if (top3 != null)
+      before.push(
+        visual(top3, { size, position: layerAt(position, -0.003), time: FOREVER, clientSided, effect: 'Cancel', visualTag: frontTag }),
+        visual(top3, { size, position: layerAt(position, -0.003), time: FOREVER, clientSided, visualTag: frontTag }),
+      );
     return withHelpers(name, tag, start, top, branches, regen, before);
   }
   textures.forEach((texture, i) => {
@@ -395,7 +425,7 @@ const stepTag = (tag, i) => `${tag}${i}`;
 
 // `drop(step)`, when given, names the branch a lower step goes by from
 // `step` (Complex Separate's trail), instead of straight to it.
-function complexSteps({ textures, tag, rails, checkEvery, show, drop = null }) {
+function complexSteps({ textures, tag, rails, checkEvery, show, drop = null, also = () => [] }) {
   const top = textures.length - 1;
   const steps = textures.map((_, k) => k);
   const branches = {};
@@ -450,6 +480,7 @@ function complexSteps({ textures, tag, rails, checkEvery, show, drop = null }) {
         ...steps
           .filter((k) => k !== i)
           .map((k) => cancel(texture, stepTag(tag, k))),
+        ...also(i),
         ...waitInLoop(i),
       ],
       Req: [],
@@ -468,6 +499,7 @@ function complexSteps({ textures, tag, rails, checkEvery, show, drop = null }) {
         Line: [
           shown(texture, visualTag),
           ...steps.map((k) => cancel(texture, stepTag(tag, k))),
+          ...also(step),
           branch(`${name}Hold`),
         ],
         Req: [],

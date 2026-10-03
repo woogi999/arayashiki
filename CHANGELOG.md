@@ -3,6 +3,58 @@
 What changed in each version of Arayashiki, newest first. The app shows this
 under Help → What's new.
 
+## 1.0.4
+
+### AI
+- **AI apps see Arayashiki straight away.** `arayashiki.exe --mcp` answers the
+  handshake and lists its tools itself; the app's window only opens for the
+  first tool call. Before, the AI app waited for the whole app to start, and
+  could give up.
+- **Claude Desktop from the Microsoft Store** is connected where it really
+  reads its settings (its own package folder), as well as where the
+  downloaded Claude Desktop does. Connect it again if you connected it
+  before.
+- **The install folder explains itself**: next to `arayashiki.exe` are
+  `AGENTS.md` (what the app is and how to reach it), `mcp.json`, the handbook,
+  the move library, the game's animations and sounds, and a skill for Claude.
+  Claude Code also gets the skill when you connect it.
+- **Sign in with your AI plan**: the assistant can use your Claude (Pro/Max),
+  ChatGPT (Plus/Pro) or Google account instead of an API key, through the
+  provider's own app (Claude Code, Codex, Gemini CLI), the way the Claude Code
+  extension for VS Code does. Install and sign in from the assistant's
+  settings.
+
+### Impact frames
+- **New anime and manga looks**, drawn from the hit outward: Ink smear,
+  Graphite, Zoom ink, Neon streak, Crimson rim, Black flash and Screentone.
+  Bodies can be smeared into streaks, drawn as soft edge streaks, rim-lit or
+  glowing; focus lines (集中線) stop at a ragged edge round the hit; a flare,
+  streaks, a zoom blur and ink levels finish it.
+- **Pose the fighters**: pose you and the dummy by hand for the frame, as in
+  Blender: click a body part, then Reach (IK: drag the hand or foot), Turn, or
+  Move the body; Mirror and Reset. A small live preview of the frame can stay
+  up while you pose.
+
+### Meter Maker
+- **Rulers and guides** (Ctrl+R), and **snapping** (Ctrl+;) to the middle,
+  the edges, guides and other layers.
+- **More effects** for any layer: halftone, chromatic aberration, 3D extrude,
+  bevel, tilt in 3D, glitch, scanlines, pixelate and blur.
+- **An outline's own roundness**, apart from the bar's (or the rectangle's).
+- **Complex Separate** works out where each layer goes: unchanging layers in
+  the container or a new front picture, layers shown on some steps only as
+  pictures of their own (shown only then), and the bar's inner shadow and
+  outline baked into the meter where it covers them.
+
+### Skill Builder
+- **JJS's own effects show without signing in**: their textures and meshes
+  come with the app.
+- **The auto-sheathing template has a 3D preview** of the weapon, sheathed and
+  drawn.
+- **A camera animation's shake on its last key** now goes on through the hold,
+  instead of stopping dead.
+- Stopping the assistant mid-reply no longer leaves it broken.
+
 ## 1.0.3
 
 ### Impact frames

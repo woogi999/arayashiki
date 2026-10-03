@@ -182,6 +182,22 @@ test('shake is keyed: it eases between keys and only shakes where a key asks', (
   assert.deepEqual(pts.at(-1).pos, keys.at(-1).pos);
 });
 
+test('a shake on the last key goes on through the hold', () => {
+  const k = keys.map((x, i) => ({ ...x, shake: i === 2 ? 0.5 : 0, turn: i === 2 ? 2 : 0 }));
+  const a = { ...base, keys: k, effect: 'Camera', shakeFreq: 10, hold: 1 };
+  const legs = cameraLegs(a);
+  const inHold = legs.filter((l) => l.from.t >= 1.2 - 1e-6);
+  assert.ok(inHold.length > 3, `the hold is cut into pieces (${inHold.length})`);
+  assert.ok(Math.abs(inHold.at(-1).to.t - 2.2) < 1e-6, 'and still ends where the hold does');
+  assert.ok(inHold.some((l) => l.from.pos.some((v, i) => Math.abs(v - l.to.pos[i]) > 1e-3)), 'the pieces move: it shakes');
+  // Without a shake the hold stays one still block.
+  const still = cameraLegs({ ...base, keys, effect: 'Camera', hold: 1 }).filter((l) => l.from.t >= 1.2 - 1e-6);
+  assert.equal(still.length, 1);
+  // A part effect shakes through its hold too.
+  const mesh = chainNodes({ ...base, keys: k, effect: 'Mesh', shakeFreq: 10, hold: 1 });
+  assert.ok(mesh.filter((n) => n.at >= 1.2 - 1e-6).length > 3);
+});
+
 test('an animation kept with the old single shake gets it on its keys', () => {
   const old = { ...base, shake: { amount: 0.3, turn: 1, freq: 12, from: 0, to: 1.2, decay: true } };
   const a = normalize(old);

@@ -490,7 +490,14 @@ export function cameraLegs(anim) {
   }
   const last = keys.at(-1);
   const hold = frames(a.hold ?? 0);
-  if (hold > 0) {
+  if (hold > 0 && shaky(last)) {
+    // The last key's shake goes on through the hold, as it would to a next
+    // key with the same shake: a piece per half shake, never under three frames.
+    const step = Math.max(MIN_PIECE, 1 / Math.max(2, freq * 2));
+    const n = Math.max(1, Math.min(Math.floor(hold / MIN_PIECE + EPS), Math.round(hold / step)));
+    const ts = [...new Set(Array.from({ length: n + 1 }, (_, j) => frames(last.t + (hold * j) / n)))];
+    for (let j = 0; j < ts.length - 1; j++) leg(jitter(at, { ...last, t: ts[j] }), jitter(at, { ...last, t: ts[j + 1] }), 'Linear In');
+  } else if (hold > 0) {
     const end = jitter(at, { ...last });
     leg({ ...end, t: last.t }, { ...end, t: last.t + hold }, 'Linear In');
   }
@@ -547,7 +554,20 @@ export function chainNodes(a, frameAt = null) {
       .slice(0, -1)
       .map((p, i) => [p, pts[i + 1]])
       .filter(([from, to]) => to.t - from.t > 0.0005);
-    if (a.hold > 0) legs.push([pts.at(-1), { ...pts.at(-1), t: pts.at(-1).t + a.hold }]);
+    if (a.hold > 0) {
+      const last = a.keys.at(-1);
+      if (shaky(last)) {
+        // Shaking on through the hold, as between two keys that shake.
+        const step = 1 / Math.max(2, (a.shakeFreq ?? 14) * 2);
+        let prev = pts.at(-1);
+        for (let t = last.t + step; t < last.t + a.hold - 0.002; t += step) {
+          const next = jitter(a, { ...last, t: r3(t) });
+          legs.push([prev, next]);
+          prev = next;
+        }
+        legs.push([prev, jitter(a, { ...last, t: r3(last.t + a.hold) })]);
+      } else legs.push([pts.at(-1), { ...pts.at(-1), t: pts.at(-1).t + a.hold }]);
+    }
   }
   const F = (t) => (frameAt ? frameAt(t) : new Matrix4());
   for (const [from, to, legEase] of legs) {

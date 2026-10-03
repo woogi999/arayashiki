@@ -3,6 +3,8 @@
 // Credential Manager and streams the answer back, so keys never sit in the
 // web view.
 //
+//   subscriptions   Claude Code, Codex or Gemini CLI signed in with the user's
+//                   plan (src/ai/cli.js): they run the turn themselves
 //   Claude          the official Anthropic SDK, its fetch routed through the shell
 //   everything else OpenAI-compatible chat completions: OpenAI, Google Gemini,
 //                   OpenRouter, Groq, xAI, DeepSeek, Mistral, and models on this
@@ -17,6 +19,11 @@ import { isDesktop } from '../platform.js';
 import { localBase, refreshLocal } from './local.js';
 
 export const PROVIDERS = [
+  // Subscriptions, through the provider's own CLI (src/ai/cli.js): signed in
+  // in the browser, no API key.
+  { id: 'sub-claude', label: 'Claude: sign in with my Claude plan', cli: 'claude', subscription: true },
+  { id: 'sub-codex', label: 'ChatGPT: sign in with my ChatGPT plan', cli: 'codex', subscription: true },
+  { id: 'sub-gemini', label: 'Gemini: sign in with my Google account', cli: 'gemini', subscription: true },
   { id: 'local', label: 'On this PC (built in, free)', local: true, builtin: true },
   {
     id: 'anthropic',

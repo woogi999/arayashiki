@@ -385,6 +385,20 @@ module('Unit | JJS skill export', function () {
     assert.deepEqual(await decodeSkill(await encodeSkill(skill)), skill, 'the code decodes back to it');
   });
 
+  test('Complex Separate: the front once, extras only on their steps', function (assert) {
+    const data = program(buildSkill({ style: 'separate', textures: [10, 11, 12], container: 5, front: 7, extras: [{ id: 30, steps: [2], above: true }, { id: 31, steps: [0, 1], above: false }] }));
+    const front = data.Line.filter((n) => n['VISUAL TAG'] === 'BarFront');
+    assert.deepEqual(front.map((n) => [n.EFFECT, n.TEXTURE, n.POSITION]), [['Cancel', 7, '0, 0, -0.003'], ['Billboard', 7, '0, 0, -0.003']], 'the front, for good, in front of the meter');
+    const extrasOn = (step) =>
+      data.Branch[step].Line.filter((n) => n.K_NAME === 'VISUAL' && n['VISUAL TAG']?.startsWith('BarX')).map((n) => [n['VISUAL TAG'], n.EFFECT]);
+    assert.deepEqual(extrasOn('2'), [['BarX0', 'Cancel'], ['BarX0', 'Billboard'], ['BarX1', 'Cancel']], 'the full step shows its extra, and takes the other off');
+    assert.deepEqual(extrasOn('1'), [['BarX0', 'Cancel'], ['BarX1', 'Cancel'], ['BarX1', 'Billboard']]);
+    const shown = (step, tag) => data.Branch[step].Line.find((n) => n['VISUAL TAG'] === tag && n.EFFECT === 'Billboard');
+    assert.strictEqual(shown('2', 'BarX0').POSITION, '0, 0, -0.0025', 'over the meter');
+    assert.strictEqual(shown('0', 'BarX1').POSITION, '0, 0, -0.0005', 'under it');
+    assert.strictEqual(data.Branch.SafetyGreater.Line.some((n) => n['VISUAL TAG'] === 'BarX0' && n.EFFECT === 'Billboard'), true, 'the rails show the extras of the end they hold');
+  });
+
   test('a health bar: your health puts the tag on its step', function (assert) {
     const skills = buildSkill({ textures: [0, 1, 2, 3, 4], health: { max: 100, every: 0.05 } });
     assert.deepEqual(skills.map((s) => s.NAME), ['Bar', 'Bar Health'], 'the bar and its watcher, no regen or debug');

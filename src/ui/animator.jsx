@@ -451,7 +451,7 @@ effect(() => {
     const local = t - w.start;
     if (local < -1e-6 || local > end + 1e-6) return null;
     // The blocks as JJS runs them (whole frames, its easings), else the keys.
-    const pose = cameraAt(a, local) ?? shakenAt(a, Math.min(local, a.keys.at(-1).t));
+    const pose = cameraAt(a, local) ?? shakenAt(a, Math.min(local, a.keys.at(-1).t + (a.hold ?? 0)));
     const m = frameAt(local).multiply(keyMatrix(pose));
     const position = new Vector3();
     const quaternion = new Quaternion();
@@ -706,6 +706,9 @@ export function AnimatorPanel() {
           <span>Hold at the end (s)</span>
           <Num label="Hold at the end" step={0.1} min={0} value={a.hold} onChange={(v) => setAnim({ hold: Math.max(0, v) })} />
         </label>
+        {!(a.hold > 0) && ((a.keys.at(-1)?.shake ?? 0) > 0 || (a.keys.at(-1)?.turn ?? 0) > 0) && (
+          <p class="hint">The last key shakes, but the animation ends on it: give it a hold to keep shaking after it.</p>
+        )}
         <div class="prop-row">
           <span title="After a node: the chain starts at that node. Weave in: it starts at a time in the skill, each piece going in between the nodes already there, at its moment">
             Placement

@@ -513,6 +513,11 @@ and the shake hits and dies away. The **Light**, **Medium** and **Heavy**
 buttons set the picked key's shake; **Shakes a second** sets how fast it
 jitters.
 
+A shake on the **last** key keeps going through the **Hold at the end**, as if
+there were another key after it with the same shake. Without a hold the
+animation ends on that key, so give it one (the animator says so) to see the
+shake.
+
 ## Impact frames
 
 An impact frame is the moment of a hit that anime draws as a few frames of
@@ -521,21 +526,48 @@ moment itself. It's in the viewport's right-click menu (at the playhead), a
 skill's, and a node's (at that node), or press <kbd>Ctrl+Shift+I</kbd>.
 
 The characters are drawn as they'll be on screen then, through the skill's
-camera, and styled by a **look**:
+camera, and styled by a **look**. Everything is drawn from the hit outward,
+the way an animator draws one: focus lines rushing in, bodies smeared into
+streaks, light bursting out.
 
-- **Presets**: Basic (black on white), Negative, Flicker (strobing), Anime
-  (speed lines and a burst), Halftone, Manga ink, Red flash, Colourful,
-  Spider-Verse (comic dots, misprinted colour, glitches), Cursed, Glitch,
-  Shatter, Sketch.
+- **Presets**: **Ink smear** (manga ink: bodies torn into streaks rushing out
+  of the hit, heavy focus lines), **Graphite** (soft pencil streaks off the
+  bodies' edges, a white-hot core), **Zoom ink** (everything blown outward in a
+  zoom blur and cut into grey ink), **Neon streak** (glowing streaky outlines
+  on black, a colour each), **Crimson rim** (dark bodies rim-lit by a white
+  flare on red), **Black flash** (black and red sparks, inverted between
+  frames), **Screentone** (a manga page), and the plain **Basic**, **Negative**
+  and **Flicker**.
 - **Who's in it**: both of you, only you, only the enemy, or nobody.
 - **Frames** and **Each for**: several frames one after another make it hit
-  harder (Flicker and Red flash invert every other one).
+  harder. Each frame draws its lines anew, so they flicker the way drawn ones
+  do.
 - **Screen shape**: the shape of the screen it's drawn for (16:9 for most).
 - **Shuffle** draws another take; **Flash it** previews it at speed.
-- **Edit the look**: the colours (and a gradient out from the hit), an
-  outline, speed lines, screentone, silhouettes in dots, cracks, a colour
-  split, glitch slices, scanlines, grain, a vignette, a starburst, inverting
-  every other frame, fading out the last.
+- **Edit the look**: the **Bodies** (Solid, Smear, Edges, Rim lit, Glow), how
+  far a smear trails and how torn up it is, **focus lines** (how many, how
+  wide, how much clear space round the hit), **streaks** over the background,
+  a **flare** at the hit, a **zoom blur**, **ink levels** (cut to a few greys),
+  the colours (and a gradient out from the hit), an outline, screentone,
+  silhouettes in dots, cracks, a colour split, glitch slices, scanlines,
+  grain, a vignette, inverting every other frame, fading out the last.
+
+**Posing the fighters.** JJS's animations aren't public, so the simulator's
+poses are stand-ins. **Pose the fighters** folds the dialog into a bar over
+the viewport so you can pose both rigs by hand, as in Blender:
+
+- Click a body part on you or the dummy to pick it.
+- **Reach (IK)**: drag the hand or foot, and the arm or leg points at it.
+- **Turn**: turn the joint (the neck, a shoulder, a hip, or the waist for the
+  torso, which carries everything above it).
+- **Move body**: move the whole character.
+- **Mirror** copies the picked arm's or leg's pose to the other side;
+  **Reset** puts the picked joint back, **Reset all** both rigs.
+- **Preview** keeps a small copy of the impact frame in the corner, redrawn
+  with the pose as you go; turn it off to see more of the view.
+- **Back to the frame** (or <kbd>Esc</kbd>) returns to the dialog. The pose is
+  kept while the app is open, and the frames are drawn with it. Closing the
+  dialog puts the rigs back as the skill has them.
 
 **Upload and insert** (signed in with Roblox) uploads the frames and puts
 them in the open branch at that moment, after the nodes already there: an
@@ -562,6 +594,11 @@ each lifted node for node from a real moveset: a meter, an auto-sheathing
 weapon, accurate M1s, an accurate dash, and percentage damage. Fill in the
 form, preview it, and add the skills to your moveset.
 
+The **auto-sheathing weapon** has a 3D preview: an R6 body wearing the weapon
+(and its scabbard) where the skill puts them, **Sheathed**, **Drawn**, or
+**Both** (the drawn one see-through), so you can check a position or rotation
+before it goes into JJS. Drag to look around.
+
 ## The Meter Maker
 
 The Meter Maker draws a meter (a progress bar: a picture for every step of a
@@ -577,6 +614,26 @@ account, and makes the JJS skill that shows the right picture for the value.
 
 Designs are saved inside the app (**Save**), or as `.meter.json` files to
 share (**Save As**). **Settings** is in the Meter Maker's top bar too.
+
+**Rulers, guides and snapping.** Rulers run along the top and left of the
+picture in its pixels (<kbd>Ctrl+R</kbd> shows or hides them), with a mark
+where the pointer is and a pink tick at the middle. Drag out of a ruler for a
+guide; drag a guide to move it, or off the picture to remove it (**Clear the
+guides** in the search removes them all). A layer you move, resize or draw
+snaps to the picture's middle and edges, the guides, and the other layers'
+edges and middles, with a pink line where it snapped. Hold <kbd>Alt</kbd> to
+place it freely, or turn snapping off with <kbd>Ctrl+;</kbd>.
+
+**Effects.** Every layer has **Layer effects** (drop shadow, outer glow,
+outline, colour overlay) and **Stylise**: **Halftone** (dots, lines or
+squares on a turned grid, in its own colours or one ink, sized by how solid,
+dark or light it is), **Chromatic aberration** (red and blue pulled apart),
+**3D extrude** (depth under it, in its own colours darker or one colour, or a
+fading long shadow), **Bevel** (lit and shaded edges), **Tilt in 3D**
+(leaned back in perspective), **Glitch** (torn slices, changing every step if
+you like), **Scanlines**, **Pixelate** and **Blur**. A bar's **Stroke** tab can
+give its outline **its own roundness**, apart from the bar's (a square frame
+round a pill), and so can a rectangle's outline.
 
 **Fonts.** A text layer's (or text bar's) **Font** opens the font browser:
 **Built in and added**, **On this PC** (every font installed here), and
@@ -595,9 +652,10 @@ see-through background works best (a sword, a skill icon, a logo).
 
 **In layers.** Under Export → Pictures, **Render in layers** saves the meter
 apart from its container: one container picture (the background, the outline,
-and any layer that never changes), then a folder each of the meter, its
-leading edge and its catch-up trail (whichever the design has), a picture per
-step.
+and the layers under the bar that never change), a front picture (the layers
+over it that never change) and one for each set of steps that a layer only
+shows on, then a folder each of the meter, its leading edge and its catch-up
+trail (whichever the design has), a picture per step.
 
 **The skill's styles** (Export → JJS skill):
 
@@ -612,6 +670,16 @@ step.
   container's image ID, the meter's (one per step, with the leading edge in
   them) and the trail's (one per step, if a bar's catch-up trail is on); the
   upload makes and fills in all of them.
+
+  Which picture a layer goes in is worked out for you. Layers that never
+  change go in the container (under the bar) or the **front** (over it), shown
+  once. A layer shown on some steps only (**Only show between**, like a
+  “FULL!” on the last) is a picture of its own, shown on those steps and
+  taken off the others, rather than drawn into every meter picture. And since
+  the meter sits in front of the container, the bar's inner shadow and outline
+  are drawn into the meter pictures too where they cover them, so they look
+  the same as all in one; the container keeps the drop shadow, glow and
+  extrusion under the whole bar.
 - **Legacy**: each step shown again and again, every wait. Simple, but it can
   lag.
 
@@ -689,8 +757,17 @@ animate cameras, and every change it makes can be undone with
 
 ### The assistant inside the app
 
-Press <kbd>Ctrl+J</kbd>. Pick your AI and paste its API key:
+Press <kbd>Ctrl+J</kbd>. Sign in with a plan you already pay for, or pick your AI and paste its API key:
 
+- **Sign in with your plan** (no API key): **Claude** (Pro or Max),
+  **ChatGPT** (Plus, Pro, Business) or **Gemini** (a Google account). These
+  go through the provider's own app, the way the Claude Code extension for VS
+  Code works: Claude Code, Codex or Gemini CLI. If it isn't on your PC,
+  **Install** opens a window that installs it; **Sign in** opens the
+  provider's sign-in page in your browser. Arayashiki never sees your
+  password or the sign-in token, and what you ask counts against your plan's
+  usage, not a bill. The model box takes the app's own names (for Claude:
+  `opus`, `sonnet`, `haiku`, `fable`), or leave it empty for its default.
 - **Claude** (Anthropic), **OpenAI** (ChatGPT's models), **Google Gemini**,
   **OpenRouter** (hundreds of models with one key), **Groq**, **xAI**,
   **DeepSeek**, **Mistral**, or any OpenAI-compatible service;
@@ -745,7 +822,16 @@ Desktop, Claude Code, Cursor, VS Code (GitHub Copilot), Windsurf, Cline, Codex
 CLI, Gemini CLI or LM Studio. **Connect automatically** adds Arayashiki to
 that app's MCP settings (keeping a backup of the file), and the wizard shows
 the steps to see it working in that app. Nothing else to install: Arayashiki
-is its own MCP server, and the AI app starts Arayashiki if it isn't open.
+is its own MCP server. The AI app sees it and its tools straight away, and
+Arayashiki's window opens the first time the AI uses a tool, if it isn't open.
+Claude Desktop from the Microsoft Store keeps its settings in a different
+place from the downloaded one: both are filled in. Claude Code also gets
+Arayashiki's skill, so it knows when to use the tools.
+
+The install folder (`%LOCALAPPDATA%\Arayashiki`) also holds what an AI needs
+to read: `AGENTS.md` (what the app is and how to reach it), `mcp.json`, the
+handbook, the move library and the game's animations and sounds, under
+`docs`. Give an AI app that folder and it knows what it's looking at.
 
 ChatGPT's apps can't start programs on your PC, so they can't connect this
 way: use the assistant inside the app with an OpenAI key instead.
@@ -825,15 +911,19 @@ cleared) in Settings → Keybinds (<kbd>Ctrl+/</kbd>).
 
 In the Meter Maker: <kbd>V</kbd> move, <kbd>B</kbd> brush, <kbd>E</kbd>
 eraser, <kbd>U</kbd> shapes, <kbd>T</kbd> text, <kbd>Ctrl+0</kbd> fit the
-canvas, <kbd>,</kbd> / <kbd>.</kbd> previous / next step, and the arrows nudge
-the picked layer (Shift: ten pixels).
+canvas, <kbd>Ctrl+R</kbd> rulers and guides, <kbd>Ctrl+;</kbd> snapping,
+<kbd>,</kbd> / <kbd>.</kbd> previous / next step, and the arrows nudge the
+picked layer (Shift: ten pixels). Hold <kbd>Alt</kbd> while dragging to place
+a layer without snapping.
 
 ## Troubleshooting
 
 ### Effects show as grey shapes, or sounds are silent
 
-Sign in with Roblox (the account button, top right). Some meshes, textures
-and most sounds are only handed to an account. A few assets are private to
+JJS's own effects (their textures and meshes) come with the app, so they show
+without signing in. A skill's own assets (a Mesh VISUAL's mesh, a TEXTURE, a
+sound) come from Roblox: sign in with Roblox (the account button, top right),
+since some meshes, textures and most sounds are only handed to an account. A few assets are private to
 their creator and can't be loaded by anyone else.
 
 ### A video export says the PC can't encode that format
@@ -852,7 +942,9 @@ can be turned off (Export → Video → Audio).
 ### The AI app doesn't see Arayashiki
 
 Restart the AI app completely after connecting (for Claude Desktop, quit it
-from the system tray). Check its MCP list for "arayashiki". If you moved or
+from the system tray). Check its MCP list for "arayashiki". If Claude Desktop
+was connected with an older version of Arayashiki, connect it again: older
+versions wrote to the settings file the Microsoft Store's Claude doesn't read. If you moved or
 reinstalled Arayashiki, connect again: the settings point at the app's path.
 
 ### The assistant says the key wasn't accepted
