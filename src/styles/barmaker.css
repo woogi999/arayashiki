@@ -30,7 +30,7 @@
 
 .workspace-tabs button[aria-selected='true'] {
   background: var(--ground);
-  color: #fff;
+  color: var(--g100);
   font-weight: 500;
 }
 
@@ -47,8 +47,8 @@
 
 /* See-through areas of a picture, as image editors show them. */
 .checker {
-  background-color: #2a2a2a;
-  background-image: conic-gradient(#333 25%, transparent 0 50%, #333 0 75%, transparent 0);
+  background-color: var(--g16);
+  background-image: conic-gradient(var(--g20) 25%, transparent 0 50%, var(--g20) 0 75%, transparent 0);
   background-size: 16px 16px;
 }
 
@@ -132,7 +132,7 @@
 
 .pb-rail-btn[aria-pressed='true'] {
   background: var(--widget-on);
-  color: #fff;
+  color: var(--g100);
 }
 
 .pb-rail-sep {
@@ -167,7 +167,7 @@
   display: block;
   width: 100%;
   height: 100%;
-  background: #141414;
+  background: var(--g8);
   cursor: default;
   touch-action: none;
 }
@@ -175,14 +175,14 @@
 .pb-ruler.is-top {
   grid-row: 1;
   grid-column: 2;
-  border-bottom: 1px solid #070707;
+  border-bottom: 1px solid var(--g3);
   cursor: row-resize;
 }
 
 .pb-ruler.is-left {
   grid-row: 2;
   grid-column: 1;
-  border-right: 1px solid #070707;
+  border-right: 1px solid var(--g3);
   cursor: col-resize;
 }
 
@@ -191,9 +191,9 @@
   grid-column: 1;
   padding: 0;
   border: 0;
-  border-right: 1px solid #070707;
-  border-bottom: 1px solid #070707;
-  background: #141414;
+  border-right: 1px solid var(--g3);
+  border-bottom: 1px solid var(--g3);
+  background: var(--g8);
 }
 
 .pb-canvas-area {
@@ -203,11 +203,11 @@
   min-height: 0;
   overflow: auto;
   container-type: size;
-  background: #1a1a1a;
+  background: var(--g10);
 }
 
 .pb-canvas-area.is-dragging {
-  outline: 2px dashed #7a7a7a;
+  outline: 2px dashed var(--g48);
   outline-offset: -8px;
 }
 
@@ -215,7 +215,7 @@
   position: relative;
   flex: none;
   margin: 20px;
-  box-shadow: 0 0 0 1px #070707, 0 8px 28px rgb(0 0 0 / 45%);
+  box-shadow: 0 0 0 1px var(--g3), 0 8px 28px rgb(0 0 0 / 45%);
 }
 
 .pb-canvas,
@@ -286,7 +286,7 @@
   place-items: center;
   height: 64px;
   padding: 4px 4px 14px;
-  border: 1px solid #070707;
+  border: 1px solid var(--g3);
   border-radius: var(--radius);
 }
 
@@ -308,7 +308,7 @@
 }
 
 .pb-thumb:hover {
-  border-color: #5a5a5a;
+  border-color: var(--g35);
 }
 
 .pb-thumb[aria-pressed='true'] {
@@ -357,7 +357,7 @@
 
 .pb-tabs button[aria-selected='true'] {
   background: var(--area);
-  color: #fff;
+  color: var(--g100);
 }
 
 .pb-props {
@@ -458,10 +458,10 @@
 .pb-mini input[type='range'] {
   width: 100%;
   min-width: 0;
-  accent-color: #a0a0a0;
+  accent-color: var(--g63);
 }
 
-.pb-slider output {
+.pb-slider .type-value {
   color: var(--text);
   font-size: var(--text-xs);
   text-align: right;
@@ -476,7 +476,7 @@
 }
 
 .pb-check input {
-  accent-color: #a0a0a0;
+  accent-color: var(--g63);
 }
 
 .pb-check:hover {
@@ -498,7 +498,7 @@
 
 .pb-chips .chip[aria-pressed='true'] {
   background: var(--widget-on);
-  color: #fff;
+  color: var(--g100);
 }
 
 .segmented.pb-wrap {
@@ -564,9 +564,9 @@
   width: 22px;
   height: 22px;
   overflow: hidden;
-  border: 1px solid #070707;
+  border: 1px solid var(--g3);
   border-radius: var(--radius);
-  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 12%);
+  box-shadow: inset 0 0 0 1px rgb(var(--fg-rgb) / 12%);
 }
 
 .colour-swatch input {
@@ -601,7 +601,7 @@
   width: 96px;
   height: 14px;
   overflow: hidden;
-  border: 1px solid #070707;
+  border: 1px solid var(--g3);
   border-radius: var(--radius-sm);
 }
 
@@ -622,7 +622,7 @@
   place-items: center;
   width: 40px;
   height: 40px;
-  border: 1px solid #070707;
+  border: 1px solid var(--g3);
   border-radius: var(--radius);
   background-position: center;
   background-repeat: no-repeat;
@@ -690,7 +690,7 @@
 }
 
 .pb-layer-clip[aria-pressed='true'] {
-  color: #fff;
+  color: var(--g100);
 }
 
 .pb-layer-name {
@@ -774,7 +774,7 @@
 .pb-export-modal .pb-tabs {
   margin: -14px -14px 0;
   padding: 3px 10px 0;
-  background: #151515;
+  background: var(--g8);
 }
 
 .pb-export-modal .pb-tabs button[aria-selected='true'] {
@@ -879,7 +879,7 @@
 }
 
 .pb-upload-row.is-failed .pb-upload-state {
-  color: #ff8a8c;
+  color: var(--hit-text);
 }
 
 .pb-ids,
@@ -910,7 +910,7 @@
   height: 240px;
   overflow: hidden;
   border-radius: var(--radius);
-  background: #202020;
+  background: var(--g13);
 }
 
 .pb-bar3d-view .scene-canvas {
@@ -1118,4 +1118,103 @@
   display: grid;
   place-items: center;
   color: var(--text-2);
+}
+
+.pb-canvas-area.is-panning,
+.pb-canvas-area.is-panning .pb-overlay {
+  cursor: grabbing;
+}
+
+/* The custom shape library (the shape tool's and a shape layer's). */
+.pb-shape-lib {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.pb-shape-pick {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 4px;
+  border: 1px solid var(--line, var(--g16));
+  border-radius: var(--radius);
+  background: var(--field);
+  color: var(--text-2);
+  cursor: pointer;
+}
+
+.pb-shape-pick svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+}
+
+.pb-shape-pick:hover {
+  color: var(--text);
+}
+
+.pb-shape-pick[aria-pressed='true'] {
+  border-color: var(--g42);
+  background: var(--widget-on, var(--g23));
+  color: var(--g100);
+}
+
+.pb-overlay[data-tool='pen'],
+.pb-overlay[data-tool='bar'] {
+  cursor: crosshair;
+}
+
+/* The New dialog's examples: a picture of each, what it shows. */
+.pb-examples {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+  max-height: 46vh;
+  overflow: auto;
+}
+
+.pb-example {
+  display: grid;
+  gap: 4px;
+  align-content: start;
+  padding: 6px;
+  border: 1px solid var(--line, var(--g16));
+  border-radius: 8px;
+  background: var(--panel-2, var(--g11));
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+
+.pb-example:hover,
+.pb-example:focus-visible {
+  border-color: var(--g35);
+  background: var(--widget-hover, var(--g15));
+}
+
+.pb-example-thumb {
+  display: block;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 5px;
+}
+
+.pb-example-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.pb-example strong {
+  font-size: var(--text-sm);
+}
+
+.pb-example small {
+  color: var(--text-3);
+  font-size: var(--text-xs);
+  line-height: 1.35;
 }

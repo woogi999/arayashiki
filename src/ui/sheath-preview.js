@@ -1,6 +1,8 @@
 // The auto-sheathing template's 3D preview: an R6 character wearing the
 // weapon (and its scabbard) where the skill puts them, sheathed and drawn,
-// so a POSITION or ROTATION can be checked before it goes into JJS.
+// so a POSITION or ROTATION can be checked before it goes into JJS. Click a
+// mesh to drag it into place, as in Blender (Move, or Turn: G and R): its
+// POSITION and ROTATION are worked out back from where it ends up.
 //
 // Each mesh is placed the way the 3D Viewport places a Mesh VISUAL
 // (src/fx/builderfx.js, shape()): the body part's Roblox CFrame ·
@@ -9,6 +11,11 @@
 
 import {
   AmbientLight,
+  Euler,
+  Object3D,
+  Quaternion,
+  Raycaster,
+  Vector2,
   Color,
   DirectionalLight,
   Fog,
@@ -28,9 +35,10 @@ import {
   WebGLRenderer,
 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js';
 import { baseplateTexture, buildCharacter, faceTexture } from '../scene.js';
 import { readRobloxMesh } from '../rbxmesh.js';
-import { cfOrient, cfPos, robloxFrame } from '../fx/roblox.js';
+import { RAD, cfOrient, cfPos, robloxFrame } from '../fx/roblox.js';
 import { robloxImage, robloxMesh } from '../platform.js';
 import { vec3 } from '../../core/schema.js';
 
@@ -84,7 +92,14 @@ function mapOf(id) {
   return maps.get(key);
 }
 
-export function mountSheathScene(host) {
+const r3 = (v) => Math.round(v * 1000) / 1000 || 0;
+
+/**
+ * Mounts the preview in `host`. `onEdit(index, { position, rotation })` hears
+ * a mesh dragged to a new place (the item's index in the last update), as
+ * the "x, y, z" text the template's fields take.
+ */
+export function mountSheathScene(host, { onEdit = () => {}, onPick = () => {} } = {}) {
   const renderer = new WebGLRenderer({ antialias: true });
   renderer.outputColorSpace = SRGBColorSpace;
   renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
@@ -110,9 +125,78 @@ export function mountSheathScene(host) {
   scene.add(you.root);
 
   let shown = [];
+  let items = [];
   let version = 0;
+  let picked = -1;
+  let mode = 'translate';
   const render = () => renderer.render(scene, camera);
   controls.addEventListener('change', render);
+
+  // The gizmo, on a stand-in at the picked mesh (the mesh's own matrix
+  // carries its scale, which the gizmo mustn't touch).
+  const proxy = new Object3D();
+  scene.add(proxy);
+  const gizmo = new TransformControls(camera, renderer.domElement);
+  gizmo.setSize(0.8);
+  const helper = gizmo.getHelper();
+  helper.visible = false;
+  scene.add(helper);
+  gizmo.addEventListener('change', render);
+  gizmo.addEventListener('dragging-changed', (e) => {
+    controls.enabled = !e.value;
+    if (!e.value && picked >= 0) onEdit(picked, fieldsOf(picked));
+  });
+  gizmo.addEventListener('objectChange', () => {
+    const m = shown[picked];
+    if (!m) return;
+    proxy.updateMatrixWorld();
+    const s = m.userData.scale;
+    m.matrix.copy(proxy.matrixWorld).multiply(new Matrix4().makeScale(s, s, s));
+    render();
+  });
+  // Where the dragged stand-in is, as the item's POSITION and ROTATION on its body part.
+  function fieldsOf(i) {
+    const part = you.parts[items[i].part] ?? you.parts.HumanoidRootPart;
+    const local = robloxFrame(part.matrixWorld).invert().multiply(proxy.matrixWorld.clone());
+    const p = new Vector3();
+    const q = new Quaternion();
+    local.decompose(p, q, new Vector3());
+    const e = new Euler().setFromQuaternion(q, 'YXZ');
+    // CFrame.new(-x, y, -z) · fromOrientation(rx, ry, rz): back to x, y, z and degrees.
+    return {
+      position: [-p.x, p.y, -p.z].map(r3).join(', '),
+      rotation: [e.x / RAD, e.y / RAD, e.z / RAD].map((v) => Math.round(v * 10) / 10 || 0).join(', '),
+    };
+  }
+  function attach() {
+    const m = shown[picked];
+    if (!m) {
+      gizmo.detach();
+      helper.visible = false;
+      return render();
+    }
+    const s = m.userData.scale;
+    m.matrix.clone().multiply(new Matrix4().makeScale(1 / s, 1 / s, 1 / s)).decompose(proxy.position, proxy.quaternion, proxy.scale);
+    proxy.updateMatrixWorld();
+    gizmo.attach(proxy);
+    gizmo.setMode(mode);
+    gizmo.setSpace(mode === 'rotate' ? 'local' : 'world');
+    helper.visible = true;
+    render();
+  }
+  // A click (not a drag) on a mesh picks it; on nothing, lets go.
+  const ray = new Raycaster();
+  let down = null;
+  renderer.domElement.addEventListener('pointerdown', (e) => (down = [e.clientX, e.clientY]));
+  renderer.domElement.addEventListener('pointerup', (e) => {
+    if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 4 || gizmo.axis) return;
+    const r = renderer.domElement.getBoundingClientRect();
+    ray.setFromCamera(new Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1), camera);
+    const hit = ray.intersectObjects(shown, false)[0];
+    picked = hit ? shown.indexOf(hit.object) : -1;
+    onPick(picked, picked >= 0 ? items[picked] : null);
+    attach();
+  });
 
   function resize() {
     const w = host.clientWidth;
@@ -133,9 +217,9 @@ export function mountSheathScene(host) {
    * ghost }]; `ghost` draws one see-through (the other state, for comparing).
    * Returns how many of their meshes couldn't be loaded.
    */
-  async function update(items) {
+  async function update(list) {
     const mine = ++version;
-    const loaded = await Promise.all(items.map(async (it) => ({ it, g: await geometryOf(it.mesh), map: await mapOf(it.texture) })));
+    const loaded = await Promise.all(list.map(async (it) => ({ it, g: await geometryOf(it.mesh), map: await mapOf(it.texture) })));
     if (mine !== version) return 0;
     for (const m of shown) {
       scene.remove(m);
@@ -161,17 +245,31 @@ export function mountSheathScene(host) {
       // A mesh Roblox wouldn't hand over: a small marker where it would be.
       const m = new Mesh(g ?? new SphereGeometry(0.3, 16, 12), material);
       m.matrixAutoUpdate = false;
-      m.matrix.copy(frame).multiply(new Matrix4().makeScale(g ? s : 1, g ? s : 1, g ? s : 1));
+      m.userData.scale = g ? s : 1;
+      m.matrix.copy(frame).multiply(new Matrix4().makeScale(m.userData.scale, m.userData.scale, m.userData.scale));
       scene.add(m);
       shown.push(m);
     }
-    render();
+    items = list;
+    // The picked one stays picked across a redraw (its fields changed).
+    if (picked >= shown.length) picked = -1;
+    attach();
     return missing;
   }
 
   resize();
   return {
     update,
+    /** 'translate' (Move) or 'rotate' (Turn). */
+    setMode(next) {
+      mode = next;
+      attach();
+    },
+    /** Picks a mesh by its index (-1: none). */
+    pick(i) {
+      picked = i;
+      attach();
+    },
     resetCamera() {
       camera.position.set(...HOME);
       controls.target.set(0, 3, 0);
@@ -180,6 +278,7 @@ export function mountSheathScene(host) {
     },
     dispose() {
       watcher.disconnect();
+      gizmo.dispose();
       controls.dispose();
       for (const m of shown) m.material.dispose();
       renderer.dispose();

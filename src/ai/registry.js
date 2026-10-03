@@ -75,7 +75,113 @@ const bytesToBase64 = async (blob) => {
   return btoa(s);
 };
 
+const memory = () => import('./memory.js');
+const meter = () => import('../barmaker/state.js');
+const mediaKit = () => import('./media.js');
+const picture = (url, extra) => ({
+  content: [...(extra ? [{ type: 'text', text: typeof extra === 'string' ? extra : JSON.stringify(extra, null, 1) }] : []), { type: 'image', mimeType: 'image/png', data: url.split(',')[1] }],
+  result: extra ?? null,
+});
+const layerSummary = (l) => ({
+  id: l.id,
+  name: l.name,
+  type: l.type,
+  ...(l.shape ? { shape: l.shape } : {}),
+  box: l.type === 'paint' ? 'the whole picture' : [l.x, l.y, l.w, l.h],
+  ...(l.visible ? {} : { hidden: true }),
+  ...(l.clip ? { clipped: true } : {}),
+  effects: Object.entries(l.fx ?? {})
+    .filter(([, v]) => v?.on)
+    .map(([k]) => k),
+});
+
 const APP = {
+  async meter_state() {
+    const B = await meter();
+    const d = B.doc.peek();
+    const j = B.jjs.peek();
+    return json({
+      name: d.name,
+      steps: d.frames,
+      size: [d.width, d.height],
+      showing: B.frame.peek(),
+      layers: d.layers.map(layerSummary),
+      skill: { name: j.name || d.name, tag: j.tag, start: j.start, size: j.size, position: j.position, style: j.style, source: j.source, regen: j.regen, rails: j.rails },
+      image_ids: { steps: B.jjsIds.peek().length, needed: d.frames + 1, ...(B.separate.peek() ? { container: B.containerIds.peek().length === 1 } : {}) },
+      examples: B.EXAMPLES.map((t) => ({ id: t.id, label: t.label, shows: t.hint })),
+    });
+  },
+  async meter_get() {
+    return json((await meter()).doc.peek());
+  },
+  async meter_put({ doc }) {
+    const next = (await meter()).aiPutDoc(doc);
+    return json({ ok: true, layers: next.layers.map(layerSummary) });
+  },
+  async meter_new(args) {
+    const B = await meter();
+    B.aiNew(args);
+    S.workspace.value = 'bars';
+    S.showStart.value = false;
+    return json({ ok: true, steps: B.doc.peek().frames, layers: B.doc.peek().layers.map(layerSummary) });
+  },
+  async meter_add_layer({ kind, props, custom_shape }) {
+    const id = (await meter()).aiAddLayer(kind, props, custom_shape);
+    return json({ ok: true, id });
+  },
+  async meter_set_layer({ layer, props }) {
+    return json({ ok: true, id: (await meter()).aiSetLayer(layer, props) });
+  },
+  async meter_delete_layer({ layer }) {
+    return json({ ok: true, id: (await meter()).aiDeleteLayer(layer) });
+  },
+  async meter_screenshot(args) {
+    const { url, steps } = await (await meter()).aiPicture(args);
+    return picture(url, `Steps ${steps.join(', ')} of the meter, left to right.`);
+  },
+  async meter_publish({ upload, ...settings }) {
+    const B = await meter();
+    const { code, missing } = await B.aiSkillSettings(settings);
+    if (upload) {
+      const { uploadsAllowed } = await mediaKit();
+      if (!uploadsAllowed()) throw new Error('The user hasn’t allowed AI uploads to their Roblox account (Settings → AI). Ask them, or let them press Upload in Export.');
+      await B.uploadToRoblox();
+      if (B.uploadError.peek()) throw new Error(`The upload stopped: ${B.uploadError.peek()}`);
+      return json({ ok: true, uploaded: true, added_to_moveset: true, tag: B.jjs.peek().tag, note: `The bar's skills are in the moveset. Moves change the bar with a TAG node on "${B.jjs.peek().tag}".` });
+    }
+    if (code) {
+      const added = B.addToMoveset();
+      return json({ ok: true, added_to_moveset: added, tag: B.jjs.peek().tag });
+    }
+    return json({ ok: false, missing: missing ?? 'The pictures aren’t uploaded yet: meter_publish with upload true (if the user allows it), or the user uploads them in Export.' });
+  },
+  async media_inspect(args) {
+    const info = await (await mediaKit()).inspectMedia({ ...args, fileName: args.file_name });
+    const { _png, _bytes, _ext, preview, ...shown } = info;
+    return picture(preview, shown);
+  },
+  async media_upload(args) {
+    const out = await (await mediaKit()).uploadAiMedia({ ...args, fileName: args.file_name });
+    const { preview, ...shown } = out;
+    return picture(preview, shown);
+  },
+
+  async memory_read({ query }) {
+    return json(await (await memory()).readMemories({ query }));
+  },
+  async memory_write(args) {
+    return json(await (await memory()).addNote(args));
+  },
+  async memory_forget({ id }) {
+    return json(await (await memory()).forget(id));
+  },
+  async memory_remember_moveset(args) {
+    return json(await (await memory()).rememberMoveset(args));
+  },
+  async memory_get_moveset({ id }) {
+    return json(await (await memory()).getMoveset(id));
+  },
+
   async app_state() {
     const skills = S.skills.peek();
     const skill = S.skill.peek();
@@ -94,6 +200,8 @@ const APP = {
       playback: { time: round(S.time.peek()), duration: round(S.duration.peek()), playing: S.playing.peek(), speed: S.speed.peek() },
       simulation: { conditions: S.conds.peek(), hits: S.hits.peek(), distance: S.distance.peek(), wall: S.wall.peek() || null, dummy: S.dummy.peek(), result: runSummary(S.run.peek()) },
       camera: { mode: S.camMode.peek(), keys: S.camKeys.peek().length, auto: S.autoCam.peek(), skillCamera: S.skillCamera.peek(), follow: S.follow.peek() },
+      // Tools the user's plugins add: callable by name like any other.
+      ...(TOOLS.some((t) => t.kind === 'plugin') ? { plugin_tools: TOOLS.filter((t) => t.kind === 'plugin').map((t) => ({ name: t.name, description: t.description, inputSchema: t.inputSchema, readOnly: Boolean(t.readOnly) })) } : {}),
     });
   },
 
@@ -318,16 +426,57 @@ export const TOOLS = [
 const byName = new Map(TOOLS.map((t) => [t.name, t]));
 
 /**
+ * Adds a tool (a plugin's, src/plugins.js): `run(args)` returns what the
+ * tool answers (text, or anything JSON), or { content } as-is. Its input is
+ * given as JSON Schema and passed through unchecked. Returns a function that
+ * takes it back out.
+ */
+export function registerTool({ name, title, description, inputSchema, readOnly, plugin, run }) {
+  if (byName.has(name)) throw new Error(`There's already a tool "${name}".`);
+  const tool = {
+    name,
+    title,
+    description,
+    inputSchema,
+    readOnly,
+    plugin,
+    kind: 'plugin',
+    validate: { safeParse: (data) => (data && typeof data === 'object' && !Array.isArray(data) ? { success: true, data } : { success: false, error: { issues: [{ path: [], message: 'must be an object' }] } }) },
+    call: async (args) => {
+      const out = await run(args);
+      if (out && Array.isArray(out.content)) return out;
+      return typeof out === 'string' ? { content: [{ type: 'text', text: out }] } : json(out ?? null);
+    },
+  };
+  TOOLS.push(tool);
+  byName.set(name, tool);
+  return () => {
+    const i = TOOLS.indexOf(tool);
+    if (i >= 0) TOOLS.splice(i, 1);
+    byName.delete(name);
+  };
+}
+
+/**
  * Runs a tool: { content: [...], isError? }. Inputs are checked against the
  * tool's schema first (a model's input that doesn't fit is an error it can
  * correct, never a half-run tool).
  */
+// Manual mode (the assistant's): a tool that changes something waits for
+// the user to allow it. The assistant sets the gate while it's working; the
+// same gate catches its subscription CLIs' calls, which come in through the
+// bridge. Read-only tools never ask.
+let gate = null;
+export const setToolGate = (fn) => (gate = fn);
+
 export async function callTool(name, args = {}) {
   const tool = byName.get(name);
   if (!tool) return { isError: true, content: [{ type: 'text', text: `No tool "${name}".` }] };
   const checked = tool.validate.safeParse(args ?? {});
   if (!checked.success)
     return { isError: true, content: [{ type: 'text', text: `The input doesn’t fit ${name}: ${checked.error.issues.map((i) => `${i.path.join('.') || '(input)'}: ${i.message}`).join('; ')}` }] };
+  if (gate && !tool.readOnly && !(await gate(name, checked.data)))
+    return { isError: true, content: [{ type: 'text', text: `The user didn’t allow ${name} (the assistant is in manual mode). Ask them, or try something else.` }] };
   try {
     const out = await tool.call(checked.data);
     return { content: out.content, result: out.result, image: out.image };

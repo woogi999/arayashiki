@@ -3,7 +3,7 @@
 // and the slider, switch and choice rows every panel is built from.
 import { useState } from 'preact/hooks';
 import { Icon } from '../icons.jsx';
-import { Switch } from '../ui/controls.jsx';
+import { Switch, TypeValue } from '../ui/controls.jsx';
 import { paintCss, sampleStops } from './draw.js';
 
 // ─── Colour ─────────────────────────────────────────────────────────────
@@ -91,15 +91,15 @@ export function ImagePick({ src, label, onPick }) {
 
 /** Label, track and value on one line; the value has a fixed width. */
 export function Slider({ label, min, max, step = 1, value, unit = '', onInput }) {
+  // A typed value goes through the same handler as the slider, as if the
+  // slider had moved there (handlers read the event's value and type).
+  const typed = (n) => onInput({ currentTarget: { type: 'range', value: String(n) } });
   return (
-    <label class="pb-slider">
+    <div class="pb-slider">
       <span>{label}</span>
-      <input type="range" min={min} max={max} step={step} value={value} onInput={onInput} />
-      <output class="num">
-        {value}
-        {unit}
-      </output>
-    </label>
+      <input type="range" min={min} max={max} step={step} value={value} aria-label={label} onInput={onInput} />
+      <TypeValue class="num" value={value} unit={unit} label={label} min={min} max={max} onSet={typed} />
+    </div>
   );
 }
 

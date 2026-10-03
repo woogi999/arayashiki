@@ -21,6 +21,7 @@ mod fonts;
 mod install;
 mod kit;
 mod local;
+mod plugins;
 mod roblox;
 mod updates;
 
@@ -196,6 +197,35 @@ async fn roblox_upload(
     let name = meta["name"].as_str().unwrap_or("Progress bar").to_string();
     let description = meta["description"].as_str().unwrap_or_default().to_string();
     assets.inner().clone().upload_decal(png, &name, &description).await
+}
+
+/// Uploads a sound or a 3D model to the signed-in account (`x-meta`: kind
+/// "audio" | "model", fileName, name, description): its IDs.
+#[tauri::command]
+async fn roblox_upload_media(assets: tauri::State<'_, SharedAssets>, request: tauri::ipc::Request<'_>) -> Result<serde_json::Value, String> {
+    let (bytes, meta) = raw_request(&request)?;
+    let kind = meta["kind"].as_str().unwrap_or("").to_string();
+    let file = meta["fileName"].as_str().unwrap_or("file").to_string();
+    let name = meta["name"].as_str().unwrap_or("Arayashiki upload").to_string();
+    let description = meta["description"].as_str().unwrap_or_default().to_string();
+    assets.inner().clone().upload_media(&kind, bytes, &file, &name, &description).await
+}
+
+/// A picture, sound or model on this PC an AI points at (its path), to put
+/// into a skill: only media files, and not huge ones.
+#[tauri::command]
+fn read_media_file(path: String) -> Result<tauri::ipc::Response, String> {
+    let p = std::path::Path::new(&path);
+    let ext = p.extension().map(|e| e.to_string_lossy().to_lowercase()).unwrap_or_default();
+    const MEDIA: &[&str] = &["png", "jpg", "jpeg", "webp", "bmp", "gif", "tga", "mp3", "ogg", "wav", "flac", "fbx", "glb", "gltf", "obj"];
+    if !MEDIA.contains(&ext.as_str()) {
+        return Err(format!("Only pictures, sounds and models are read ({}).", MEDIA.join(", ")));
+    }
+    let size = std::fs::metadata(p).map_err(|e| e.to_string())?.len();
+    if size > 60 * 1024 * 1024 {
+        return Err("That file is over 60 MB.".into());
+    }
+    std::fs::read(p).map(tauri::ipc::Response::new).map_err(|e| e.to_string())
 }
 
 // ─── Files ──────────────────────────────────────────────────────────────
@@ -413,6 +443,29 @@ pub fn run() {
             roblox::forget_old_key();
             // The docs for AI agents next to an installed exe (kit.rs).
             std::thread::spawn(kit::ensure);
+            // An app, not a browser: WebView2's own shortcuts (Ctrl+F find,
+            // Ctrl+J downloads, Ctrl+P print, Ctrl+U source, F5 reload…) are
+            // off, so the keys are the app's alone.
+            #[cfg(windows)]
+            if let Some(window) = app.get_webview_window("main") {
+                let _ = window.with_webview(|webview| {
+                    use webview2_com::Microsoft::Web::WebView2::Win32::ICoreWebView2Settings3;
+                    use windows::core::Interface;
+                    // SAFETY: the controller is live for the webview's life, and these
+                    // are plain COM calls on the UI thread Tauri gives us.
+                    unsafe {
+                        if let Ok(core) = webview.controller().CoreWebView2() {
+                            if let Ok(settings) = core.Settings() {
+                                if let Ok(s3) = settings.cast::<ICoreWebView2Settings3>() {
+                                    let _ = s3.SetAreBrowserAcceleratorKeysEnabled(false);
+                                }
+                                let _ = settings.SetIsStatusBarEnabled(false);
+                                let _ = settings.SetIsZoomControlEnabled(false);
+                            }
+                        }
+                    }
+                });
+            }
             // Closing asks the UI first, so it can offer to save.
             if let Some(window) = app.get_webview_window("main") {
                 let w = window.clone();
@@ -465,6 +518,11 @@ pub fn run() {
             account_refresh,
             roblox_avatar,
             roblox_upload,
+            roblox_upload_media,
+            read_media_file,
+            plugins::plugins_list,
+            plugins::plugins_open_folder,
+            plugins::plugins_folder,
             save_bytes,
             open_text,
             open_code_file,

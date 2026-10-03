@@ -58,7 +58,7 @@ const imageOf = (content) => {
  * One turn through a CLI. `ui` is the chat: push(message) → row index,
  * update(row, patch). Resolves with the session id to carry on with.
  */
-export async function cliTurn({ tool, prompt, system, session, model, ui, signal }) {
+export async function cliTurn({ tool, prompt, system, session, model, effort, ui, signal }) {
   await ensureConnected(tool);
   const { Channel } = await import('@tauri-apps/api/core');
   const channel = new Channel();
@@ -102,7 +102,7 @@ export async function cliTurn({ tool, prompt, system, session, model, ui, signal
           );
       }
     };
-    invoke('ai_cli_run', { tool, prompt, system, session: session ?? null, model: model || null, onEvent: channel })
+    invoke('ai_cli_run', { tool, prompt, system, session: session ?? null, model: model || null, effort: effort || null, onEvent: channel })
       .then((runId) => {
         id = runId;
         if (signal?.aborted) invoke('ai_cli_cancel', { id }).catch(() => {});

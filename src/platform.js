@@ -132,6 +132,20 @@ export async function uploadDecal(blob, { name, description }) {
   return (await tauri()).invoke('roblox_upload', bytes, meta({ name, description }));
 }
 
+/** Uploads a sound or a 3D model (kind "audio" | "model"): its IDs (soundId, or modelId, meshId, textureId). */
+export async function uploadMedia(blob, { kind, fileName, name, description }) {
+  if (!isDesktop) throw new Error('Uploading needs the desktop app.');
+  const bytes = new Uint8Array(await blob.arrayBuffer());
+  return (await tauri()).invoke('roblox_upload_media', bytes, meta({ kind, fileName, name, description }));
+}
+
+/** A media file on this PC (a picture, sound or model), as bytes. */
+export async function readMediaFile(path) {
+  if (!isDesktop) throw new Error('Reading files needs the desktop app.');
+  const bytes = await (await tauri()).invoke('read_media_file', { path });
+  return new Uint8Array(bytes);
+}
+
 /** The Roblox cache index. */
 export async function assetsStatus() {
   if (!isDesktop) return null;

@@ -41,7 +41,7 @@ the user codes to paste into the app (Ctrl+V on the start screen) or JJS.
 | `AGENTS.md` | This file. |
 | `mcp.json` | The MCP server entry for this copy. |
 | `docs/jjs-skill-builder.md` | The handbook: every node kind, field, condition and rule of the Skill Builder, each marked confirmed, inferred or from the guides. Read the sections you need. |
-| `docs/jjs-library/` | Real moves, explained node by node, with import-ready codes. `README.md` lists them by what they do and gives the usual numbers (damage, stun, timings). Start a new move from the closest one. |
+| `docs/jjs-library/` | Real moves, explained node by node, with import-ready codes. `README.md` lists them by what they do and gives the usual numbers (damage, stun, timings). Use them as references for new moves (how JJS does things, the usual numbers), not templates to copy. |
 | `docs/jjs-game/` | JJS's own animations and sounds with their Roblox IDs (read from the game). |
 | `docs/ai-guide.md` | The tools in full, and the usual workflows (in most builds). |
 | `docs/USER-MANUAL.md` | The app's user manual: every panel, key and feature. |

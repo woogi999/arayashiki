@@ -148,16 +148,32 @@ const SHEATH_VIEWS = [
   { id: 'drawn', label: 'Drawn' },
   { id: 'both', label: 'Both' },
 ];
-function SheathPreview({ preview }) {
+const SHEATH_TOOLS = [
+  { id: 'translate', label: 'Move (G)' },
+  { id: 'rotate', label: 'Turn (R)' },
+];
+function SheathPreview({ preview, onFields }) {
   const host = useRef(null);
   const scene = useRef(null);
   const [view, setView] = useState('both');
   const [missing, setMissing] = useState(0);
+  const [tool, setTool] = useState('translate');
+  const [picked, setPicked] = useState(null);
+  // What the meshes on show are, in order, for a drag to write back to.
+  const listed = useRef([]);
+  const edit = useRef(onFields);
+  edit.current = onFields;
   useEffect(() => {
     let gone = false;
     import('./sheath-preview.js').then(({ mountSheathScene }) => {
       if (!gone) {
-        scene.current = mountSheathScene(host.current);
+        scene.current = mountSheathScene(host.current, {
+          onEdit: (i, { position, rotation }) => {
+            const it = listed.current[i];
+            if (it?.fields) edit.current({ [it.fields[0]]: position, [it.fields[1]]: rotation });
+          },
+          onPick: (i, it) => setPicked(it ? it.label ?? 'Mesh' : null),
+        });
         setView((v) => v); // draw once it's up
       }
     });
@@ -166,6 +182,21 @@ function SheathPreview({ preview }) {
       scene.current?.dispose();
     };
   }, []);
+  // G and R, as in Blender, while a mesh is picked.
+  useEffect(() => {
+    if (!picked) return;
+    const onKey = (e) => {
+      if (e.target?.closest?.('input, textarea, select') || e.ctrlKey || e.altKey || e.metaKey) return;
+      const t = { g: 'translate', r: 'rotate' }[e.key.toLowerCase()];
+      if (!t) return;
+      e.preventDefault();
+      e.stopPropagation();
+      setTool(t);
+      scene.current?.setMode(t);
+    };
+    addEventListener('keydown', onKey, true);
+    return () => removeEventListener('keydown', onKey, true);
+  }, [picked]);
   const key = JSON.stringify(preview);
   useEffect(() => {
     let stale = false;
@@ -176,6 +207,7 @@ function SheathPreview({ preview }) {
         view === 'both'
           ? [...preview.sheathed, ...preview.drawn.filter((d) => !preview.sheathed.some((s) => JSON.stringify(s) === JSON.stringify(d))).map((d) => ({ ...d, ghost: true }))]
           : preview[view];
+      listed.current = items;
       const n = await scene.current.update(items);
       if (!stale) setMissing(n);
     })();
@@ -187,12 +219,13 @@ function SheathPreview({ preview }) {
       <div class="pb-bar3d">
         <div class="pb-bar3d-view" ref={host} />
         <div class="pb-bar3d-bar">
-          <Segmented label="Weapon" options={SHEATH_VIEWS} value={view} onChange={setView} />
+          <Segmented label="Weapon" options={SHEATH_VIEWS} value={view} onChange={(v) => (setView(v), scene.current?.pick(-1), setPicked(null))} />
+          <Segmented label="Gizmo" options={SHEATH_TOOLS} value={tool} onChange={(t) => (setTool(t), scene.current?.setMode(t))} />
           <Button onClick={() => scene.current?.resetCamera()}>Reset view</Button>
         </div>
         <p class="hint">
-          Where the weapon sits on an R6 body, sheathed and drawn, at these positions and rotations (“Both” shows the drawn
-          one see-through). Drag to look around.
+          {picked ? `${picked}: drag the gizmo to place it; its position and rotation above follow. ` : 'Click a mesh to drag it into place (Move or Turn). '}
+          Drag the background to look around. “Both” shows the drawn weapon see-through.
           {missing ? ` ${missing} mesh${missing === 1 ? '' : 'es'} couldn’t be loaded: a grey dot marks where it goes.` : ''}
         </p>
       </div>
@@ -318,7 +351,12 @@ export function TemplatesDialog() {
               </fieldset>
             ))}
             {preview && <BarPreview preview={preview} />}
-            {template.sheathPreview && <SheathPreview preview={template.sheathPreview(current)} />}
+            {template.sheathPreview && (
+              <SheathPreview
+                preview={template.sheathPreview(current)}
+                onFields={(patch) => setValues((all) => ({ ...all, [template.id]: { ...all[template.id], ...patch } }))}
+              />
+            )}
             {error ? (
               <p class="error">{error}</p>
             ) : (

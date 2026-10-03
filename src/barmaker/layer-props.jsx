@@ -1,6 +1,6 @@
 // The settings for whichever layer is picked in the Progress Bar Maker, one
 // tab at a time.
-import { BLENDS } from './draw.js';
+import { BLENDS, CUSTOM_SHAPES } from './draw.js';
 import { FontPicker } from './font-picker.jsx';
 import { layerField, matchSteps, setLayer } from './state.js';
 import { Check, Chips, ColourAlpha, ColourField, Fx, Group, ImagePick, Num, PaintField, Picks, Slider } from './fields.jsx';
@@ -145,6 +145,9 @@ const SHAPES = [
   { id: 'ellipse', label: 'Ellipse' },
   { id: 'triangle', label: 'Triangle' },
   { id: 'diamond', label: 'Diamond' },
+  { id: 'polygon', label: 'Polygon' },
+  { id: 'star', label: 'Star' },
+  { id: 'path', label: 'Custom' },
 ];
 const ALIGNS = [
   { id: 'left', label: 'Left' },
@@ -387,6 +390,7 @@ function BarShape({ layer }) {
             <Check label="Bold" checked={layer.textBold} onChange={f('textBold')} />
             <Picks title="Written" options={TEXT_LAYOUTS} value={layer.textLayout} onPick={set('textLayout')} />
             <Slider label="Spacing" unit="%" min="0" max="100" value={layer.textSpacing} onInput={f('textSpacing')} />
+            <Slider label="Slant" unit="°" min="-45" max="45" value={layer.skew} onInput={f('skew')} />
           </>
         ) : layer.shape === 'image' ? (
           <>
@@ -395,6 +399,7 @@ function BarShape({ layer }) {
             <Picks title="Fills" options={BAR_DIRECTIONS} value={layer.direction} onPick={set('direction')} />
             <Picks title="Filled with" options={IMAGE_FILLS} value={layer.barImageOwn !== false} onPick={set('barImageOwn')} />
             <Picks title="Still to fill" options={IMAGE_TRACKS} value={layer.barImageTrack ?? 'faded'} onPick={set('barImageTrack')} />
+            <Slider label="Slant" unit="°" min="-45" max="45" value={layer.skew} onInput={f('skew')} />
             <p class="hint">
               The whole picture is the bar, not one segment’s shape: it fills across its outline (anything with a
               see-through background works best: a sword, a skill icon, a logo).
@@ -407,6 +412,7 @@ function BarShape({ layer }) {
             <Slider label="Goes round" unit="°" min="10" max="360" value={layer.ringSweep} onInput={f('ringSweep')} />
             <Slider label="Thickness" min="1" max={half(layer.w, layer.h)} value={layer.thickness} onInput={f('thickness')} />
             <Check label="Round ends" checked={layer.roundEnds} onChange={f('roundEnds')} />
+            <Slider label="Slant" unit="°" min="-45" max="45" value={layer.skew} onInput={f('skew')} />
           </>
         ) : (
           <>
@@ -454,6 +460,23 @@ function BarShape({ layer }) {
         </Group>
       )}
 
+      {layer.shape === 'ring' && (
+        <Group title="Taper">
+          <Slider label="Taper start" unit="%" min="5" max="100" value={layer.taperStart} onInput={f('taperStart')} />
+          <Slider label="Taper end" unit="%" min="5" max="100" value={layer.taperEnd} onInput={f('taperEnd')} />
+          <Picks
+            title="Line up"
+            options={[
+              { id: 'start', label: 'Inside' },
+              { id: 'center', label: 'Middle' },
+              { id: 'end', label: 'Outside' },
+            ]}
+            value={layer.taperAlign}
+            onPick={set('taperAlign')}
+          />
+          <p class="hint">The ring thins (or thickens) from where it starts to where it ends, like a bar’s taper.</p>
+        </Group>
+      )}
       {layer.shape === 'bar' && (
         <Group title="Segment shape">
           <Chips label="Segment shape" options={SEGMENT_SHAPES} value={layer.segShape} onPick={set('segShape')} />
@@ -578,15 +601,40 @@ function ShapeTab({ layer }) {
   return (
     <>
       <Group title="Shape">
-        <Chips label="Shape" options={SHAPES} value={layer.shape} onPick={set('shape')} />
-        <Slider label="Roundness" min="0" max={half(layer.w, layer.h)} value={layer.radius} onInput={f('radius')} />
+        <Chips
+          label="Shape"
+          options={SHAPES}
+          value={layer.shape}
+          onPick={(id) => (id === 'path' && !layer.d ? (setLayer('d', CUSTOM_SHAPES[0].d), setLayer('shape', 'path')) : setLayer('shape', id))}
+        />
+        {layer.shape === 'polygon' && <Slider label="Sides" min="3" max="16" value={layer.sides ?? 6} onInput={f('sides')} />}
+        {layer.shape === 'star' && (
+          <>
+            <Slider label="Points" min="3" max="24" value={layer.points ?? 5} onInput={f('points')} />
+            <Slider label="Inner" unit="%" min="5" max="95" value={layer.inner ?? 45} onInput={f('inner')} />
+          </>
+        )}
+        {layer.shape === 'path' && (
+          <div class="pb-shape-lib" role="group" aria-label="Custom shape">
+            {CUSTOM_SHAPES.map((c) => (
+              <button type="button" key={c.id} class="pb-shape-pick" aria-pressed={layer.d === c.d} title={c.label} aria-label={c.label} onClick={() => setLayer('d', c.d)}>
+                <svg viewBox="0 0 100 100" aria-hidden="true">
+                  <path d={c.d} />
+                </svg>
+              </button>
+            ))}
+          </div>
+        )}
+        {!['ellipse', 'path'].includes(layer.shape) && (
+          <Slider label="Roundness" min="0" max={half(layer.w, layer.h)} value={layer.radius} onInput={f('radius')} />
+        )}
       </Group>
       <Fx title="Fill" on={layer.fillOn} onToggle={set('fillOn')} hint="Off leaves just the outline.">
         <PaintField label="Fill" paint={layer.fill} path="fill" onSet={setLayer} />
       </Fx>
       <Group title="Outline">
         <Slider label="Width" min="0" max="60" value={layer.stroke} onInput={f('stroke')} />
-        {layer.shape === 'rect' && (
+        {!['ellipse', 'path'].includes(layer.shape) && (
           <>
             <Check label="Its own roundness" checked={layer.strokeOwnRadius} onChange={f('strokeOwnRadius')} />
             {layer.strokeOwnRadius && <Slider label="Roundness" min="0" max={half(layer.w, layer.h)} value={layer.strokeRadius} onInput={f('strokeRadius')} />}

@@ -9,28 +9,36 @@ import { Button, IconButton, Modal } from '../ui/controls.jsx';
 import { account } from '../account.js';
 import * as S from '../store.js';
 import * as B from './state.js';
-import { hasPart } from './draw.js';
+import { CUSTOM_SHAPES, hasPart } from './draw.js';
 import { ColourField, Check, Slider } from './fields.jsx';
 import { LayerProps } from './layer-props.jsx';
+import { theme } from '../theme.js';
 
 const TOOLS = [
   { id: 'move', icon: 'pointer', label: 'Move and resize (V)' },
+  { id: 'bar', icon: 'battery', label: 'Meter (M)' },
+  { id: 'shape', icon: 'shapes', label: 'Shape (U)' },
+  { id: 'pen', icon: 'pen-tool', label: 'Pen (P)' },
+  { id: 'text', icon: 'type', label: 'Text (T)' },
   { id: 'brush', icon: 'brush', label: 'Brush (B)' },
   { id: 'eraser', icon: 'eraser', label: 'Eraser (E)' },
-  { id: 'shape', icon: 'shapes', label: 'Shapes and meters (U)' },
-  { id: 'text', icon: 'type', label: 'Text (T)' },
 ];
 
-// What the shape tool draws. The bar and ring come first: they're what the
-// workspace is for.
-const SHAPE_KINDS = [
+// What the meter tool draws: what the workspace is for.
+const BAR_KINDS = [
   { id: 'bar', icon: 'battery', label: 'Meter' },
   { id: 'ring', icon: 'circle-dot', label: 'Progress ring' },
   { id: 'textbar', icon: 'languages', label: 'Text bar' },
+];
+// What the shape tool draws.
+const SHAPE_KINDS = [
   { id: 'rect', icon: 'square', label: 'Rectangle' },
   { id: 'ellipse', icon: 'circle', label: 'Ellipse' },
   { id: 'triangle', icon: 'triangle', label: 'Triangle' },
   { id: 'diamond', icon: 'diamond', label: 'Diamond' },
+  { id: 'polygon', icon: 'hexagon', label: 'Polygon' },
+  { id: 'star', icon: 'star', label: 'Star' },
+  { id: 'custom', icon: 'heart', label: 'Custom' },
 ];
 
 const STARTS = [
@@ -84,7 +92,21 @@ function ToolOptions() {
   const tool = B.tool.value;
   const layer = B.selected.value;
   let body;
-  if (tool === 'shape')
+  if (tool === 'bar')
+    body = (
+      <>
+        <div class="segmented" role="group" aria-label="Meter to draw">
+          {BAR_KINDS.map((k) => (
+            <button type="button" key={k.id} aria-pressed={B.barKind.value === k.id} title={k.label} onClick={() => B.pickBarKind(k.id)}>
+              <Icon name={k.icon} size={13} />
+              {k.label}
+            </button>
+          ))}
+        </div>
+        <span class="hint">Drag on the picture to draw it. Shift keeps it square.</span>
+      </>
+    );
+  else if (tool === 'shape')
     body = (
       <>
         <div class="segmented" role="group" aria-label="Shape to draw">
@@ -95,8 +117,32 @@ function ToolOptions() {
             </button>
           ))}
         </div>
+        {B.shapeKind.value === 'polygon' && (
+          <Slider label="Sides" min="3" max="16" value={B.polySides.value} onInput={(e) => (B.polySides.value = Math.max(3, Math.round(Number(e.currentTarget.value) || 6)))} />
+        )}
+        {B.shapeKind.value === 'star' && (
+          <Slider label="Points" min="3" max="24" value={B.starPoints.value} onInput={(e) => (B.starPoints.value = Math.max(2, Math.round(Number(e.currentTarget.value) || 5)))} />
+        )}
+        {B.shapeKind.value === 'custom' && (
+          <div class="pb-shape-lib" role="group" aria-label="Custom shape">
+            {CUSTOM_SHAPES.map((c) => (
+              <button type="button" key={c.id} class="pb-shape-pick" aria-pressed={B.customShape.value === c.id} title={c.label} aria-label={c.label} onClick={() => B.pickCustomShape(c.id)}>
+                <svg viewBox="0 0 100 100" aria-hidden="true">
+                  <path d={c.d} />
+                </svg>
+              </button>
+            ))}
+          </div>
+        )}
         <span class="hint">Drag on the picture to draw it. Shift keeps it square.</span>
       </>
+    );
+  else if (tool === 'pen')
+    body = (
+      <span class="hint">
+        Click to place points, drag to curve. Click the first point or press Enter to close it; Esc drops it, Backspace
+        takes the last point back. {B.penPoints.value.length ? `${B.penPoints.value.length} points.` : ''}
+      </span>
     );
   else if (tool === 'brush' || tool === 'eraser')
     body = (
@@ -172,8 +218,11 @@ function drawRuler(el, axis, area, box) {
     .find((s) => s < major && major % s === 0 && s * k >= 6);
   const from = Math.floor(-zero / k / (minor ?? major)) * (minor ?? major);
   const to = (len - zero) / k;
-  ctx.strokeStyle = '#555';
-  ctx.fillStyle = '#8a8a8a';
+  // The theme's greys, so the rulers follow it.
+  const css = getComputedStyle(el);
+  const ink = css.getPropertyValue('--text-3').trim() || '#8a8a8a';
+  ctx.strokeStyle = css.getPropertyValue('--line-strong').trim() || '#555';
+  ctx.fillStyle = ink;
   ctx.font = '9px "IBM Plex Mono", monospace';
   ctx.lineWidth = 1;
   ctx.beginPath();
@@ -203,10 +252,12 @@ function drawRuler(el, axis, area, box) {
   }
   ctx.stroke();
   // The picture's own extent, and its middle.
-  ctx.fillStyle = 'rgba(255,255,255,0.05)';
+  ctx.fillStyle = ink;
+  ctx.globalAlpha = 0.08;
   const full = (along ? d.width : d.height) * k;
   if (along) ctx.fillRect(zero, 0, full, RULER);
   else ctx.fillRect(0, zero, RULER, full);
+  ctx.globalAlpha = 1;
   ctx.fillStyle = '#ff3df2';
   const mid = zero + full / 2;
   if (along) ctx.fillRect(mid - 0.5, RULER - 4, 1, 4);
@@ -252,7 +303,7 @@ function Workspace() {
   // The rulers follow the zoom, the pointer and the picture's size.
   useEffect(() => {
     requestAnimationFrame(redrawRulers);
-  }, [showRulers, B.zoom.value, B.viewScale.value, B.pointerAt.value, B.doc.value.width, B.doc.value.height]);
+  }, [showRulers, B.zoom.value, B.viewScale.value, B.pointerAt.value, B.doc.value.width, B.doc.value.height, theme.value]);
   const { width, height } = B.doc.value;
   const z = B.zoom.value;
   // Fits the workspace either way round, from its container's size.
@@ -284,8 +335,10 @@ function Workspace() {
         onDragLeave={() => (B.dragging.value = false)}
         onDrop={drop}
         onWheel={B.wheel}
+        onPointerDown={(e) => B.startPan(e, area.current, redrawRulers)}
+        onAuxClick={(e) => e.button === 1 && e.preventDefault()}
       >
-        <div class="pb-canvas-box checker" ref={box} style={fit}>
+        <div class="pb-canvas-box checker" ref={box} style={{ ...fit, translate: `${B.pan.value.x}px ${B.pan.value.y}px` }}>
           <canvas class="pb-canvas" ref={canvas} />
           <canvas
             class="pb-overlay"
@@ -305,10 +358,12 @@ function Workspace() {
 
 function Rail() {
   const kind = SHAPE_KINDS.find((k) => k.id === B.shapeKind.value);
+  const meter = BAR_KINDS.find((k) => k.id === B.barKind.value);
   return (
     <nav class="pb-rail" aria-label="Tools">
       {TOOLS.map((t) => {
-        const shown = t.id === 'shape' && kind ? { ...t, icon: kind.icon, label: `${kind.label} (U)` } : t;
+        const shown =
+          t.id === 'shape' && kind ? { ...t, icon: kind.icon, label: `${kind.label} (U)` } : t.id === 'bar' && meter ? { ...t, icon: meter.icon, label: `${meter.label} (M)` } : t;
         return (
           <button
             type="button"
@@ -396,6 +451,7 @@ function Steps() {
           <button
             type="button"
             key={t.frame}
+            data-step={t.frame}
             class="pb-thumb checker"
             aria-pressed={t.frame === B.frame.value}
             title={`Step ${t.frame}`}
@@ -492,6 +548,7 @@ function Layers() {
         {[...d.layers].reverse().map((layer) => (
           <li
             key={layer.id}
+            data-layer-id={layer.id}
             class={`pb-layer ${layer.id === B.selectedId.value ? 'is-active' : ''} ${layer.visible ? '' : 'is-hidden'}`}
           >
             <button
@@ -541,6 +598,9 @@ function Layers() {
 // ─── Dialogs ────────────────────────────────────────────────────────────
 
 function NewDialog() {
+  useEffect(() => {
+    B.drawExampleThumbs();
+  }, []);
   return (
     <Modal title="New meter" onClose={B.closeDialog}>
       <div class="pb-dialog">
@@ -572,10 +632,12 @@ function NewDialog() {
           </Button>
         </div>
         <h3 class="section-title">Or pull apart an example</h3>
-        <div class="pb-chips">
+        <div class="pb-examples">
           {B.EXAMPLES.map((t) => (
-            <button type="button" class="chip" key={t.id} onClick={() => B.useExample(t)}>
-              {t.label}
+            <button type="button" class="pb-example" key={t.id} title={t.hint} onClick={() => B.useExample(t)}>
+              <span class="pb-example-thumb checker">{B.exampleThumbs.value[t.id] && <img src={B.exampleThumbs.value[t.id]} alt="" />}</span>
+              <strong>{t.label}</strong>
+              <small>{t.hint}</small>
             </button>
           ))}
         </div>

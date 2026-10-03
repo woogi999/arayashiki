@@ -25,7 +25,7 @@ function AddMenu() {
     <div class="menu-wrap" ref={menu}>
       <button type="button" class="head-btn" aria-expanded={open} aria-haspopup="menu" onClick={() => setOpen(!open)}>
         <Icon name="plus" size={13} />
-        Add
+        <span class="head-label">Add</span>
       </button>
       {open && (
         <div class="menu menu-add" role="menu">
@@ -80,8 +80,9 @@ function AnimateMenu() {
   };
   return (
     <div class="menu-wrap" ref={menu}>
-      <button type="button" class="head-btn" aria-expanded={open} aria-haspopup="menu" onClick={() => setOpen(!open)}>
-        Animate
+      <button type="button" class="head-btn" aria-expanded={open} aria-haspopup="menu" aria-label="Animate" onClick={() => setOpen(!open)}>
+        <Icon name="diamond" size={12} class="head-icon" />
+        <span class="head-label">Animate</span>
         <Icon name="chevron-down" size={11} />
       </button>
       {open && (

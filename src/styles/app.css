@@ -77,8 +77,8 @@ button:disabled {
 }
 
 ::selection {
-  background: #5c5c5c;
-  color: #fff;
+  background: var(--g36);
+  color: var(--g100);
 }
 
 :focus-visible {
@@ -88,7 +88,7 @@ button:disabled {
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: #363636 transparent;
+  scrollbar-color: var(--g21) transparent;
 }
 
 [hidden] {
@@ -152,7 +152,7 @@ kbd {
   padding: var(--s2) var(--s3);
   border-radius: var(--radius);
   background: var(--hit-soft);
-  color: #ff8a8c;
+  color: var(--hit-text);
   font-size: var(--text-sm);
 }
 
@@ -252,7 +252,7 @@ kbd {
 
 .resizer:hover,
 .resizer:focus-visible {
-  background: #555;
+  background: var(--g33);
   outline: none;
 }
 
@@ -277,6 +277,38 @@ kbd {
   padding: 0 4px 0 8px;
   background: var(--head);
   white-space: nowrap;
+  container: head / inline-size;
+}
+
+/* Narrow areas (the assistant open, a small window): long labels in a
+   header fold down to their icons, so no tool is cut off. */
+.head-icon {
+  display: none;
+}
+
+@container head (max-width: 300px) {
+  .head-label {
+    display: none;
+  }
+
+  .head-icon {
+    display: inline-block;
+  }
+}
+
+@container head (max-width: 760px) {
+  .head-collapse > span {
+    display: none;
+  }
+
+}
+
+/* The Viewport's header is all tools: narrow, its icon names it. */
+@container head (max-width: 700px) {
+  .area-view .area-title-text,
+  .area-time .segmented .icon {
+    display: none;
+  }
 }
 
 .area-title {
@@ -349,7 +381,7 @@ kbd {
 }
 
 .icon-btn.danger:hover:not(:disabled) {
-  color: #ff8a8c;
+  color: var(--hit-text);
 }
 
 .btn {
@@ -360,7 +392,7 @@ kbd {
   gap: 6px;
   height: 26px;
   padding: 0 12px;
-  border: 1px solid #070707;
+  border: 1px solid var(--g3);
   border-radius: var(--radius);
   background: var(--widget);
   color: var(--text);
@@ -381,24 +413,24 @@ kbd {
 }
 
 .btn-primary {
-  background: #6a6a6a;
-  color: #fff;
+  background: var(--g42);
+  color: var(--g100);
   font-weight: 500;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #7a7a7a;
+  background: var(--g48);
 }
 
 .btn-danger:hover:not(:disabled) {
-  color: #ff8a8c;
+  color: var(--hit-text);
 }
 
 .segmented {
   display: inline-flex;
   flex: none;
   overflow: hidden;
-  border: 1px solid #070707;
+  border: 1px solid var(--g3);
   border-radius: var(--radius);
   background: var(--widget);
 }
@@ -410,7 +442,7 @@ kbd {
   height: 22px;
   padding: 0 9px;
   border: 0;
-  border-left: 1px solid #3a3a3a;
+  border-left: 1px solid var(--g23);
   background: none;
   color: var(--text-2);
   white-space: nowrap;
@@ -427,7 +459,7 @@ kbd {
 
 .segmented button[aria-pressed='true'] {
   background: var(--widget-on);
-  color: #fff;
+  color: var(--g100);
 }
 
 .toggle {
@@ -451,7 +483,7 @@ kbd {
 .toggle-mark {
   width: 12px;
   height: 12px;
-  border: 1px solid #070707;
+  border: 1px solid var(--g3);
   border-radius: 3px;
   background: var(--widget);
 }
@@ -466,7 +498,7 @@ kbd {
 }
 
 .toggle:has(input:checked) .toggle-mark {
-  background: #d8d8d8
+  background: var(--g85)
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 6.2 5 8.5l4.5-5' fill='none' stroke='%23222' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
     center / 10px no-repeat;
 }
@@ -494,7 +526,7 @@ kbd {
 .switch-track {
   width: 100%;
   height: 100%;
-  border: 1px solid #070707;
+  border: 1px solid var(--g3);
   border-radius: 999px;
   background: var(--widget);
   pointer-events: none;
@@ -509,16 +541,16 @@ kbd {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: #9a9a9a;
+  background: var(--g60);
   transition: transform 160ms ease-out;
 }
 
 .switch input:checked + .switch-track {
-  background: #cfcfcf;
+  background: var(--g81);
 }
 
 .switch input:checked + .switch-track::after {
-  background: #0c0c0c;
+  background: var(--g5);
   transform: translateX(12px);
 }
 
@@ -532,7 +564,7 @@ kbd {
   min-width: 0;
   height: 22px;
   padding: 0 7px;
-  border: 1px solid #070707;
+  border: 1px solid var(--g3);
   border-radius: var(--radius);
   background: var(--field);
   color: var(--text);
@@ -551,16 +583,16 @@ textarea.input {
 }
 
 .input:hover {
-  border-color: #454545;
+  border-color: var(--g27);
 }
 
 .input:focus {
   outline: none;
-  border-color: #7a7a7a;
+  border-color: var(--g48);
 }
 
 .input::placeholder {
-  color: #6f6f6f;
+  color: var(--g44);
 }
 
 .kind-chip {
@@ -580,7 +612,7 @@ textarea.input {
   gap: 4px;
   height: 22px;
   padding: 0 8px;
-  border: 1px solid #070707;
+  border: 1px solid var(--g3);
   border-radius: var(--radius);
   background: var(--widget);
   color: var(--text-2);
@@ -676,7 +708,7 @@ textarea.input {
 
 .moveset-name input:focus {
   outline: none;
-  border-color: #7a7a7a;
+  border-color: var(--g48);
   background: var(--field);
 }
 
@@ -696,15 +728,15 @@ textarea.input {
   height: 22px;
   margin-left: 6px;
   padding: 0 12px;
-  border: 1px solid #070707;
+  border: 1px solid var(--g3);
   border-radius: var(--radius);
-  background: #5e5e5e;
-  color: #fff;
+  background: var(--g37);
+  color: var(--g100);
   font-weight: 500;
 }
 
 .export-btn:hover {
-  background: #6e6e6e;
+  background: var(--g43);
 }
 
 .statusbar {
@@ -774,7 +806,7 @@ textarea.input {
   flex: none;
   height: 22px;
   padding: 0 9px;
-  border: 1px solid #070707;
+  border: 1px solid var(--g3);
   border-radius: var(--radius);
   background: var(--widget);
   color: var(--text-2);
@@ -788,7 +820,7 @@ textarea.input {
 
 .branch-tab[aria-selected='true'] {
   background: var(--widget-on);
-  color: #fff;
+  color: var(--g100);
 }
 
 .branch-add {
@@ -826,7 +858,7 @@ textarea.input {
 
 .node-row.is-active {
   background: var(--row-selected);
-  box-shadow: inset 0 0 0 1px #7a7a7a;
+  box-shadow: inset 0 0 0 1px var(--g48);
 }
 
 .node-row.is-playing {
@@ -871,9 +903,9 @@ textarea.input {
   grid-template-columns: repeat(2, 150px);
   gap: 4px 8px;
   padding: 8px;
-  border: 1px solid #1a1a1a;
+  border: 1px solid var(--g10);
   border-radius: 6px;
-  background: #1a1a1a;
+  background: var(--g10);
   box-shadow: 0 8px 24px rgb(0 0 0 / 45%);
 }
 
@@ -901,7 +933,7 @@ textarea.input {
 }
 
 .menu-item:hover {
-  background: #5a5a5a;
+  background: var(--g35);
 }
 
 .menu-item .kind-chip {
@@ -944,7 +976,7 @@ textarea.input {
 
 .tree-row[aria-selected='true'] {
   background: var(--row-selected);
-  color: #fff;
+  color: var(--g100);
 }
 
 .depth-0 {
@@ -953,7 +985,7 @@ textarea.input {
 }
 
 .depth-0.is-current .tree-label {
-  color: #fff;
+  color: var(--g100);
 }
 
 .depth-1 {
@@ -966,7 +998,7 @@ textarea.input {
 }
 
 .depth-2[aria-selected='true'] {
-  color: #fff;
+  color: var(--g100);
 }
 
 .tree-twisty {
@@ -1054,7 +1086,7 @@ textarea.input {
 
 .props-tabs button[aria-selected='true'] {
   background: var(--area);
-  color: #fff;
+  color: var(--g100);
 }
 
 .props-body {
@@ -1119,7 +1151,7 @@ textarea.input {
 }
 
 .panel-head:hover {
-  background: #2c2c2c;
+  background: var(--g17);
 }
 
 .panel-body {
@@ -1216,8 +1248,8 @@ textarea.input {
 
 .field.is-default .input {
   border-style: dashed;
-  border-color: #3a3a3a;
-  color: #8a8a8a;
+  border-color: var(--g23);
+  color: var(--g54);
 }
 
 .field.is-default .input:focus {
@@ -1277,7 +1309,7 @@ textarea.input {
   flex: none;
   width: 22px;
   height: 22px;
-  border: 1px solid #070707;
+  border: 1px solid var(--g3);
   border-radius: var(--radius);
 }
 
@@ -1302,15 +1334,15 @@ textarea.input {
 .flip {
   width: 38px;
   height: 20px;
-  border: 1px solid #070707;
+  border: 1px solid var(--g3);
   border-radius: var(--radius-sm);
   background: var(--widget);
   font: 500 10px var(--font-mono);
 }
 
 .flip.is-flipped {
-  background: #e6e6e6;
-  color: #1a1a1a;
+  background: var(--g90);
+  color: var(--g10);
 }
 
 .req-label {
@@ -1343,12 +1375,12 @@ textarea.input {
 }
 
 .flag:hover {
-  background: #202020;
+  background: var(--g13);
 }
 
 .flag input {
   margin: 0;
-  accent-color: #cfcfcf;
+  accent-color: var(--g81);
   transform: translateY(2px);
 }
 
@@ -1370,7 +1402,7 @@ textarea.input {
   min-height: 0;
   overflow: hidden;
   container-type: size;
-  background: #202020;
+  background: var(--g13);
 }
 
 /* The canvas is sized by the view (a letterboxed shape when one is picked),
@@ -1385,6 +1417,7 @@ textarea.input {
 }
 
 .view-aspect {
+  flex: none;
   width: auto;
   height: 22px;
   padding: 0 4px;
@@ -1396,7 +1429,8 @@ textarea.input {
   inset: 0;
   display: grid;
   place-items: center;
-  color: #aaa;
+  color: #ababab;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 70%);
 }
 
 .view-gizmo {
@@ -1415,8 +1449,13 @@ textarea.input {
   z-index: 1;
   right: 10px;
   bottom: 8px;
-  color: rgb(255 255 255 / 45%);
+  left: 10px;
+  text-align: right;
+  text-wrap: balance;
+  /* Over the 3D view, whatever the theme: light, with a shadow for light skies. */
+  color: rgb(255 255 255 / 62%);
   font-size: var(--text-xs);
+  text-shadow: 0 1px 2px rgb(0 0 0 / 70%);
   pointer-events: none;
 }
 
@@ -1443,7 +1482,7 @@ textarea.input {
   gap: 2px;
   padding: 3px;
   border-radius: var(--radius-area);
-  background: rgb(10 10 10 / 80%);
+  background: rgb(var(--bg-rgb) / 80%);
   transform: translateY(-50%);
 }
 
@@ -1460,13 +1499,13 @@ textarea.input {
 }
 
 .view-tool:hover {
-  background: rgb(255 255 255 / 8%);
+  background: rgb(var(--fg-rgb) / 8%);
   color: var(--text);
 }
 
 .view-tool[aria-pressed='true'] {
   background: var(--widget-on);
-  color: #fff;
+  color: var(--g100);
 }
 
 .view-tools-sep {
@@ -1481,7 +1520,7 @@ textarea.input {
   width: 190px;
   padding: 7px 9px;
   border-radius: var(--radius-area);
-  background: rgb(10 10 10 / 80%);
+  background: rgb(var(--bg-rgb) / 80%);
 }
 
 .plate-top {
@@ -1524,13 +1563,13 @@ textarea.input {
   height: 5px;
   overflow: hidden;
   border-radius: 1px;
-  background: rgb(255 255 255 / 12%);
+  background: rgb(var(--fg-rgb) / 12%);
 }
 
 .hp span {
   display: block;
   height: 100%;
-  background: #d6d6d6;
+  background: var(--g84);
   transform-origin: left;
   transition: transform 140ms ease-out;
 }
@@ -1555,18 +1594,18 @@ textarea.input {
   display: flex;
   justify-content: space-between;
   gap: 8px;
-  color: #a0a0a0;
+  color: var(--g63);
   font-size: var(--text-xs);
 }
 
 .plate-states li span:first-child {
-  color: #e6e6e6;
+  color: var(--g90);
 }
 
 .plate-states li.is-tag span:first-child::before {
   content: '#';
   margin-right: 2px;
-  color: #909090;
+  color: var(--g56);
 }
 
 @container (max-width: 560px) or (max-height: 280px) {
@@ -1599,7 +1638,7 @@ textarea.input {
 }
 
 .play-btn:hover:not(:disabled) {
-  background: #d6f86e;
+  background: color-mix(in srgb, var(--play) 82%, white);
 }
 
 .play-btn:disabled {
@@ -1683,7 +1722,7 @@ textarea.input {
   right: 8px;
   height: 18px;
   padding: 0 8px;
-  border: 1px solid #070707;
+  border: 1px solid var(--g3);
   border-radius: var(--radius-sm);
   background: var(--widget);
   color: var(--text);
@@ -1701,9 +1740,9 @@ textarea.input {
   gap: 2px;
   max-width: 340px;
   padding: 5px 8px;
-  border: 1px solid #1a1a1a;
+  border: 1px solid var(--g10);
   border-radius: var(--radius);
-  background: #0e0e0e;
+  background: var(--g5);
   font-size: var(--text-xs);
   pointer-events: none;
 }
@@ -1779,7 +1818,7 @@ textarea.input {
   margin-bottom: 3px;
   padding: 4px 8px;
   border-radius: var(--radius-sm);
-  background: #3a3526;
+  background: var(--warn-soft);
   color: var(--warn);
 }
 
@@ -1789,7 +1828,7 @@ textarea.input {
   width: min(620px, calc(100vw - 48px));
   max-height: calc(100vh - 80px);
   padding: 0;
-  border: 1px solid #1a1a1a;
+  border: 1px solid var(--g10);
   border-radius: 8px;
   background: var(--head);
   color: var(--text);
@@ -1824,7 +1863,7 @@ textarea.input {
   gap: 8px;
   height: 36px;
   padding: 0 6px 0 14px;
-  background: #151515;
+  background: var(--g8);
 }
 
 .modal-head h2 {
@@ -1862,6 +1901,11 @@ textarea.input {
   font-weight: 500;
 }
 
+/* A new section: more room above its title than below it. */
+.settings-body > .section-title:not(:first-child) {
+  margin-top: 14px;
+}
+
 .saved-list {
   display: grid;
   gap: 3px;
@@ -1880,7 +1924,7 @@ textarea.input {
 }
 
 .saved-list li.is-current {
-  box-shadow: inset 0 0 0 1px #6a6a6a;
+  box-shadow: inset 0 0 0 1px var(--g42);
 }
 
 .saved-list .empty {
@@ -1907,7 +1951,7 @@ textarea.input {
 }
 
 .saved-open:hover strong {
-  color: #fff;
+  color: var(--g100);
 }
 
 .library {
@@ -1979,7 +2023,7 @@ textarea.input {
 
 .library-list li button[aria-selected='true'] {
   background: var(--row-selected);
-  color: #fff;
+  color: var(--g100);
 }
 
 .lib-kind {
@@ -2070,7 +2114,7 @@ textarea.input {
   height: 40px;
   overflow: hidden;
   border-radius: var(--radius-sm);
-  background: #1c1c1c;
+  background: var(--g11);
   color: var(--text-3);
 }
 
@@ -2088,11 +2132,11 @@ textarea.input {
   border: 0;
   border-radius: 50%;
   background: var(--widget-on);
-  color: #fff;
+  color: var(--g100);
 }
 
 .asset-play:hover {
-  background: #7a7a7a;
+  background: var(--g48);
 }
 
 .asset-play .icon {
@@ -2102,8 +2146,8 @@ textarea.input {
 .asset-spinner {
   width: 14px;
   height: 14px;
-  border: 2px solid #555;
-  border-top-color: #bbb;
+  border: 2px solid var(--g33);
+  border-top-color: var(--g73);
   border-radius: 50%;
   animation: spin 800ms linear infinite;
 }
@@ -2156,7 +2200,7 @@ textarea.input {
   height: 22px;
   margin-right: 4px;
   padding: 0 8px 0 4px;
-  border: 1px solid #070707;
+  border: 1px solid var(--g3);
   border-radius: 999px;
   background: var(--widget);
   color: var(--text);
@@ -2306,13 +2350,14 @@ textarea.input {
 
 .anim-preview figcaption {
   padding: 4px 8px;
-  color: var(--text-muted, #9a9a9a);
+  color: var(--text-muted, var(--g60));
   font-size: var(--text-xs);
 }
 
 /* Settings */
 .settings-body {
   display: grid;
+  align-content: start;
   gap: 6px;
   min-height: 320px;
   max-height: 60vh;
@@ -2444,7 +2489,7 @@ textarea.input {
 }
 
 .dock-gutter:hover {
-  background: #555;
+  background: var(--g33);
 }
 
 .area-head.is-draggable {
@@ -2567,4 +2612,48 @@ input[type='number']:not(:focus, :disabled) {
 .vec3-input .input {
   min-width: 0;
   padding: 0 4px;
+}
+
+/* A slider's value: click it to type one (controls.jsx TypeValue). */
+.type-value {
+  min-width: 0;
+  padding: 0 3px;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-family: var(--font-mono, inherit);
+  font-size: var(--text-xs);
+  text-align: right;
+  white-space: nowrap;
+  cursor: text;
+}
+
+.type-value:hover {
+  border-color: var(--line-strong, var(--g23));
+  background: var(--field);
+}
+
+.type-value.is-editing {
+  height: 20px;
+  text-align: right;
+}
+
+.range-value {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 6ch;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.range-value input[type='range'] {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Any slider without its own styling: grey, not the browser's blue. */
+input[type='range'] {
+  accent-color: var(--text-2);
 }

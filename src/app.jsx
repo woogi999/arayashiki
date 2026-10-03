@@ -79,8 +79,9 @@ function StatusBar() {
         </span>
         <span class="spacer" />
         <span class="status-keys">
-          <kbd>V</kbd> Move <kbd>B</kbd> Brush <kbd>U</kbd> Shapes <kbd>T</kbd> Text <kbd>Space</kbd> Play{' '}
-          <kbd>Ctrl Wheel</kbd> Zoom
+          <kbd>{bindingOf('barMove')}</kbd> Move <kbd>{bindingOf('barBar')}</kbd> Meter <kbd>{bindingOf('barShape')}</kbd> Shape{' '}
+          <kbd>{bindingOf('barPen')}</kbd> Pen <kbd>{bindingOf('barText')}</kbd> Text <kbd>{bindingOf('barBrush')}</kbd> Brush{' '}
+          <kbd>Middle drag</kbd> Pan <kbd>Ctrl Wheel</kbd> Zoom
         </span>
         <BarZoom />
       </footer>

@@ -24,7 +24,7 @@
   border-radius: 10px;
   background: var(--area);
   box-shadow:
-    0 1px 0 rgb(255 255 255 / 4%) inset,
+    0 1px 0 rgb(var(--fg-rgb) / 4%) inset,
     0 30px 80px rgb(0 0 0 / 55%);
   animation: start-rise 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
@@ -44,7 +44,7 @@
   min-height: 560px;
   padding: 36px 40px;
   overflow: hidden;
-  background: linear-gradient(180deg, #232323 0%, #1d1d1d 100%);
+  background: linear-gradient(180deg, var(--g14) 0%, var(--g11) 100%);
 }
 
 .start-glow {
@@ -72,7 +72,7 @@
   inset: auto 0 0;
   width: 100%;
   height: 56%;
-  stroke: #2a2a2a;
+  stroke: var(--g16);
   stroke-width: 1;
   mask-image: linear-gradient(to top, rgb(0 0 0 / 80%) 10%, transparent 85%);
 }
@@ -82,7 +82,7 @@
 }
 
 .start-floor .is-major {
-  stroke: #353535;
+  stroke: var(--g21);
 }
 
 .start-mark {
@@ -186,18 +186,18 @@
 }
 
 .start-workspace:hover {
-  border-color: #4a4a4a;
+  border-color: var(--g29);
   color: var(--text);
 }
 
 .start-workspace[aria-checked='true'] {
-  border-color: #6a6a6a;
+  border-color: var(--g42);
   background: var(--widget);
-  color: #fff;
+  color: var(--g100);
 }
 
 .start-workspace[aria-checked='true'] .icon {
-  color: #fff;
+  color: var(--g100);
 }
 
 .start-workspace:focus-visible {
@@ -282,7 +282,7 @@
 
 .start-action.is-primary .start-action-icon {
   background: var(--widget-on);
-  color: #fff;
+  color: var(--g100);
 }
 
 .start-action.is-primary:hover {

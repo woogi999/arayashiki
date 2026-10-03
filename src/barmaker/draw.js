@@ -405,7 +405,41 @@ const SHAPE_NAMES = {
   ellipse: 'Ellipse',
   triangle: 'Triangle',
   diamond: 'Diamond',
+  polygon: 'Polygon',
+  star: 'Star',
+  path: 'Shape',
 };
+
+// Custom shapes (the shape tool's library), as SVG paths in a 100 × 100
+// box, stretched to the layer's box. The pen tool's own paths are kept the
+// same way.
+export const CUSTOM_SHAPES = [
+  { id: 'heart', label: 'Heart', d: 'M50 90C20 66 4 49 4 30 4 16 15 6 28 6c10 0 18 6 22 14C54 12 62 6 72 6c13 0 24 10 24 24 0 19-16 36-46 60Z' },
+  { id: 'arrow', label: 'Arrow', d: 'M4 36H58V12L96 50 58 88V64H4Z' },
+  { id: 'chevron', label: 'Chevron', d: 'M4 18 50 50 96 18V44L50 78 4 44Z' },
+  { id: 'lightning', label: 'Lightning', d: 'M60 2 14 56H44L34 98 88 38H56Z' },
+  { id: 'bubble', label: 'Speech bubble', d: 'M12 8H88Q96 8 96 16V60Q96 68 88 68H42L18 92 24 68H12Q4 68 4 60V16Q4 8 12 8Z' },
+  { id: 'shield', label: 'Shield', d: 'M50 4 92 18V46C92 72 74 88 50 96 26 88 8 72 8 46V18Z' },
+  { id: 'plus', label: 'Plus', d: 'M36 4H64V36H96V64H64V96H36V64H4V36H36Z' },
+  { id: 'crescent', label: 'Crescent', d: 'M64 6A46 46 0 1 0 94 72 36 36 0 1 1 64 6Z' },
+  { id: 'drop', label: 'Drop', d: 'M50 4C50 4 86 46 86 64A36 36 0 0 1 14 64C14 46 50 4 50 4Z' },
+  { id: 'flame', label: 'Flame', d: 'M50 4C62 24 84 36 84 62 84 82 68 96 50 96 32 96 16 82 16 62 16 46 28 38 32 24 38 36 42 40 46 42 46 28 44 16 50 4Z' },
+  { id: 'kunai', label: 'Kunai', d: 'M50 2 60 40 54 44V70H62V76H54V86A7 7 0 1 1 46 86V76H38V70H46V44L40 40Z' },
+  { id: 'burst', label: 'Burst', d: burstPath(14, 0.62) },
+  { id: 'slash', label: 'Slash', d: 'M2 98C30 70 64 34 98 2 82 30 52 66 14 98Z' },
+  { id: 'banner', label: 'Banner', d: 'M2 20H98L86 50 98 80H2L14 50Z' },
+];
+
+// A spiky burst (manga's impact bubble): `n` points, the inner ones `inner` of the way out.
+function burstPath(n, inner) {
+  const pts = [];
+  for (let i = 0; i < n * 2; i++) {
+    const a = (i / (n * 2)) * Math.PI * 2 - Math.PI / 2;
+    const r = (i % 2 ? inner : 1) * 48 * (i % 2 ? 1 : 0.9 + ((i * 37) % 10) / 100);
+    pts.push(`${(50 + Math.cos(a) * r).toFixed(1)} ${(50 + Math.sin(a) * r).toFixed(1)}`);
+  }
+  return `M${pts.join('L')}Z`;
+}
 
 export const newShape = (shape = 'rect', extra = {}) =>
   base('shape', SHAPE_NAMES[shape] ?? 'Shape', {
@@ -422,6 +456,13 @@ export const newShape = (shape = 'rect', extra = {}) =>
     strokeAlpha: 100,
     strokeOwnRadius: false,
     strokeRadius: 0,
+    // Polygons and stars.
+    sides: 6,
+    points: 5,
+    inner: 45,
+    // A path ('path'): SVG path data in a 100 × 100 box, and whether it's closed.
+    d: '',
+    closed: true,
     ...extra,
   });
 
@@ -964,6 +1005,39 @@ function ringGeometry(L) {
   const innerThickness = Math.max(0, thickness - pad * 2);
   const round = Boolean(L.roundEnds);
   const whole = full && n === 1;
+  // A taper, as a bar's: the ring's thickness from TAPER START to TAPER END
+  // of itself round its sweep, lined up on its inside, middle or outside.
+  const taperA = clamp(L.taperStart ?? 100, 1, 100) / 100;
+  const taperB = clamp(L.taperEnd ?? 100, 1, 100) / 100;
+  const tapered = taperA !== 1 || taperB !== 1;
+  const scaleAt = (rel) => taperA + (taperB - taperA) * clamp(rel / sweep, 0, 1);
+  // The band's inner and outer radius at `rel`, for a full width `width`.
+  const edgesAt = (rel, width) => {
+    const w = width * scaleAt(rel);
+    const lineUp = L.taperAlign === 'start' ? mid - width / 2 + w / 2 : L.taperAlign === 'end' ? mid + width / 2 - w / 2 : mid;
+    return [Math.max(0, lineUp - w / 2), lineUp + w / 2, lineUp, w];
+  };
+  // A tapered band from `from` to `to` (degrees along the sweep), round-ended or not.
+  function taperedBand(ctx, from, to, width) {
+    if (width <= 0 || to <= from) return;
+    const steps = Math.max(8, Math.ceil((to - from) / 3));
+    const at = (k) => from + ((to - from) * k) / steps;
+    const pt = (rel, r) => [cx + r * Math.cos(angle(rel)), cy + r * Math.sin(angle(rel))];
+    ctx.moveTo(...pt(from, edgesAt(from, width)[1]));
+    for (let k = 1; k <= steps; k++) ctx.lineTo(...pt(at(k), edgesAt(at(k), width)[1]));
+    if (round) {
+      const [, , m, w] = edgesAt(to, width);
+      const c = pt(to, m);
+      ctx.arc(c[0], c[1], w / 2, angle(to), angle(to) + sign * Math.PI, !cw);
+    }
+    for (let k = steps; k >= 0; k--) ctx.lineTo(...pt(at(k), edgesAt(at(k), width)[0]));
+    if (round) {
+      const [, , m, w] = edgesAt(from, width);
+      const c = pt(from, m);
+      ctx.arc(c[0], c[1], w / 2, angle(from) + sign * Math.PI, angle(from) + sign * Math.PI * 2, !cw);
+    }
+    ctx.closePath();
+  }
 
   const startOf = (i) => offset + i * (seg + gapDeg);
   // Degrees clockwise from twelve o'clock, turned into canvas radians.
@@ -982,6 +1056,14 @@ function ringGeometry(L) {
 
   function arc(ctx, from, to, width) {
     if (width <= 0) return;
+    if (tapered) {
+      // Round caps sit inside the segment, as an untapered stroke's do.
+      const cap = capOf(width * Math.min(scaleAt(from), scaleAt(to)));
+      ctx.beginPath();
+      taperedBand(ctx, from + cap, Math.max(from + cap + 0.01, to - cap), width);
+      ctx.fill();
+      return;
+    }
     ctx.lineWidth = width;
     ctx.lineCap = round ? 'round' : 'butt';
     if (whole && to - from >= 360 - 1e-6) {
@@ -1003,6 +1085,10 @@ function ringGeometry(L) {
 
   // The outline of a band of the ring, `halfW` either side of its middle.
   function band(ctx, from, to, halfW) {
+    if (tapered) {
+      const cap = capOf(thickness);
+      return taperedBand(ctx, from + cap, Math.max(from + cap + 0.01, to - cap), halfW * 2);
+    }
     const rO = mid + halfW;
     const rI = Math.max(0, mid - halfW);
     if (full && to - from >= 360 - 1e-6) {
@@ -2027,46 +2113,56 @@ function drawBar(out, L, env) {
   return shape;
 }
 
-function shapePath(ctx, L) {
+// The shape's outline as a Path2D, so it can be filled and stroked alike.
+// Polygons and stars sit in the layer's box (an ellipse round them), their
+// corners rounded by `radius`; a path is its SVG data stretched to the box.
+export function shapeOutline(L, radius = L.radius) {
   const { x, y, w, h } = L;
-  ctx.beginPath();
-  if (L.shape === 'ellipse')
-    ctx.ellipse(
-      x + w / 2,
-      y + h / 2,
-      Math.abs(w / 2),
-      Math.abs(h / 2),
-      0,
-      0,
-      Math.PI * 2,
-    );
-  else if (L.shape === 'triangle') {
-    ctx.moveTo(x + w / 2, y);
-    ctx.lineTo(x + w, y + h);
-    ctx.lineTo(x, y + h);
-    ctx.closePath();
-  } else if (L.shape === 'diamond') {
-    ctx.moveTo(x + w / 2, y);
-    ctx.lineTo(x + w, y + h / 2);
-    ctx.lineTo(x + w / 2, y + h);
-    ctx.lineTo(x, y + h / 2);
-    ctx.closePath();
-  } else roundRectPath(ctx, { x, y, w, h }, L.radius);
+  const p = new Path2D();
+  const kind = L.shape ?? 'rect';
+  const around = (n, at) => {
+    const pts = [];
+    for (let i = 0; i < n; i++) {
+      const a = (i / n) * Math.PI * 2 - Math.PI / 2;
+      const r = at(i);
+      pts.push([x + w / 2 + (Math.cos(a) * w * r) / 2, y + h / 2 + (Math.sin(a) * h * r) / 2]);
+    }
+    return pts;
+  };
+  if (kind === 'ellipse') p.ellipse(x + w / 2, y + h / 2, Math.abs(w / 2), Math.abs(h / 2), 0, 0, Math.PI * 2);
+  else if (kind === 'triangle')
+    polyPath(p, [[x + w / 2, y], [x + w, y + h], [x, y + h]], radius);
+  else if (kind === 'diamond')
+    polyPath(p, [[x + w / 2, y], [x + w, y + h / 2], [x + w / 2, y + h], [x, y + h / 2]], radius);
+  else if (kind === 'polygon') polyPath(p, around(clamp(Math.round(L.sides ?? 6), 3, 64), () => 1), radius);
+  else if (kind === 'star') {
+    const n = clamp(Math.round(L.points ?? 5), 2, 64);
+    polyPath(p, around(n * 2, (i) => (i % 2 ? clamp(L.inner ?? 45, 2, 100) / 100 : 1)), radius);
+  } else if (kind === 'path' && L.d) {
+    const m = new DOMMatrix().translateSelf(x, y).scaleSelf(w / 100, h / 100);
+    try {
+      p.addPath(new Path2D(L.d), m);
+    } catch {
+      // not a path the browser can read
+    }
+  } else roundRectPath(p, { x, y, w, h }, radius);
+  return p;
 }
 
 function drawShape(ctx, L) {
-  shapePath(ctx, L);
-  if (L.fillOn) {
+  const outline = shapeOutline(L);
+  if (L.fillOn && L.closed !== false) {
     ctx.fillStyle = paintStyle(ctx, L.fill, { box: L });
-    ctx.fill();
+    ctx.fill(outline, 'nonzero');
   }
-  // The outline can round its corners on its own.
-  if (L.strokeOwnRadius && (L.shape ?? 'rect') === 'rect') shapePath(ctx, { ...L, radius: L.strokeRadius ?? 0 });
   if (L.stroke > 0) {
+    // The outline can round its corners on its own.
+    const line = L.strokeOwnRadius && !['ellipse', 'path'].includes(L.shape) ? shapeOutline(L, L.strokeRadius ?? 0) : outline;
     ctx.lineWidth = L.stroke;
     ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
     ctx.strokeStyle = rgba(L.strokeColor, L.strokeAlpha);
-    ctx.stroke();
+    ctx.stroke(line);
   }
 }
 
@@ -2580,15 +2676,45 @@ export function render(doc, frame, options = {}) {
 }
 
 // ─── Examples ─────────────────────────────────────────────────────
+// Starting points, each showing off a handful of the Maker's features, so
+// that between them they use all of them: every bar shape, segment shape and
+// fill, the patterns and effects, the shape tool's custom shapes and the
+// pen's paths, text that counts, layers on some steps only, clipping, and
+// the skill's styles.
+
+// Layer effects: the defaults with some switched on (`on` unless said).
+function fxWith(patch) {
+  const fx = newFx();
+  for (const [k, v] of Object.entries(patch)) fx[k] = { ...fx[k], on: true, ...v };
+  return fx;
+}
+const shapeD = (id) => CUSTOM_SHAPES.find((c) => c.id === id)?.d ?? '';
+const grad = (stops, angle = 0) => paint('linear', stops, angle);
 
 export const TEMPLATES = [
   {
     id: 'health',
     label: 'Health bar',
+    hint: 'Gloss, inner shadow, a catch-up trail, a leading edge, and the percentage in text that counts.',
     make: () =>
       newDoc({
+        name: 'Health bar',
         frames: 20,
+        jjs: { ...newJjs(), style: 'separate' },
         layers: [
+          newShape('rect', {
+            name: 'Frame',
+            x: 40,
+            y: 432,
+            w: 944,
+            h: 160,
+            radius: 80,
+            fill: solid('#0B0B0B', 85),
+            stroke: 6,
+            strokeColor: '#FFFFFF',
+            strokeAlpha: 30,
+            fx: fxWith({ shadow: { y: 10, blur: 30, alpha: 70 } }),
+          }),
           newBar({
             name: 'Health',
             x: 64,
@@ -2596,71 +2722,198 @@ export const TEMPLATES = [
             w: 896,
             h: 120,
             radius: 60,
-            stroke: { ...newBar().stroke, on: true, width: 10 },
-            padding: 10,
+            padding: 8,
             track: solid('#1A1A1A'),
-            fill: paint(
-              'linear',
-              [
-                [0, '#16A34A'],
-                [100, '#86EFAC'],
-              ],
-              0,
-            ),
-            shine: { on: true, alpha: 35 },
+            fill: grad([
+              [0, '#16A34A'],
+              [100, '#86EFAC'],
+            ]),
+            innerShadow: { ...newBar().innerShadow, on: true, alpha: 80 },
+            shine: { on: true, alpha: 40, style: 'glass' },
+            tip: { on: true, color: '#FFFFFF', alpha: 80, size: 70 },
+            trail: { on: true, color: '#FDE68A', alpha: 70, amount: 12 },
+          }),
+          newText({
+            name: 'Percent',
+            text: '{percent}%',
+            x: 362,
+            y: 462,
+            w: 300,
+            h: 100,
+            size: 72,
+            font: 'Arial Black',
+            stroke: 6,
+            fx: fxWith({ shadow: { y: 4, blur: 8, alpha: 60 } }),
           }),
         ],
       }),
   },
   {
-    id: 'segments',
-    label: 'Segmented',
+    id: 'cursed-energy',
+    label: 'Cursed energy (呪力)',
+    hint: 'A text bar written stroke by stroke, glowing, with scanlines and a flash when full.',
     make: () =>
       newDoc({
-        frames: 10,
+        name: 'Cursed energy',
+        frames: 24,
         layers: [
           newBar({
-            name: 'Segments',
-            x: 72,
-            y: 452,
-            w: 880,
-            h: 120,
-            radius: 18,
-            segments: 10,
-            gap: 18,
-            stepped: true,
-            skew: -15,
-            track: solid('#FFFFFF', 15),
-            fill: paint(
-              'linear',
+            name: '呪力',
+            shape: 'text',
+            text: '呪力',
+            x: 162,
+            y: 262,
+            w: 700,
+            h: 500,
+            textMode: 'strokes',
+            textPen: 9,
+            textFont: 'serif',
+            track: solid('#FFFFFF', 12),
+            fill: grad(
               [
-                [0, '#38BDF8'],
-                [100, '#6366F1'],
+                [0, '#60A5FA'],
+                [100, '#A855F7'],
               ],
-              0,
+              45,
             ),
-            glow: { on: true, color: '#38BDF8', alpha: 80, size: 30 },
+            glow: { on: true, color: '#7C3AED', alpha: 85, size: 40, grow: true },
+            flash: { on: true, color: '#FFFFFF', alpha: 60 },
+            fx: fxWith({ scanlines: { gap: 6, alpha: 25 } }),
+          }),
+        ],
+      }),
+  },
+  {
+    id: 'black-flash',
+    label: 'Black Flash',
+    hint: 'Red and black, torn by a glitch that changes every step, colour fringes, lightning on full.',
+    make: () =>
+      newDoc({
+        name: 'Black Flash',
+        frames: 20,
+        background: { on: false, color: '#000000' },
+        layers: [
+          newBar({
+            name: 'Flash',
+            x: 64,
+            y: 462,
+            w: 896,
+            h: 100,
+            radius: 0,
+            skew: -20,
+            segments: 5,
+            gap: 14,
+            segShape: 'slant',
+            segSlant: 40,
+            track: solid('#1A0004'),
+            fill: grad([
+              [0, '#000000'],
+              [55, '#7F0010'],
+              [100, '#FF1F3D'],
+            ]),
+            stroke: { ...newBar().stroke, on: true, width: 5, paint: solid('#FF1F3D'), position: 'outside' },
+            fx: fxWith({ glitch: { amount: 18, slices: 10, animate: true }, chroma: { amount: 5 } }),
+          }),
+          newShape('path', {
+            name: 'Lightning',
+            d: shapeD('lightning'),
+            x: 820,
+            y: 320,
+            w: 160,
+            h: 260,
+            fill: solid('#FF1F3D'),
+            stroke: 6,
+            strokeColor: '#000000',
+            fx: fxWith({ outerGlow: { color: '#FF1F3D', size: 40 }, range: { from: 100, to: 100 } }),
+          }),
+        ],
+      }),
+  },
+  {
+    id: 'manga',
+    label: 'Manga burst',
+    hint: 'Halftone and ink: a burst behind, a slash, and “MAX!” on the last step only.',
+    make: () =>
+      newDoc({
+        name: 'Manga burst',
+        frames: 16,
+        layers: [
+          newShape('path', {
+            name: 'Burst',
+            d: shapeD('burst'),
+            x: 212,
+            y: 162,
+            w: 600,
+            h: 600,
+            fill: solid('#FFFFFF'),
+            stroke: 10,
+            strokeColor: '#000000',
+            fx: fxWith({ halftone: { size: 12, angle: 45, ink: 'ink', color: '#000000', scale: 45, tone: 'even', under: 100 } }),
+          }),
+          newBar({
+            name: 'Ink',
+            x: 112,
+            y: 472,
+            w: 800,
+            h: 80,
+            radius: 4,
+            skew: -12,
+            track: solid('#FFFFFF'),
+            fill: solid('#111111'),
+            stroke: { ...newBar().stroke, on: true, width: 8, paint: solid('#000000') },
+            fx: fxWith({ halftone: { size: 10, angle: 20, shape: 'lines', scale: 70 }, outline: { color: '#FFFFFF', width: 6 } }),
+          }),
+          newText({
+            name: 'MAX!',
+            text: 'MAX!',
+            x: 312,
+            y: 252,
+            w: 400,
+            h: 160,
+            size: 140,
+            italic: true,
+            font: 'Impact',
+            fill: solid('#FF2A2A'),
+            stroke: 10,
+            fx: fxWith({ extrude: { depth: 18, angle: 35, colour: 'ink', color: '#000000' }, range: { from: 100, to: 100 } }),
           }),
         ],
       }),
   },
   {
     id: 'ring',
-    label: 'Ring',
+    label: 'Cooldown ring',
+    hint: 'A ring that tapers as it goes round, round ends, a bevel, and the steps counting down.',
     make: () =>
       newDoc({
+        name: 'Cooldown ring',
         frames: 20,
         layers: [
-          newRing({ track: solid('#FFFFFF', 12) }),
-          newText({ x: 212, y: 432, w: 600, h: 160, size: 150 }),
+          newRing({
+            name: 'Cooldown',
+            thickness: 90,
+            taperStart: 35,
+            taperEnd: 100,
+            taperAlign: 'end',
+            roundEnds: true,
+            track: solid('#FFFFFF', 12),
+            fill: paint('conic', [
+              [0, '#22D3EE'],
+              [100, '#6366F1'],
+            ]),
+            fx: fxWith({ bevel: { size: 12, depth: 60 } }),
+          }),
+          newText({ name: 'Left', text: '{left}', x: 312, y: 412, w: 400, h: 200, size: 160 }),
         ],
       }),
   },
   {
     id: 'gauge',
     label: 'Gauge',
+    hint: 'A segmented dial, red to green by step, with a needle drawn with the pen.',
     make: () =>
       newDoc({
+        name: 'Gauge',
         frames: 20,
         layers: [
           newRing({
@@ -2678,15 +2931,29 @@ export const TEMPLATES = [
               [50, '#FACC15'],
               [100, '#22C55E'],
             ]),
+            stroke: { ...newBar().stroke, on: true, width: 3, paint: solid('#FFFFFF', 40), around: 'bar' },
           }),
+          newShape('path', {
+            name: 'Needle (pen)',
+            d: 'M46 100L50 0 54 100Z',
+            x: 492,
+            y: 212,
+            w: 40,
+            h: 300,
+            fill: solid('#FFFFFF'),
+            fx: fxWith({ shadow: { y: 6, blur: 10 } }),
+          }),
+          newShape('ellipse', { name: 'Hub', x: 472, y: 472, w: 80, h: 80, fill: solid('#E5E5E5'), stroke: 6, strokeColor: '#111111' }),
         ],
       }),
   },
   {
     id: 'charge',
     label: 'Charge meter',
+    hint: 'Upright, stripes drifting, film grain, a dashed marching outline, and depth.',
     make: () =>
       newDoc({
+        name: 'Charge',
         frames: 20,
         layers: [
           newBar({
@@ -2697,15 +2964,9 @@ export const TEMPLATES = [
             h: 896,
             direction: 'btt',
             radius: 28,
-            stroke: {
-              ...newBar().stroke,
-              on: true,
-              width: 8,
-              paint: solid('#FFFFFF'),
-            },
+            stroke: { ...newBar().stroke, on: true, width: 6, style: 'dashed', dash: 18, gap: 10, march: 4, paint: solid('#FFFFFF') },
             track: solid('#000000', 60),
-            fill: paint(
-              'linear',
+            fill: grad(
               [
                 [0, '#F97316'],
                 [100, '#FDE047'],
@@ -2713,15 +2974,9 @@ export const TEMPLATES = [
               270,
             ),
             fillMode: 'stretch',
-            stripes: {
-              ...newBar().stripes,
-              on: true,
-              alpha: 22,
-              width: 28,
-              gap: 28,
-              anchor: 'drift',
-              move: 8,
-            },
+            stripes: { ...newBar().stripes, on: true, alpha: 22, width: 28, gap: 28, anchor: 'drift', move: 8 },
+            grain: { on: true, alpha: 30, size: 2, animate: true },
+            fx: fxWith({ extrude: { depth: 20, angle: 45, shade: 55 } }),
           }),
         ],
       }),
@@ -2729,10 +2984,15 @@ export const TEMPLATES = [
   {
     id: 'boss',
     label: 'Boss HP',
+    hint: 'A name on a banner, a long bar with a trail and leading edge, a texture clipped to the fill.',
     make: () =>
       newDoc({
+        name: 'Boss HP',
         frames: 20,
+        jjs: { ...newJjs(), style: 'separate' },
         layers: [
+          newShape('path', { name: 'Banner', d: shapeD('banner'), x: 262, y: 362, w: 500, h: 90, fill: solid('#7F1D1D'), stroke: 4, strokeColor: '#FCA5A5' }),
+          newText({ name: 'Name', text: 'SUKUNA', x: 262, y: 362, w: 500, h: 90, size: 64, font: 'Impact', stroke: 4 }),
           newBar({
             name: 'Boss HP',
             x: 64,
@@ -2741,30 +3001,61 @@ export const TEMPLATES = [
             h: 80,
             radius: 10,
             track: solid('#140A0A'),
-            fill: paint(
-              'linear',
-              [
-                [0, '#7F1D1D'],
-                [100, '#EF4444'],
-              ],
-              0,
-            ),
+            fill: grad([
+              [0, '#7F1D1D'],
+              [100, '#EF4444'],
+            ]),
             trail: { on: true, color: '#FDE68A', alpha: 75, amount: 12 },
             tip: { on: true, color: '#FFFFFF', alpha: 85, size: 50 },
             innerShadow: { ...newBar().innerShadow, on: true },
-            stripes: {
-              ...newBar().stripes,
-              on: true,
-              alpha: 10,
-              width: 10,
-              gap: 22,
-            },
-            stroke: {
-              ...newBar().stroke,
-              on: true,
-              width: 6,
-              paint: solid('#FFFFFF', 85),
-            },
+            stroke: { ...newBar().stroke, on: true, width: 6, paint: solid('#FFFFFF', 85), ownRadius: true, radius: 0 },
+          }),
+          newShape('rect', {
+            name: 'Texture (clipped)',
+            clip: true,
+            x: 64,
+            y: 472,
+            w: 896,
+            h: 80,
+            fill: solid('#FFFFFF'),
+            opacity: 30,
+            blend: 'overlay',
+            fx: fxWith({ halftone: { size: 8, angle: 30, shape: 'lines', ink: 'ink', color: '#000000', scale: 60 } }),
+          }),
+        ],
+      }),
+  },
+  {
+    id: 'domain',
+    label: 'Domain gauge',
+    hint: 'Hexagon segments leaning back in 3D, a grid pattern, a bevel, purple glow.',
+    make: () =>
+      newDoc({
+        name: 'Domain gauge',
+        frames: 7,
+        layers: [
+          newBar({
+            name: 'Domain',
+            x: 64,
+            y: 392,
+            w: 896,
+            h: 240,
+            segments: 7,
+            gap: 8,
+            stepped: true,
+            segShape: 'hexagon',
+            segDepth: 40,
+            track: solid('#1E1033'),
+            fill: grad(
+              [
+                [0, '#7C3AED'],
+                [100, '#F0ABFC'],
+              ],
+              90,
+            ),
+            stripes: { ...newBar().stripes, on: true, kind: 'crosshatch', alpha: 15, width: 3, gap: 22, angle: 0 },
+            glow: { on: true, color: '#A855F7', alpha: 70, size: 35 },
+            fx: fxWith({ tilt: { tiltX: 35, tiltY: -10, distance: 2 }, bevel: { size: 8, depth: 50 } }),
           }),
         ],
       }),
@@ -2772,8 +3063,10 @@ export const TEMPLATES = [
   {
     id: 'signal',
     label: 'Signal',
+    hint: 'Tapered segments that light up whole, like a phone’s signal.',
     make: () =>
       newDoc({
+        name: 'Signal',
         frames: 5,
         layers: [
           newBar({
@@ -2799,8 +3092,10 @@ export const TEMPLATES = [
   {
     id: 'chevrons',
     label: 'Chevrons',
+    hint: 'Chevron segments, a progress colour, and a marching dashed outline inside.',
     make: () =>
       newDoc({
+        name: 'Chevrons',
         frames: 8,
         layers: [
           newBar({
@@ -2816,14 +3111,10 @@ export const TEMPLATES = [
             segShape: 'chevron',
             segDepth: 60,
             track: solid('#FFFFFF', 10),
-            fill: paint(
-              'linear',
-              [
-                [0, '#FACC15'],
-                [100, '#F97316'],
-              ],
-              0,
-            ),
+            fill: grad([
+              [0, '#FACC15'],
+              [100, '#F97316'],
+            ]),
             stroke: {
               ...newBar().stroke,
               on: true,
@@ -2836,6 +3127,46 @@ export const TEMPLATES = [
               march: 3,
             },
           }),
+        ],
+      }),
+  },
+  {
+    id: 'retro',
+    label: 'Retro hearts',
+    hint: 'Five pixel hearts (a custom shape) that fill one a step: each layer shown on its steps only.',
+    make: () =>
+      newDoc({
+        name: 'Retro hearts',
+        frames: 5,
+        layers: [
+          ...[0, 1, 2, 3, 4].map((i) =>
+            newShape('path', {
+              name: `Empty ${i + 1}`,
+              d: shapeD('heart'),
+              x: 92 + i * 172,
+              y: 432,
+              w: 150,
+              h: 140,
+              fill: solid('#3F3F46'),
+              stroke: 8,
+              strokeColor: '#000000',
+              fx: fxWith({ pixelate: { size: 10 }, range: { from: 0, to: Math.round(((i + 1) / 5) * 100) - 1 } }),
+            }),
+          ),
+          ...[0, 1, 2, 3, 4].map((i) =>
+            newShape('path', {
+              name: `Heart ${i + 1}`,
+              d: shapeD('heart'),
+              x: 92 + i * 172,
+              y: 432,
+              w: 150,
+              h: 140,
+              fill: solid('#EF4444'),
+              stroke: 8,
+              strokeColor: '#000000',
+              fx: fxWith({ pixelate: { size: 10 }, range: { from: Math.round(((i + 1) / 5) * 100), to: 100 } }),
+            }),
+          ),
         ],
       }),
   },

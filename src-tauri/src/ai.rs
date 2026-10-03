@@ -16,7 +16,9 @@ use serde_json::{json, Value};
 use tauri::ipc::Channel;
 
 const SERVICE: &str = "arayashiki-ai";
-const PROVIDERS: &[&str] = &["anthropic", "openai", "gemini", "openrouter", "groq", "xai", "deepseek", "mistral", "custom"];
+const PROVIDERS: &[&str] = &[
+    "anthropic", "openai", "gemini", "openrouter", "groq", "xai", "deepseek", "mistral", "cerebras", "together", "fireworks", "moonshot", "qwen", "zai", "huggingface", "nvidia", "custom",
+];
 
 fn entry(provider: &str) -> Result<keyring::Entry, String> {
     if !PROVIDERS.contains(&provider) {

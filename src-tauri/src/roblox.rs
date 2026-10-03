@@ -592,19 +592,24 @@ impl Assets {
     // image a game draws, in the background: the upload is polled until it's
     // done, then the decal is read back for its image ID.
 
-    pub async fn upload_decal(&self, png: Vec<u8>, name: &str, description: &str) -> Result<Uploaded, String> {
-        let user = self.account.status().user.ok_or("Sign in with Roblox first: the pictures go to your account.")?;
+    /// Creates an asset on the signed-in account (Roblox's user-auth Assets
+    /// API) and waits for it: (its asset ID, its moderation state). Types:
+    /// "Decal" (png, jpeg, bmp, tga), "Audio" (mp3, ogg, wav, flac),
+    /// "Model" (fbx, gltf, glb).
+    async fn create_asset(&self, bytes: Vec<u8>, asset_type: &str, file_name: &str, mime: &str, name: &str, description: &str) -> Result<(String, Option<String>), String> {
+        let user = self.account.status().user.ok_or("Sign in with Roblox first: uploads go to your account.")?;
         let request = serde_json::json!({
-            "assetType": "Decal",
+            "assetType": asset_type,
             "displayName": name.chars().take(50).collect::<String>(),
             "description": description.chars().take(1000).collect::<String>(),
             "creationContext": { "creator": { "userId": user.id } },
         })
         .to_string();
+        let (file_name, mime) = (file_name.to_string(), mime.to_string());
         let form = || {
             reqwest::multipart::Form::new().text("request", request.clone()).part(
                 "fileContent",
-                reqwest::multipart::Part::bytes(png.clone()).file_name("step.png").mime_str("image/png").expect("a mime type"),
+                reqwest::multipart::Part::bytes(bytes.clone()).file_name(file_name.clone()).mime_str(&mime).expect("a mime type"),
             )
         };
         const SIGNED_IN: &str = "https://apis.roblox.com/assets/user-auth/v1";
@@ -617,7 +622,7 @@ impl Assets {
         let mut tries = 0;
         while operation["done"] != true {
             tries += 1;
-            if tries > 60 {
+            if tries > 90 {
                 return Err("Roblox is taking too long with the upload.".into());
             }
             crate::account::tokio_sleep(Duration::from_millis((1000 + tries * 250).min(3000))).await;
@@ -636,12 +641,60 @@ impl Assets {
         if let Some(message) = operation["error"]["message"].as_str() {
             return Err(message.to_string());
         }
-        let decal_id = operation["response"]["assetId"]
+        let id = operation["response"]["assetId"]
             .as_str()
             .map(str::to_string)
             .or_else(|| operation["response"]["assetId"].as_i64().map(|i| i.to_string()))
-            .ok_or("Roblox didn't make the decal.")?;
+            .ok_or("Roblox didn't make the asset.")?;
         let moderation = operation["response"]["moderationResult"]["moderationState"].as_str().map(str::to_string);
+        Ok((id, moderation))
+    }
+
+    /// A sound (for an SFX node's ID) or a 3D model (for a Mesh VISUAL: the
+    /// mesh and texture IDs inside the model Roblox makes of it).
+    pub async fn upload_media(&self, kind: &str, bytes: Vec<u8>, file_name: &str, name: &str, description: &str) -> Result<serde_json::Value, String> {
+        let ext = file_name.rsplit('.').next().unwrap_or("").to_lowercase();
+        match kind {
+            "audio" => {
+                let mime = match ext.as_str() {
+                    "mp3" => "audio/mpeg",
+                    "ogg" => "audio/ogg",
+                    "wav" => "audio/wav",
+                    "flac" => "audio/flac",
+                    _ => return Err("Audio goes up as mp3, ogg, wav or flac.".into()),
+                };
+                let (id, moderation) = self.create_asset(bytes, "Audio", file_name, mime, name, description).await?;
+                Ok(serde_json::json!({ "kind": "audio", "soundId": id, "moderation": moderation }))
+            }
+            "model" => {
+                let mime = match ext.as_str() {
+                    "fbx" => "model/fbx",
+                    "glb" => "model/gltf-binary",
+                    "gltf" => "model/gltf+json",
+                    _ => return Err("A model goes up as fbx, glb or gltf.".into()),
+                };
+                let (id, moderation) = self.create_asset(bytes, "Model", file_name, mime, name, description).await?;
+                // The model Roblox made holds MeshParts: their mesh and texture.
+                let mut found = (None, None);
+                for attempt in 0..10u64 {
+                    if attempt > 0 {
+                        crate::account::tokio_sleep(Duration::from_millis(1500 * attempt)).await;
+                    }
+                    if let Ok(model) = self.model(&id).await {
+                        found = mesh_ids(&model);
+                        if found.0.is_some() {
+                            break;
+                        }
+                    }
+                }
+                Ok(serde_json::json!({ "kind": "model", "modelId": id, "meshId": found.0, "textureId": found.1, "moderation": moderation }))
+            }
+            _ => Err(format!("Unknown kind {kind}")),
+        }
+    }
+
+    pub async fn upload_decal(&self, png: Vec<u8>, name: &str, description: &str) -> Result<Uploaded, String> {
+        let (decal_id, moderation) = self.create_asset(png, "Decal", "step.png", "image/png", name, description).await?;
         // A new decal takes a moment to be readable.
         let mut last = String::from("Couldn't find the picture behind that decal.");
         for attempt in 0..10u64 {
@@ -738,6 +791,17 @@ fn inner_asset(bytes: &[u8]) -> Option<String> {
     let text = if bytes.starts_with(b"<roblox!") { binary_model_text(bytes) } else { String::from_utf8_lossy(bytes).to_string() };
     let re = regex::Regex::new(r"(?i)(?:rbxassetid://|roblox\.com/asset/?\?id=)(\d+)").ok()?;
     re.captures(&text).map(|c| c[1].to_string())
+}
+
+/// The first MeshId and TextureID in a model (a MeshPart's or a SpecialMesh's).
+fn mesh_ids(bytes: &[u8]) -> (Option<String>, Option<String>) {
+    let text = if bytes.starts_with(b"<roblox!") { binary_model_text(bytes) } else { String::from_utf8_lossy(bytes).to_string() };
+    let find = |prop: &str| {
+        regex::Regex::new(&format!(r"(?is){prop}.{{0,80}}?(?:rbxassetid://|roblox\.com/asset/?\?id=)(\d+)"))
+            .ok()
+            .and_then(|re| re.captures(&text).map(|c| c[1].to_string()))
+    };
+    (find("MeshId"), find("TextureI[dD]"))
 }
 
 fn binary_model_text(bytes: &[u8]) -> String {

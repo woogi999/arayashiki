@@ -16,3 +16,4 @@
 # The JJS exports and guides the handbook and library are built from. Some
 # are other people's characters, so they stay on this machine.
 /data/
+/update-release.bat

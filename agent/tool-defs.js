@@ -84,6 +84,29 @@ export const ENGINE_TOOLS = [
     run: (T, a) => T.validate(a),
   },
   {
+    name: 'lint',
+    title: 'Lint a moveset',
+    description:
+      "A linter for movesets, like a code linter: everything validate finds, plus bugs that load fine but don't do what was meant (nodes after a BRANCH that never run, tags checked but never set, permanent VISUALs nothing can cancel, Cancels with no target, a GRAB before anyone is hit, two skills on one key, combos the dummy escapes between hits) and tips (merge WAITs, use a LOOP, lock direction during a camera shot, add a cooldown). Each problem has level (error, warning, info, tip), rule, skill, at { branch, index }, message and fix. Run it after building or changing skills.",
+    shape: {
+      ...skillsInput,
+      select,
+      simulate: z.boolean().optional().describe('Also run the checks that simulate (combos, endless loops). Default true.'),
+      ignore: z.array(z.string()).optional().describe('Rules to leave out, e.g. ["no-cooldown"].'),
+    },
+    readOnly: true,
+    run: (T, a) => T.lint(a),
+  },
+  {
+    name: 'profile',
+    title: 'A moveset’s style',
+    description:
+      'What a moveset tends to do, in numbers: its median damage, stun, first-hit time, move length and cooldown, typical hitbox sizes, favourite node kinds, effects and animations, the tags it uses, how many skills use camera work, and its skill names. Use it to build new moves in the same style as the user’s other moves (as a guide, not a copy).',
+    shape: { ...skillsInput },
+    readOnly: true,
+    run: (T, a) => T.profile(a),
+  },
+  {
     name: 'encode',
     title: 'Write a moveset code',
     description:
@@ -120,9 +143,9 @@ export const ENGINE_TOOLS = [
   },
   {
     name: 'search_library',
-    title: 'Find a real move to build from',
+    title: 'Find real moves for reference',
     description:
-      'Searches 37 real moves (M1 strings, dashes, leaps and slams, grabs, barrages, projectiles, counters, passives…) by what they do, e.g. "launch", "grab slam", "projectile wall", "resource bar". Every word must match. No query lists them all. Build new moves from the closest one.',
+      'Searches 37 real moves (M1 strings, dashes, leaps and slams, grabs, barrages, projectiles, counters, passives…) by what they do, e.g. "launch", "grab slam", "projectile wall", "resource bar". Every word must match. No query lists them all. Use them as references (how JJS does a thing, the usual numbers), not as templates to copy: design the move the user asked for.',
     shape: { query: z.string().optional(), limit: z.number().optional() },
     readOnly: true,
     run: (T, a) => T.searchLibrary(a),
@@ -182,7 +205,7 @@ export const APP_TOOLS = [
     name: 'app_state',
     title: 'What the app has open',
     description:
-      'The desktop app right now: the moveset (name, file, unsaved changes, every skill with its category, name and node count), the open skill, branch and node, the playhead, the simulation settings and result summary, and the camera. Start here when working with what the user sees.',
+      'The desktop app right now: the moveset (name, file, unsaved changes, every skill with its category, name and node count), the open skill, branch and node, the playhead, the simulation settings and result summary, and the camera; and the tools the user’s plugins add (plugin_tools: call them by name). Start here when working with what the user sees.',
     shape: {},
     readOnly: true,
   },
@@ -333,6 +356,134 @@ export const APP_TOOLS = [
     description: 'Saves the open moveset to its .txt (or asks the user where, the first time).',
     shape: {},
   },
+  // ─── The Meter Maker ──────────────────────────────────────────────────
+  {
+    name: 'meter_state',
+    title: 'The Meter Maker’s design',
+    description:
+      'The meter (progress bar) open in the Meter Maker: its name, steps (frames: the picture for each value, 0 empty to frames full), every layer (id, name, type, shape, box, visibility, clipping), the JJS skill settings (style, tag, name, size, position, start, what moves it) and which image IDs it has. The examples to start from are listed too. A meter is pictures, one per step, shown by a skill that watches a TAG: a skill that adds to or sets that tag moves the bar.',
+    shape: {},
+    readOnly: true,
+  },
+  {
+    name: 'meter_get',
+    title: 'The meter design as JSON',
+    description: 'The whole design (doc) as JSON: every layer with all its settings (fill, track, stroke, segments, effects in fx…). Change it and give it back with meter_put, or change single layers with meter_set_layer.',
+    shape: {},
+    readOnly: true,
+  },
+  {
+    name: 'meter_put',
+    title: 'Put a meter design in',
+    description: 'Replaces the open design with this one (doc JSON, as meter_get gives; missing settings take their defaults), as one undo step.',
+    shape: { doc: z.record(z.string(), z.any()) },
+  },
+  {
+    name: 'meter_new',
+    title: 'Start a new meter',
+    description:
+      'A new design: `frames` steps (20 is common; a meter with N segments that light up whole wants N), starting from a bar, a ring or nothing; or `example` (meter_state lists them: health, cursed-energy, black-flash, manga, ring, gauge, charge, boss, domain, signal, chevrons, retro) to start from one. An example is a starting point to change, not the answer.',
+    shape: { frames: z.number().optional(), start: z.enum(['bar', 'ring', 'empty']).optional(), example: z.string().optional() },
+  },
+  {
+    name: 'meter_add_layer',
+    title: 'Add a layer to the meter',
+    description:
+      'Adds a layer: kind "bar" (a meter), "ring", "textbar" (text that fills), "rect", "ellipse", "triangle", "diamond", "polygon", "star", "custom" (custom_shape: heart, arrow, chevron, lightning, bubble, shield, plus, crescent, drop, flame, kunai, burst, slash, banner), "path" (props.d: SVG path in a 100×100 box), "text" (props.text; {percent}, {frame}, {frames}, {left} count) or "paint". props go over its defaults (x, y, w, h on a 1024×1024 picture; fill, track, stroke, fx…). Returns its id.',
+    shape: { kind: z.string(), props: z.record(z.string(), z.any()).optional(), custom_shape: z.string().optional() },
+  },
+  {
+    name: 'meter_set_layer',
+    title: 'Change a meter layer',
+    description:
+      'Changes a layer (by id or name): props merge into it, groups a level down ({ fx: { halftone: { on: true } } } keeps the other effects). Bars: shape (bar, ring, text, image), direction, radius, skew, segments, gap, stepped, segShape, taper*, fill and track (paints: { type: solid|linear|radial|conic, angle, stops: [{ pos, color, alpha }] }), stroke, innerShadow, stripes, shine, tip, trail, glow, grain, flash. Any layer: opacity, blend, clip, rotation, fx (shadow, outerGlow, outline, overlay, fade, range: show on some steps only, halftone, chroma, glitch, pixelate, blur, scanlines, bevel, tilt, extrude).',
+    shape: { layer: z.string(), props: z.record(z.string(), z.any()) },
+  },
+  {
+    name: 'meter_delete_layer',
+    title: 'Delete a meter layer',
+    description: 'Deletes a layer by id or name.',
+    shape: { layer: z.string() },
+  },
+  {
+    name: 'meter_screenshot',
+    title: 'Look at the meter',
+    description:
+      'The meter drawn as a picture, so you can see what you made: one step, or several side by side (steps: [0, 10, 20] shows empty, half and full). part draws one of the pictures Complex Separate makes (container, meterLead, trail, front). Look before you call it done.',
+    shape: { steps: z.array(z.number()).optional(), scale: z.number().optional(), part: z.string().optional() },
+    readOnly: true,
+  },
+  {
+    name: 'meter_publish',
+    title: 'Make the meter’s skill',
+    description:
+      "Sets the JJS skill's settings (name, tag: the TAG that holds the bar's step, start \"full\"|\"empty\", size, position \"x, y, z\", style \"complex\"|\"separate\"|\"legacy\", source \"tag\"|\"health\", regen, rails) and, with upload true, uploads every picture to the user's Roblox account and puts the bar's skills straight into the open moveset (needs the user signed in and to have allowed AI uploads). Without upload it makes the skill from the image IDs it already has. Then give the moves that should fill or empty it a TAG node on the same tag (VALUE +n / -n to add or take away, or set a step).",
+    shape: {
+      upload: z.boolean().optional(),
+      name: z.string().optional(),
+      tag: z.string().optional(),
+      start: z.enum(['full', 'empty']).optional(),
+      size: z.number().optional(),
+      position: z.string().optional(),
+      style: z.enum(['complex', 'separate', 'legacy']).optional(),
+      source: z.enum(['tag', 'health']).optional(),
+      regen: z.boolean().optional(),
+      rails: z.boolean().optional(),
+    },
+  },
+  // ─── Media an AI makes ────────────────────────────────────────────────
+  {
+    name: 'media_inspect',
+    title: 'Check a picture, sound or model',
+    description:
+      'Checks media you made (a picture, a sound, a 3D model) against what Roblox and JJS take, and shows it to you: a picture as it will be (PNG, up to 1024 px), a sound’s length and waveform, a model rendered with its triangle count (Roblox takes up to 20,000). Give path (a file on this PC) or data (base64 or a data: URL).',
+    shape: { path: z.string().optional(), data: z.string().optional(), file_name: z.string().optional(), kind: z.enum(['image', 'audio', 'model']).optional() },
+    readOnly: true,
+  },
+  {
+    name: 'media_upload',
+    title: 'Upload a picture, sound or model',
+    description:
+      "Uploads media you made to the user's Roblox account, made fit first (pictures to PNG ≤ 1024 px; sounds mp3/ogg/wav/flac ≤ 7 min; models glb/gltf/fbx, obj turned to glb, ≤ 20,000 triangles), and says where its IDs go: an image ID in a TEXTURE, a sound ID in an SFX, a model's mesh and texture IDs in a Mesh VISUAL (AMOUNT, TEXTURE). Only when the user asked for it and has allowed AI uploads (Settings → AI). Give path or data, and a name.",
+    shape: { path: z.string().optional(), data: z.string().optional(), file_name: z.string().optional(), kind: z.enum(['image', 'audio', 'model']).optional(), name: z.string(), description: z.string().optional() },
+    openWorld: true,
+  },
+  {
+    name: 'memory_read',
+    title: 'Read your memories',
+    description:
+      'What you remember from earlier conversations in this app, if the user has turned memories on: notes (their preferences, JJS rules found out, patterns that worked) and movesets they asked you to remember, each with its style. Read it at the start of a conversation about building or changing skills, and follow what it says. query narrows it down.',
+    shape: { query: z.string().optional() },
+    readOnly: true,
+  },
+  {
+    name: 'memory_write',
+    title: 'Remember something',
+    description:
+      'Saves a short note for later conversations (only when memories are on): kind "preference" (how the user likes things), "rule" (something about JJS or the Skill Builder you found out), "pattern" (a way of building that worked), or "note". One fact per note, specific: "Prefers M1s with 0.2 s startup and red hit sparks", not "user likes good moves". Don’t save secrets or one-off details.',
+    shape: { kind: z.enum(['preference', 'rule', 'pattern', 'note']).optional(), text: z.string(), tags: z.array(z.string()).optional() },
+  },
+  {
+    name: 'memory_forget',
+    title: 'Forget a memory',
+    description: 'Deletes a note or a remembered moveset by its id (from memory_read), when it’s wrong or the user asks.',
+    shape: { id: z.string() },
+  },
+  {
+    name: 'memory_remember_moveset',
+    title: 'Remember this moveset',
+    description:
+      'Keeps the moveset open in the app (with its style profile) for later conversations, when the user asks you to remember it or to build like it again (memories must be on). name and note say what it is and why it matters.',
+    shape: { name: z.string().optional(), note: z.string().optional() },
+  },
+  {
+    name: 'memory_get_moveset',
+    title: 'A remembered moveset',
+    description:
+      'One moveset you were asked to remember: its style profile and its skills (DATA parsed). Use it as a reference for the user’s style: timings, damage, effects, naming. Take after it, don’t copy it whole unless asked.',
+    shape: { id: z.string() },
+    readOnly: true,
+  },
   {
     name: 'app_notify',
     title: 'Tell the user something',
@@ -355,9 +506,12 @@ export const OPEN_IN_APP = {
 export const APP_INSTRUCTIONS = [
   'Arayashiki is a desktop app for Jujutsu Shenanigans (Roblox) Skill Builder skills; these tools work on it (the app starts if it is closed).',
   'The app_* tools act on what the user has open: app_state first, then app_get_skills / app_put_skills to edit the moveset in place (every change is undoable with Ctrl+Z), app_simulate and app_playback to run it, app_screenshot to see it, app_export_video to render it, app_animate to keyframe a mesh or camera.',
-  'A "code" is the text JJS copies out (base64 of zstd JSON, starts "KLUv/"). To build a new move: search_library for the closest real move, get_library_move for its nodes, node_reference for fields, adapt, validate, then app_put_skills.',
+  'A "code" is the text JJS copies out (base64 of zstd JSON, starts "KLUv/"). To build a move: work out what it should do, look at real moves that do something like it (search_library, get_library_move) as references for how JJS does it and the usual numbers, but design the move the user asked for: don\'t just copy the nearest one. node_reference for fields, then simulate, lint, and app_put_skills.',
+  'Meters (progress bars) are made in the Meter Maker: meter_new / meter_add_layer / meter_set_layer, meter_screenshot to look, meter_publish to make the skill (and its pictures). A skill that needs a bar (a resource, a charge, a cooldown) gets one: make the meter, publish it, then have the moves change its TAG.',
+  'Media you make (pictures, sounds, 3D models) can go into skills: media_inspect to check and see it, media_upload (only when the user asks and allows it) for its IDs.',
   "The simulator is a model of JJS's rules read from real exports, not the game: timings and damage are close, not exact. The handbook says what is confirmed and what is inferred.",
   'Reference docs (the handbook, the move library, the game data) are also on disk next to the app, in its install folder: read AGENTS.md there first.',
+  'If the user has turned memories on, memory_read tells you what you learned in earlier conversations (their preferences and style, movesets to take after): read it first, and save what you learn with memory_write.',
 ].join('\n');
 
 export const inputSchemaOf = (shape) => {

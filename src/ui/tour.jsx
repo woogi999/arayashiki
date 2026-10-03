@@ -299,8 +299,8 @@ const STEPS = [
     title: 'Tools',
     body: () => (
       <p>
-        <strong>Move</strong> (V), <strong>Brush</strong> (B), <strong>Eraser</strong> (E), <strong>Shapes and
-        meters</strong> (U) and <strong>Text</strong> (T), and a picture of your own. The strip above the picture holds
+        <strong>Move</strong> (V), <strong>Meter</strong> (M), <strong>Shape</strong> (U), <strong>Pen</strong> (P),{' '}
+        <strong>Text</strong> (T), <strong>Brush</strong> (B) and <strong>Eraser</strong> (E), and a picture of your own. The strip above the picture holds
         the options of the tool in hand.
       </p>
     ),

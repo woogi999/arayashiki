@@ -284,6 +284,7 @@ says where it comes from.
 | A ragdolled character is only hit by hitboxes with **`HIT RAGDOLL`** ("Always hit" still forces it). | guides |
 | `CLEAR KNOCKBACK` on a hit stops the knockback, zeroes the momentum and ends the ragdoll. | guides |
 | A `GRAB` holds its victim at the grabber's body part (plus `POSITION`); they leave with the grabber's velocity. A `TELEPORT` leaves someone at rest. | inferred |
+| A `TELEPORT` moves them at once: a `HITBOX`, `VISUAL` or anything else right after it in the line (no `WAIT` between) already happens where they landed, since a line's nodes run in the same frame. | inferred |
 | A run lasts until both characters have **landed, stopped and got up**, so a whole knockback shows. | the simulator's choice |
 
 In the 3D view, a ragdoll is a real rigid-body ragdoll (cannon-es): the

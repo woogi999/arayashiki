@@ -3,6 +3,113 @@
 What changed in each version of Arayashiki, newest first. The app shows this
 under Help → What's new.
 
+## 1.0.5
+
+### AI
+- **Pick the model and how hard it thinks, right in the chat**, as in
+  Copilot: a model picker under the message box lists every provider you've
+  set up (Claude, ChatGPT, Gemini, OpenRouter, xAI, DeepSeek, Mistral, Groq,
+  Cerebras, Kimi, Qwen, GLM, Ollama, LM Studio and more), and how hard it
+  thinks (from off up to high, or max for Claude Opus) for the models that
+  can.
+- **Autopilot or manual**: on autopilot the assistant works on its own; in
+  manual mode it asks before every change it makes (reading, simulating and
+  screenshots never ask). Manual mode covers the subscription CLIs too.
+- **Memories** (Settings → AI, off until you turn them on): the AI keeps short
+  notes on what it learns (your preferences, JJS rules it finds out, what
+  worked), and movesets you ask it to remember, with their style (damage,
+  stun, timings, effects, names). It reads them when a conversation starts,
+  here and in AI apps connected through MCP, and builds like your movesets
+  do. Kept on this PC only.
+- **AIs work in the Meter Maker**: new tools let an AI make a meter
+  (`meter_new`, `meter_add_layer`, `meter_set_layer`…), look at it
+  (`meter_screenshot`) and make its skill (`meter_publish`), so a move that
+  needs a bar gets one, with the TAG nodes that fill and empty it.
+- **AI-made pictures, sounds and 3D models**: `media_inspect` checks them
+  against what Roblox and JJS take and shows them to the AI (a picture, a
+  sound's waveform, a model rendered with its triangle count);
+  `media_upload` uploads them to your Roblox account and says where their IDs
+  go (a TEXTURE, an SFX, a Mesh VISUAL). Only when you ask and have allowed AI
+  uploads (Settings → AI → Uploads).
+- **The move library is a reference, not a template**: AIs now work out what
+  the move you asked for should do, look at real moves for how JJS does each
+  part and the usual numbers, and design the move, instead of copying the
+  nearest one.
+- New tools: `lint` (the linter, below) and `profile` (a moveset's style in
+  numbers).
+
+### The linter
+- **A Problems tab** (Ctrl+Shift+L) checks the moveset as you edit, like a
+  code editor's linter: errors (what breaks), warnings (what probably isn't
+  meant), info and tips. Click a problem to open its skill, branch and node;
+  turn off a rule you don't want. **Check with the simulator** also runs every
+  skill: combos the dummy escapes, endless loops, cameras that overlap.
+- Checks include branches nothing runs, branch targets that don't exist,
+  keys two skills share, hitboxes with no damage or stun, waits that never
+  end, cancels that cancel nothing, moves with no cooldown, fields a node
+  doesn't read, and more. Also `sbs lint` and the `lint` MCP tool.
+
+### Plugins
+- **Mods and plugins**: a plugin is a folder with a `plugin.json` and a
+  `main.js`, in the plugins folder (Settings → Plugins → Open the plugins
+  folder). Plugins can add commands (in the search, and bindable to keys),
+  linter rules, tools for the assistant and AI apps, and Meter Maker
+  examples; read and change the moveset (as one undo step); and use the
+  engine (decode, simulate, lint…). Turn each on or off in Settings →
+  Plugins; one that fails to load says why.
+- **For plugin makers**: `docs/PLUGINS.md` in the install folder is the whole
+  guide, with a working example plugin next to it.
+
+### Skill Builder
+- **Fixed: a TELEPORT before a HITBOX now lands first.** The teleport waited
+  for the next physics step, so the hitbox came out where you were before.
+- **Click a slider's number to type a value**, everywhere.
+- **Auto-sheathing template: drag the meshes into place** in its preview, as
+  in Blender: G to move, R to turn, instead of typing positions.
+
+### Impact frames
+- **Redone, after how Blender impact frame projects are built**: toon
+  shading with a light and a cut, ink lines with a weight and creases, tone and
+  hatching for the shadows, and a shockwave. The looks are reworked (Manga ink
+  first); Zoom ink is cleaner; Neon streak and Graphite are gone.
+- **Fixed: accessories drawn twice.** Ragdoll parts and accessories no longer
+  show doubled in the silhouettes.
+- **Default dummy models** (on by default): draw the plain R6 rigs, without
+  your avatar's hats, hair and gear.
+- **Download frame** saves the picture; **Load pictures…** uses your own
+  impact frame pictures instead of the drawn ones.
+
+### Meter Maker
+- **Separate bar and shape tools** (M and U), and a **pen tool** (P): click
+  for corners, drag for curves, click the first point to close.
+- **More shapes**: polygons (any number of sides), stars (any number of
+  points), and a library of custom shapes (heart, arrow, chevron, lightning,
+  shield, flame, kunai, burst, slash, banner…).
+- **Right-click menus like Photoshop's**, different for a layer, the canvas,
+  a guide, a step and the tools: arrange, align to the picture, transform,
+  convert to another kind, copy and paste a layer's style, and more.
+- **Middle-drag pans** the canvas.
+- **Changing a bar's shape keeps its settings**: from a bar to a ring, text
+  or a picture, its fill, track, stroke, segments and effects carry over.
+  Rings can taper; rings, text and pictures can slant.
+- **New examples**, between them using every feature: Health, Cursed energy,
+  Black flash, Manga, Ring, Gauge, Charge, Boss, Domain, Signal, Chevrons and
+  Retro, each with a note on what it shows.
+
+### Look and feel
+- **Themes**: Dark, Light, Midnight, Black, Warm, High contrast, or your own
+  (Settings → Appearance, or search "theme"). A custom theme saves and loads
+  as a file.
+- **The window doesn't act like a browser any more**: Ctrl+J twice no longer
+  opens downloads, Ctrl+F no longer opens find-in-page, and Ctrl+wheel no
+  longer zooms the page (Ctrl+= and Ctrl+- still size the interface).
+- **A pass over the whole interface**: toolbars that were cut off when the
+  assistant is open fold their labels into icons; Settings tabs no longer
+  spread their sections apart; error, warning and slider colours follow the
+  theme (readable in Light); the Impact frame dialog's controls line up; the
+  Meter Maker's rulers follow the theme; the viewport's hint stays inside the
+  view.
+
 ## 1.0.4
 
 ### AI

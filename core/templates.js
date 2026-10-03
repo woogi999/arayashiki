@@ -1377,11 +1377,12 @@ export const TEMPLATES = [
     sheathPreview: (v) => {
       const weapon = { mesh: id(v.mesh), texture: id(v.texture), size: Number(v.scale) || 0.12 };
       const scabbard = v.scabbard
-        ? [{ mesh: id(v.scabbardMesh), texture: id(v.scabbardTexture), size: Number(v.scale) || 0.12, part: v.holsterPart, position: text(v.scabbardPosition, '0, 0, 0'), rotation: text(v.scabbardRotation, '0, 0, 0') }]
+        ? [{ mesh: id(v.scabbardMesh), texture: id(v.scabbardTexture), size: Number(v.scale) || 0.12, part: v.holsterPart, position: text(v.scabbardPosition, '0, 0, 0'), rotation: text(v.scabbardRotation, '0, 0, 0'), label: 'Scabbard', fields: ['scabbardPosition', 'scabbardRotation'] }]
         : [];
+      // `fields`: the form's fields a drag in the preview writes back to.
       return {
-        sheathed: [...scabbard, { ...weapon, part: v.holsterPart, position: text(v.holsterPosition, '0, 0, 0'), rotation: text(v.holsterRotation, '0, 0, 0') }],
-        drawn: [...scabbard, { ...weapon, part: v.handPart, position: text(v.handPosition, '0, 0, 0'), rotation: text(v.handRotation, '0, 0, 0') }],
+        sheathed: [...scabbard, { ...weapon, part: v.holsterPart, position: text(v.holsterPosition, '0, 0, 0'), rotation: text(v.holsterRotation, '0, 0, 0'), label: 'Weapon, sheathed', fields: ['holsterPosition', 'holsterRotation'] }],
+        drawn: [...scabbard, { ...weapon, part: v.handPart, position: text(v.handPosition, '0, 0, 0'), rotation: text(v.handRotation, '0, 0, 0'), label: 'Weapon, drawn', fields: ['handPosition', 'handRotation'] }],
       };
     },
   },

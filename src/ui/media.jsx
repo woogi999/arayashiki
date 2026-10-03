@@ -7,7 +7,7 @@ import { signal } from '@preact/signals';
 import * as S from '../store.js';
 import { isDesktop, revealFile, saveBlob } from '../platform.js';
 import { Icon } from '../icons.jsx';
-import { Button, Modal, Segmented, Switch } from './controls.jsx';
+import { Button, Modal, RangeValue, Segmented, Switch } from './controls.jsx';
 
 const close = () => (S.dialog.value = null);
 const capture = () => import('../video/capture.js');
@@ -149,27 +149,27 @@ export function AutoCameraOptions() {
         />
       </Row>
       <Row label="Smoothness" hint="How lazily the camera catches up: 0 snaps, 1 drifts">
-        <input type="range" min="0" max="1" step="0.05" value={o.smooth} onInput={(e) => set({ smooth: Number(e.currentTarget.value) })} />
+        <RangeValue min={0} max={1} step={0.05} value={o.smooth} label="smooth" onChange={(smooth) => set({ smooth })} />
       </Row>
       {o.angle === 'orbit' && (
         <Row label="Orbit speed (°/s)">
-          <input type="range" min="-120" max="120" step="5" value={o.orbitSpeed} onInput={(e) => set({ orbitSpeed: Number(e.currentTarget.value) })} />
+          <RangeValue min={-120} max={120} step={5} value={o.orbitSpeed} label="orbitSpeed" onChange={(orbitSpeed) => set({ orbitSpeed })} />
         </Row>
       )}
       <Row label="Height (studs)">
-        <input type="range" min="-3" max="12" step="0.5" value={o.height} onInput={(e) => set({ height: Number(e.currentTarget.value) })} />
+        <RangeValue min={-3} max={12} step={0.5} value={o.height} label="height" onChange={(height) => set({ height })} />
       </Row>
       <Row label="Field of view">
-        <input type="range" min="30" max="110" step="1" value={o.fov} onInput={(e) => set({ fov: Number(e.currentTarget.value) })} />
+        <RangeValue min={30} max={110} step={1} value={o.fov} label="fov" onChange={(fov) => set({ fov })} />
       </Row>
       <Row label="Punch in on hits">
         <Switch checked={o.punch} label="Punch in on hits" onChange={(punch) => set({ punch })} />
       </Row>
       <Row label="Shake on hits">
-        <input type="range" min="0" max="1" step="0.05" value={o.shake} onInput={(e) => set({ shake: Number(e.currentTarget.value) })} />
+        <RangeValue min={0} max={1} step={0.05} value={o.shake} label="shake" onChange={(shake) => set({ shake })} />
       </Row>
       <Row label="Dutch tilt (°)">
-        <input type="range" min="-25" max="25" step="1" value={o.dutch} onInput={(e) => set({ dutch: Number(e.currentTarget.value) })} />
+        <RangeValue min={-25} max={25} step={1} value={o.dutch} label="dutch" onChange={(dutch) => set({ dutch })} />
       </Row>
       <Row label="Tilt kick on hits">
         <Switch checked={o.dutchOnHit} label="Tilt kick on hits" onChange={(dutchOnHit) => set({ dutchOnHit })} />

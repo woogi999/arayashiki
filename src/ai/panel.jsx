@@ -8,8 +8,8 @@ import { signal } from '@preact/signals';
 import * as S from '../store.js';
 import { Icon } from '../icons.jsx';
 import { Button, IconButton } from '../ui/controls.jsx';
-import { PROVIDERS, keyStatus, listModels, providerOf, resultsMessages, setKey, turn, userMessage } from './providers.js';
-import { TOOLS, callTool } from './registry.js';
+import { PROVIDERS, keyStatus, listModels, providerOf, reasoningLevels, resultsMessages, setKey, turn, userMessage } from './providers.js';
+import { TOOLS, callTool, setToolGate } from './registry.js';
 import { CLI_TOOLS, cliInstall, cliSignIn, cliSignOut, cliStatus, cliTurn } from './cli.js';
 import { isDesktop, openExternal } from '../platform.js';
 import { lazy } from '../ui/lazy.jsx';
@@ -23,9 +23,9 @@ export const toggleAssistant = () => (S.assistantOpen.value = !S.assistantOpen.p
 const KEY = 'arayashiki-assistant';
 function loadConfig() {
   try {
-    return { provider: 'anthropic', models: {}, bases: {}, effort: 'medium', ...JSON.parse(localStorage.getItem(KEY) ?? '{}') };
+    return { provider: 'anthropic', models: {}, bases: {}, effort: 'medium', efforts: {}, mode: 'auto', ...JSON.parse(localStorage.getItem(KEY) ?? '{}') };
   } catch {
-    return { provider: 'anthropic', models: {}, bases: {}, effort: 'medium' };
+    return { provider: 'anthropic', models: {}, bases: {}, effort: 'medium', efforts: {}, mode: 'auto' };
   }
 }
 export const config = signal(loadConfig());
@@ -44,11 +44,14 @@ const active = () => {
     provider: c.provider,
     model: c.models[c.provider] ?? p.model ?? '',
     base: c.bases[c.provider] ?? p.base ?? '',
-    effort: c.effort,
+    effort: effortOf(c, c.provider),
     ctx: c.localCtx ?? 32768,
     gpu: c.localGpu ?? true,
   };
 };
+
+/** The reasoning level picked for a provider ('auto': its default). */
+export const effortOf = (c, provider) => c.efforts?.[provider] ?? (provider === 'anthropic' ? c.effort : 'auto');
 
 const keys = signal({});
 const refreshKeys = () => keyStatus().then((k) => (keys.value = k ?? {}));
@@ -157,9 +160,18 @@ let stopper = null;
 
 const SYSTEM = `You are the assistant inside Arayashiki, a desktop app for building Jujutsu Shenanigans (Roblox) Skill Builder skills. The user is a JJS creator; they see the app while you talk: a node editor, a 3D viewport where skills play against a dummy, a timeline, and the moveset's skills.
 
-Use your tools to do things rather than describing how. Start with app_state to see what's open. Edit skills with app_get_skills then app_put_skills (mode "merge" changes skills with the same name in place). Every change you make is one undo step: the user can press Ctrl+Z. Before writing a new move, find the closest real one (search_library, get_library_move) and copy its structure and numbers; check field names with node_reference; validate and app_simulate before you call it done. Use app_screenshot to look at the result when how it looks matters. Keep JJS's key names exactly ("LAST HIT", "BRANCH TARGET", spaces and capitals included).
+Use your tools to do things rather than describing how. Start with app_state to see what's open. Edit skills with app_get_skills then app_put_skills (mode "merge" changes skills with the same name in place). Every change you make is one undo step: the user can press Ctrl+Z. Before writing a new move, work out what it should do, then look at real moves that do similar things (search_library, get_library_move) as references: how JJS does each part, and the usual numbers. Design the move the user asked for; don't just copy the nearest one. Check field names with node_reference; app_simulate and lint before you call it done. A move that needs a bar (a resource, a charge) gets one from the Meter Maker tools (meter_*). Use app_screenshot to look at the result when how it looks matters. Keep JJS's key names exactly ("LAST HIT", "BRANCH TARGET", spaces and capitals included).
 
 The simulator is a model of JJS read from real exports, not the game: timings and damage are close, not exact; say so when it matters. Never replace or delete the whole moveset unless the user asks for that. Answer briefly and plainly: the user wants the skill, not an essay.`;
+
+/** The instructions, with what the assistant remembers when memories are on. */
+async function systemPrompt() {
+  const { memoryDigest } = await import('./memory.js');
+  const digest = await memoryDigest().catch(() => '');
+  return digest ? `${SYSTEM}
+
+${digest}` : SYSTEM;
+}
 
 function contextLine() {
   const s = S.skill.peek();
@@ -177,18 +189,49 @@ const push = (m) => {
 // A subscription CLI keeps the conversation itself: only its session id is kept here.
 let cliSession = null;
 
+// ─── Manual mode: tools that change something wait for a yes ─────────────
+
+let allowAll = false;
+function approvalGate(name, input) {
+  if (allowAll) return Promise.resolve(true);
+  return new Promise((resolve) => {
+    const row = push({ role: 'approve', name, input, state: 'asking' });
+    approvals.set(row, (answer) => {
+      if (answer === 'all') allowAll = true;
+      update(row, { state: answer === 'no' ? 'denied' : 'allowed' });
+      approvals.delete(row);
+      resolve(answer !== 'no');
+    });
+  });
+}
+const approvals = new Map();
+const answer = (row, a) => approvals.get(row)?.(a);
+
+/** While a turn runs: the gate in manual mode, none in autopilot. */
+function startTurn() {
+  allowAll = false;
+  setToolGate(config.peek().mode === 'manual' ? approvalGate : null);
+}
+function endTurn() {
+  setToolGate(null);
+  // Questions left open when it ended (stopped): no.
+  for (const [row] of approvals) answer(row, 'no');
+}
+
 async function sendCli(text, c) {
   push({ role: 'user', text });
   busy.value = true;
+  startTurn();
   const controller = new AbortController();
   stopper = () => controller.abort();
   try {
     cliSession = await cliTurn({
       tool: providerOf(c.provider).cli,
       prompt: `${text}\n\n${contextLine()}`,
-      system: SYSTEM,
+      system: await systemPrompt(),
       session: cliSession,
       model: c.model,
+      effort: c.effort,
       signal: controller.signal,
       ui: { push, update },
     });
@@ -198,6 +241,7 @@ async function sendCli(text, c) {
   } finally {
     // Tools still spinning when it ended didn't finish.
     shown.value = shown.value.map((m) => (m.running ? { ...m, running: false, error: true, result: m.result || 'Not finished.' } : m));
+    endTurn();
     busy.value = false;
     stopper = null;
   }
@@ -215,16 +259,18 @@ async function send(text) {
   push({ role: 'user', text });
   history.push(userMessage(c, `${text}\n\n${contextLine()}`));
   busy.value = true;
+  startTurn();
   const controller = new AbortController();
   stopper = () => controller.abort();
   const tools = TOOLS.filter((t) => t.name !== 'open_in_app');
+  const system = await systemPrompt();
   try {
     for (let step = 0; step < 40; step++) {
       const at = push({ role: 'assistant', text: '', thinking: '' });
       let text = '';
       let thinking = '';
       const reply = await turn(c, {
-        system: SYSTEM,
+        system,
         history,
         tools,
         signal: controller.signal,
@@ -268,6 +314,7 @@ async function send(text) {
     // Drop the unfinished turn, so the next message starts from a whole conversation.
     history.length = mark;
   } finally {
+    endTurn();
     busy.value = false;
     stopper = null;
   }
@@ -382,7 +429,7 @@ function Settings({ onDone }) {
       {c.provider === 'anthropic' && (
         <label class="prop-row">
           <span>Effort</span>
-          <select class="input" value={c.effort} onChange={(e) => setConfig({ effort: e.currentTarget.value })}>
+          <select class="input" value={effortOf(c, 'anthropic') === 'auto' ? 'medium' : effortOf(c, 'anthropic')} onChange={(e) => setConfig({ efforts: { ...c.efforts, anthropic: e.currentTarget.value } })}>
             {['low', 'medium', 'high', 'xhigh', 'max'].map((x) => (
               <option key={x}>{x}</option>
             ))}
@@ -427,6 +474,32 @@ function Message({ m }) {
   const [open, setOpen] = useState(false);
   if (m.role === 'user') return <div class="ai-msg is-user">{m.text}</div>;
   if (m.role === 'note') return <div class={`ai-msg is-note ${m.error ? 'is-error' : ''}`}>{m.text}</div>;
+  if (m.role === 'approve')
+    return (
+      <div class={`ai-approve is-${m.state}`}>
+        <div class="ai-approve-head">
+          <Icon name={m.state === 'denied' ? 'x' : m.state === 'allowed' ? 'check' : 'warning'} size={13} />
+          <span>
+            {m.state === 'asking' ? 'Allow ' : m.state === 'allowed' ? 'Allowed ' : 'Not allowed: '}
+            <strong class="num">{m.name}</strong>?
+          </span>
+        </div>
+        <pre class="ai-tool-body">{JSON.stringify(m.input, null, 1).slice(0, 1200)}</pre>
+        {m.state === 'asking' && (
+          <div class="ai-approve-actions">
+            <Button variant="primary" icon="check" onClick={() => answer(m.index, 'yes')}>
+              Allow
+            </Button>
+            <Button icon="check" onClick={() => answer(m.index, 'all')} title="Allow every change for the rest of this reply">
+              Allow all
+            </Button>
+            <Button variant="ghost" icon="x" onClick={() => answer(m.index, 'no')}>
+              No
+            </Button>
+          </div>
+        )}
+      </div>
+    );
   if (m.role === 'tool')
     return (
       <div class={`ai-tool ${m.error ? 'is-error' : ''}`}>
@@ -454,6 +527,114 @@ function Message({ m }) {
       )}
       <Markdown text={m.text} />
     </div>
+  );
+}
+
+// ─── The composer's bar: mode, model, reasoning (as Copilot's chat has) ──
+
+const MODES = [
+  { id: 'auto', label: 'Autopilot', title: 'Runs its tools as it goes, as soon as it decides to (every change is still undoable)' },
+  { id: 'manual', label: 'Manual', title: 'Asks before each tool that changes something (reading and looking don’t ask)' },
+];
+const LEVEL_LABELS = { auto: 'Default', off: 'Off', on: 'On', minimal: 'Minimal', low: 'Low', medium: 'Medium', high: 'High', xhigh: 'Extra high', max: 'Max' };
+
+/** Whether a provider can be used now: signed in, a key saved, or on this PC. */
+const usable = (p) => (p.cli ? Boolean(cliState.value[p.cli]?.signedIn) : p.local || Boolean(keys.value[p.id]));
+
+function ModelPicker({ onClose }) {
+  const c = config.value;
+  const [query, setQuery] = useState('');
+  const [local, setLocal] = useState([]);
+  useEffect(() => {
+    listModels({ provider: 'local' }).then(setLocal).catch(() => {});
+    for (const t of ['claude', 'codex', 'gemini']) refreshCli(t);
+  }, []);
+  const q = query.trim().toLowerCase();
+  const pick = (provider, model) => {
+    setConfig({ provider, models: { ...c.models, [provider]: model } });
+    onClose();
+  };
+  const groups = PROVIDERS.map((p) => {
+    const list = p.id === 'local' ? local : (p.models ?? []);
+    const extra = c.models[p.id] && !list.includes(c.models[p.id]) ? [c.models[p.id]] : [];
+    const models = [...extra, ...list].filter((m) => !q || `${p.label} ${m}`.toLowerCase().includes(q));
+    return { p, models, ok: usable(p) };
+  }).filter((g) => g.models.length || (!q && g.p.id === c.provider));
+  return (
+    <div class="ai-picker" role="dialog" aria-label="Pick a model">
+      <input
+        class="input"
+        placeholder="Find a model…"
+        autoFocus
+        value={query}
+        onInput={(e) => setQuery(e.currentTarget.value)}
+        onKeyDown={(e) => {
+          e.stopPropagation();
+          if (e.key === 'Escape') onClose();
+        }}
+      />
+      <div class="ai-picker-list">
+        {groups
+          .sort((a, b) => Number(b.ok) - Number(a.ok))
+          .map(({ p, models, ok }) => (
+            <section key={p.id}>
+              <h5>
+                {p.label}
+                {!ok && <span class="hint"> · {p.cli ? 'sign in first' : p.local ? 'not running' : 'needs a key'}</span>}
+              </h5>
+              {models.map((m) => (
+                <button type="button" key={m} class="ai-picker-item" aria-pressed={c.provider === p.id && (c.models[p.id] ?? p.model) === m} onClick={() => pick(p.id, m)}>
+                  <span class="num">{m}</span>
+                  {!ok && <Icon name="lock" size={11} />}
+                </button>
+              ))}
+            </section>
+          ))}
+      </div>
+      <button type="button" class="link" onClick={() => (onClose(), (openSettingsNext.value = true))}>
+        Set up another service or model…
+      </button>
+    </div>
+  );
+}
+const openSettingsNext = signal(false);
+
+function ChatBar() {
+  const c = config.value;
+  const p = providerOf(c.provider);
+  const [picking, setPicking] = useState(false);
+  const levels = reasoningLevels(c.provider);
+  const model = c.models[c.provider] || p.model || '';
+  return (
+    <>
+      <div class="segmented ai-mode" role="group" aria-label="Mode">
+        {MODES.map((m) => (
+          <button type="button" key={m.id} aria-pressed={c.mode === m.id} title={m.title} onClick={() => setConfig({ mode: m.id })}>
+            {m.label}
+          </button>
+        ))}
+      </div>
+      <span class="ai-model-pick">
+        <button type="button" class="btn btn-ghost ai-model-btn" aria-expanded={picking} title="Change the model" onClick={() => setPicking(!picking)}>
+          <span class="ai-model-provider">{p.short ?? p.label}</span>
+          <span class="num">{model || 'pick a model'}</span>
+          <Icon name="chevron-down" size={11} />
+        </button>
+        {picking && <ModelPicker onClose={() => setPicking(false)} />}
+      </span>
+      {levels.length > 0 && (
+        <label class="ai-effort" title="How hard it thinks before it answers: more is slower, and better at hard requests">
+          <Icon name="sparkles" size={12} />
+          <select class="input" aria-label="Reasoning" value={effortOf(c, c.provider)} onChange={(e) => setConfig({ efforts: { ...c.efforts, [c.provider]: e.currentTarget.value } })}>
+            {levels.map((l) => (
+              <option key={l} value={l}>
+                {LEVEL_LABELS[l] ?? l}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+    </>
   );
 }
 
@@ -511,6 +692,12 @@ export function AssistantPanel() {
   useEffect(() => {
     if (p.cli) refreshCli(p.cli);
   }, [p.cli]);
+  useEffect(() => {
+    if (openSettingsNext.value) {
+      openSettingsNext.value = false;
+      setSettings(true);
+    }
+  }, [openSettingsNext.value]);
   useEffect(() => {
     list.current?.scrollTo({ top: list.current.scrollHeight });
   }, [shown.value]);
@@ -584,7 +771,7 @@ export function AssistantPanel() {
               </div>
             )}
             {shown.value.map((m, i) => (
-              <Message key={i} m={m} />
+              <Message key={i} m={{ ...m, index: i }} />
             ))}
             {busy.value && <div class="ai-typing" aria-label="Working">●●●</div>}
           </div>
@@ -604,15 +791,19 @@ export function AssistantPanel() {
                 e.stopPropagation();
               }}
             />
-            {busy.value ? (
-              <Button icon="circle-stop" onClick={() => stopper?.()}>
-                Stop
-              </Button>
-            ) : (
-              <Button variant="primary" icon="send" disabled={!text.trim()} onClick={go}>
-                Send
-              </Button>
-            )}
+            <div class="ai-bar">
+              <ChatBar />
+              <span class="spacer" />
+              {busy.value ? (
+                <Button icon="circle-stop" onClick={() => stopper?.()}>
+                  Stop
+                </Button>
+              ) : (
+                <Button variant="primary" icon="send" disabled={!text.trim()} onClick={go}>
+                  Send
+                </Button>
+              )}
+            </div>
           </footer>
         </>
       )}

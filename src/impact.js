@@ -19,6 +19,13 @@
 //                 and end: what smears, edges and textures are cut from
 //   smear         a silhouette pulled away from the hit (a radial trail),
 //                 cut into streaks: the body drawn as speed
+//   shading       the bodies lit from the hit and cut to two tones (a cel
+//                 shader's constant ramp, as Blender impact-frame setups
+//                 do), with ink lines on their outline and creases (its
+//                 Line Art / Freestyle), screentone or hatching in the
+//                 half-tones: from the surface's direction at each pixel,
+//                 which the scene reads with the silhouettes
+//   shockwave     the picture bent outward in a ring round the hit
 //
 // A look is a set of options, drawn by one renderer; the presets are just
 // sets of them, so "Edit the look" edits the same knobs.
@@ -32,10 +39,18 @@ export const DEFAULTS = {
   background2: null, // a second colour: a radial gradient out from the hit
   ink: '#000000', // the silhouettes and lines
   accent: '#ffffff', // rim light, flare, cracks
-  // The bodies: 'solid' (flat ink), 'smear' (streaks trailing from the hit),
-  // 'edges' (soft streaks off their edges, like graphite), 'rim' (dark, lit
-  // round the side facing the hit), 'glow' (glowing streaky outlines).
+  // The bodies: 'solid' (flat ink), 'toon' (lit from the hit, cut to two
+  // tones, inked), 'lines' (line art: outlines, creases, hatching), 'smear'
+  // (streaks trailing from the hit), 'rim' (dark, lit round the side facing
+  // the hit), and 'edges' and 'glow' (soft or glowing streaky edges).
   body: 'solid',
+  light: '#ffffff', // 'toon': the lit side's colour (the shadow side is the ink)
+  cut: 45, // 'toon': how much is in shadow, 0–100
+  lineWeight: 3, // 'toon' / 'lines': the ink lines, px at 1080p
+  creases: 60, // how readily a fold in the surface gets a line, 0–100
+  tone: 0, // screentone dots (px) in the half-tones, 0: none
+  hatch: 0, // hatching lines' spacing (px) in the shadows, 0: none
+  shock: 0, // a shockwave bending the picture round the hit, 0–100
   smear: 60, // how far a smear or edge streak trails, in % of the frame's height
   breakup: 50, // how much of a smeared body the streaks cut away, 0–100
   userColour: '#ff9a3c', // 'glow': yours
@@ -65,16 +80,30 @@ export const DEFAULTS = {
 /** The looks to start from, each { id, label, hint, options }. */
 export const PRESETS = [
   {
-    id: 'smear',
-    label: 'Ink smear',
-    hint: 'Manga ink: bodies torn into streaks rushing out of the hit, heavy focus lines.',
-    options: { body: 'smear', smear: 55, breakup: 55, focusLines: 220, lineWidth: 9, clear: 24, frames: 2 },
+    id: 'manga',
+    label: 'Manga ink',
+    hint: 'Shaded from the hit and cut to ink and paper, inked outlines and folds, screentone, focus lines.',
+    options: { body: 'toon', cut: 48, lineWeight: 3, tone: 6, focusLines: 260, lineWidth: 7, clear: 26, grain: 12, frames: 2 },
   },
   {
-    id: 'graphite',
-    label: 'Graphite',
-    hint: 'Soft pencil streaks off the bodies’ edges, a white-hot core.',
-    options: { body: 'edges', ink: '#3a3a3a', smear: 45, flare: 70, focusLines: 120, lineWidth: 3, clear: 30, lineColour: '#7a7a7a', grain: 18, frames: 2 },
+    id: 'invert',
+    label: 'Flash invert',
+    hint: 'The anime flash: black, only the sides facing the hit lit, strobing inverted.',
+    options: {
+      background: '#000000',
+      ink: '#000000',
+      light: '#ffffff',
+      body: 'toon',
+      cut: 55,
+      lineWeight: 2,
+      focusLines: 160,
+      lineWidth: 3,
+      lineColour: '#ffffff',
+      clear: 30,
+      frames: 3,
+      alternate: true,
+      frameTime: 0.04,
+    },
   },
   {
     id: 'zoom',
@@ -91,6 +120,7 @@ export const PRESETS = [
       focusLines: 160,
       lineWidth: 5,
       lineColour: '#f5f5f5',
+      shade: false,
       zoom: 55,
       posterize: 4,
       grain: 30,
@@ -98,28 +128,44 @@ export const PRESETS = [
     },
   },
   {
-    id: 'neon',
-    label: 'Neon streak',
-    hint: 'Black, the fighters as glowing streaky outlines, one colour each.',
-    options: { background: '#000000', ink: '#000000', body: 'glow', smear: 25, streaks: 25, lineColour: '#1a2a3a', focusLines: 0, frames: 2 },
+    id: 'smear',
+    label: 'Ink smear',
+    hint: 'Shaded bodies whose shadows tear into streaks rushing out of the hit, heavy focus lines.',
+    options: { body: 'smear', cut: 50, lineWeight: 3, smear: 50, breakup: 45, focusLines: 220, lineWidth: 9, clear: 24, frames: 2 },
   },
   {
     id: 'crimson',
-    label: 'Crimson rim',
-    hint: 'Red, streaked; dark bodies rim-lit by a white flare at the hit.',
-    options: { background: '#b3202c', background2: '#3b0508', ink: '#120304', accent: '#ffffff', body: 'rim', flare: 85, streaks: 60, vignette: 35, frames: 2 },
+    label: 'Crimson',
+    hint: 'Red and streaked, the bodies shaded black and white against a flare at the hit.',
+    options: {
+      background: '#b3202c',
+      background2: '#3b0508',
+      ink: '#120304',
+      light: '#ffffff',
+      accent: '#ffffff',
+      body: 'toon',
+      cut: 58,
+      lineWeight: 3,
+      flare: 75,
+      streaks: 55,
+      vignette: 35,
+      frames: 2,
+    },
   },
   {
     id: 'blackflash',
     label: 'Black flash',
-    hint: 'Black and red sparks cracking out of the hit, inverted between frames.',
+    hint: 'Black and red: the bodies lit red from the hit, sparks cracking out, inverted between frames.',
     options: {
       background: '#000000',
       background2: '#2a0006',
       ink: '#000000',
+      light: '#ff1f3d',
       accent: '#ff1f3d',
-      body: 'rim',
-      flare: 60,
+      body: 'toon',
+      cut: 52,
+      lineWeight: 2,
+      flare: 55,
       cracks: 14,
       focusLines: 140,
       lineWidth: 4,
@@ -131,14 +177,20 @@ export const PRESETS = [
     },
   },
   {
-    id: 'screentone',
-    label: 'Screentone',
-    hint: 'Manga page: dotted tone, smeared ink, cracks and focus lines.',
-    options: { body: 'smear', smear: 35, breakup: 40, halftone: 5, focusLines: 160, lineWidth: 6, cracks: 6, vignette: 45, grain: 15, frames: 2 },
+    id: 'shockwave',
+    label: 'Shockwave',
+    hint: 'A ring of force bending the picture round the hit, colour fringes, toned shading.',
+    options: { background: '#f4f4f4', body: 'toon', cut: 46, tone: 5, lineWeight: 3, shock: 70, split: 5, focusLines: 180, lineWidth: 6, clear: 28, frames: 2 },
+  },
+  {
+    id: 'sketch',
+    label: 'Sketch ink',
+    hint: 'Pen on paper: outlines and folds, hatched shadows, light focus lines, grain.',
+    options: { background: '#efe8d8', ink: '#2b2622', body: 'lines', lineWeight: 2, creases: 70, hatch: 7, focusLines: 140, lineWidth: 3, lineColour: '#8a8070', clear: 30, grain: 30, frames: 2 },
   },
   { id: 'basic', label: 'Basic', hint: 'Black silhouettes on white: the classic.', options: { frames: 1 } },
   { id: 'negative', label: 'Negative', hint: 'White on black.', options: { background: '#000000', ink: '#ffffff', frames: 1 } },
-  { id: 'flicker', label: 'Flicker', hint: 'Black on white, then inverted: a strobe.', options: { body: 'smear', smear: 30, focusLines: 120, frames: 3, alternate: true, frameTime: 0.04 } },
+  { id: 'flicker', label: 'Flicker', hint: 'Shaded ink, then inverted: a strobe.', options: { body: 'toon', cut: 50, focusLines: 120, frames: 3, alternate: true, frameTime: 0.04 } },
 ];
 
 export const optionsOf = (id) => ({ ...DEFAULTS, ...(PRESETS.find((p) => p.id === id)?.options ?? {}) });
@@ -430,6 +482,83 @@ function paintField(g, w, h, field, colour, mode = 'normal') {
   g.putImageData(img, 0, 0);
 }
 
+/**
+ * How the bodies are lit, and where their ink lines go, from the surface's
+ * direction at each pixel (`data.normals`): a light at the hit, a little in
+ * front of them, so the sides facing the hit are lit and the rest falls into
+ * shadow, as an impact frame's flash does. Lines go on the outline (where
+ * the body meets something else) and on folds (where the surface turns
+ * sharply), thickened to `lineWeight`. Without normals: flat, outlined.
+ */
+function shadingOf(data, mask, point, o) {
+  const { width: w, height: h, normals: N } = data;
+  const lit = new Float32Array(w * h);
+  const edge = new Uint8Array(w * h);
+  const crease = 1.6 - (clamp01((o.creases ?? 60) / 100) * 1.3);
+  const inside = (x, y) => x >= 0 && y >= 0 && x < w && y < h && mask[y * w + x] > 127;
+  for (let y = 0; y < h; y++)
+    for (let x = 0; x < w; x++) {
+      const i = y * w + x;
+      if (!(mask[i] > 127)) continue;
+      if (!inside(x + 1, y) || !inside(x - 1, y) || !inside(x, y + 1) || !inside(x, y - 1)) edge[i] = 1;
+      if (!N) {
+        lit[i] = 1;
+        continue;
+      }
+      const nx = N[i * 3];
+      const ny = N[i * 3 + 1];
+      const nz = N[i * 3 + 2];
+      let lx = (point[0] - x) / h;
+      let ly = -(point[1] - y) / h;
+      let lz = 0.45;
+      const len = Math.hypot(lx, ly, lz) || 1;
+      lx /= len;
+      ly /= len;
+      lz /= len;
+      lit[i] = clamp01(0.08 + 0.92 * Math.max(0, nx * lx + ny * ly + nz * lz));
+      // A fold: the direction turns sharply to the next pixel along.
+      if (!edge[i] && x + 1 < w && y + 1 < h) {
+        const r = (i + 1) * 3;
+        const d = (i + w) * 3;
+        const turn = Math.abs(nx - N[r]) + Math.abs(ny - N[r + 1]) + Math.abs(nz - N[r + 2]) + Math.abs(nx - N[d]) + Math.abs(ny - N[d + 1]) + Math.abs(nz - N[d + 2]);
+        if (turn > crease) edge[i] = 1;
+      }
+    }
+  // Thickened to the line weight (scaled to the picture's height).
+  const radius = Math.max(0, Math.round(((o.lineWeight ?? 3) * h) / 1080 / 2));
+  if (!radius) return { lit, line: edge };
+  const line = new Uint8Array(w * h);
+  for (let y = 0; y < h; y++)
+    for (let x = 0; x < w; x++) {
+      if (!edge[y * w + x]) continue;
+      for (let dy = -radius; dy <= radius; dy++)
+        for (let dx = -radius; dx <= radius; dx++) {
+          if (dx * dx + dy * dy > radius * radius + radius) continue;
+          const X = x + dx;
+          const Y = y + dy;
+          if (X >= 0 && Y >= 0 && X < w && Y < h && mask[Y * w + X] > 127) line[Y * w + X] = 1;
+        }
+    }
+  return { lit, line };
+}
+
+/** Screentone dots at 45°, `size` px apart, as big as `amount` (0–1) asks: 1 where a dot is. */
+function toneAt(x, y, size, amount) {
+  const c = 0.7071;
+  const u = (x * c - y * c) / size;
+  const v = (x * c + y * c) / size;
+  const fu = u - Math.floor(u) - 0.5;
+  const fv = v - Math.floor(v) - 0.5;
+  return Math.hypot(fu, fv) < 0.55 * Math.sqrt(clamp01(amount)) ? 1 : 0;
+}
+
+/** Hatching: diagonal lines `size` px apart, crossed where it's darker. */
+function hatchAt(x, y, size, dark) {
+  const one = ((x + y) % size + size) % size < Math.max(1, size * 0.22);
+  const two = dark > 0.55 && ((x - y) % size + size) % size < Math.max(1, size * 0.22);
+  return one || two ? 1 : 0;
+}
+
 /** The bodies, in the look's style. */
 function drawBodies(g, data, o, point, rnd) {
   const { width: w, height: h } = data;
@@ -437,25 +566,61 @@ function drawBodies(g, data, o, point, rnd) {
   if (!mask.some((v) => v)) return;
   const far = Math.hypot(w, h);
   const length = (o.smear / 100) * h;
+  // A misregistered print: cyan and magenta copies of the bodies, offset,
+  // under them, so they show as fringes round the edges.
+  if (o.split > 0) {
+    const solid = Float32Array.from(mask, (v) => (v > 127 ? 1 : 0));
+    g.drawImage(fieldCanvas(solid, w, h, '#00e5ff'), -o.split, 0);
+    g.globalCompositeOperation = 'multiply';
+    g.drawImage(fieldCanvas(solid, w, h, '#ff2bd6'), o.split, o.split * 0.3);
+    g.globalCompositeOperation = 'source-over';
+  }
   const angleAt = (i) => Math.atan2(Math.floor(i / w) - point[1], (i % w) - point[0]);
   const distAt = (i) => Math.hypot((i % w) - point[0], Math.floor(i / w) - point[1]);
 
-  if (o.body === 'smear') {
-    // Solid where the body is, cut by a few gaps along the lines; past it,
-    // the trail kept only where a streak runs.
+  if (o.body === 'toon' || o.body === 'lines') {
+    const { lit, line } = shadingOf(data, mask, point, o);
+    const cut = clamp01((o.cut ?? 45) / 100);
+    const ink = new Float32Array(w * h);
+    const light = new Float32Array(w * h);
+    for (let i = 0; i < ink.length; i++) {
+      if (!(mask[i] > 127)) continue;
+      const x = i % w;
+      const y = (i - x) / w;
+      const v = lit[i];
+      let dark;
+      if (o.body === 'lines') dark = o.hatch > 0 && v < cut + 0.08 ? hatchAt(x, y, o.hatch, 1 - v / Math.max(0.01, cut)) : 0;
+      else {
+        dark = v < cut ? 1 : 0;
+        // Screentone in the half-tones, just past the cut.
+        if (!dark && o.tone > 0 && v < cut + 0.25) dark = toneAt(x, y, o.tone, 1 - (v - cut) / 0.25);
+        if (dark && o.hatch > 0) dark = hatchAt(x, y, o.hatch, 1 - v / Math.max(0.01, cut)) || v < cut * 0.5 ? 1 : 0;
+      }
+      if (line[i]) dark = 1;
+      ink[i] = dark;
+      if (!dark && o.body === 'toon') light[i] = 1;
+    }
+    if (o.body === 'toon') paintField(g, w, h, light, o.light ?? '#ffffff');
+    paintField(g, w, h, ink, o.ink);
+  } else if (o.body === 'smear') {
+    // Shaded where the body is (its shadow side ink, cut by a few gaps along
+    // the lines); past it, the trail kept only where a streak runs.
     // Each streak runs as far as its strength lets it: next to the body
     // nearly all of them, far out only the strongest, so they taper away.
     const trail = smearOf(mask, w, h, point, length, 0.3);
     const lines = streaks(rnd, 300, { far, start: [0, 0], length: [3, 3], thin: 1.15 });
     const gaps = streaks(rnd, 160, { far, start: [0, 0.3], length: [0.05, 0.4], thin: 0.45 });
     const cut = o.breakup / 100;
+    // With the surface's directions, the body is shaded: lit side paper.
+    const shade = data.normals && o.shade !== false ? shadingOf(data, mask, point, o) : null;
+    const shadeCut = clamp01((o.cut ?? 50) / 100);
     const ink = new Float32Array(w * h);
     for (let i = 0; i < ink.length; i++) {
       const t = trail[i];
       if (!t) continue;
       const a = angleAt(i);
       const r = distAt(i);
-      if (mask[i] > 127) ink[i] = 1 - smooth(0.25, 0.45, gaps(a, r) * cut * 1.4);
+      if (mask[i] > 127) ink[i] = (shade && shade.lit[i] >= shadeCut && !shade.line[i] ? 0 : 1) * (1 - smooth(0.25, 0.45, gaps(a, r) * cut * 1.4));
       else ink[i] = smooth(0.02, 0.12, lines(a, r) - (1 - t) * 0.95);
     }
     paintField(g, w, h, ink, o.ink);
@@ -549,13 +714,46 @@ function drawBodies(g, data, o, point, rnd) {
       g.drawImage(tone, 0, 0);
     } else g.drawImage(ink, 0, 0);
   }
-  if (o.split > 0) {
-    g.globalCompositeOperation = 'multiply';
-    const solid = Float32Array.from(mask, (v) => (v > 127 ? 1 : 0));
-    g.drawImage(fieldCanvas(solid, w, h, '#00e5ff'), -o.split, 0);
-    g.drawImage(fieldCanvas(solid, w, h, '#ff2bd6'), o.split, o.split * 0.3);
-    g.globalCompositeOperation = 'source-over';
-  }
+}
+
+/**
+ * A shockwave: the picture pushed outward in a ring round the hit (each
+ * pixel near the ring taken from nearer the middle), and the ring's edge lit.
+ */
+function shockwave(g, w, h, point, o) {
+  const k = clamp01(o.shock / 100);
+  const R = h * (0.18 + 0.3 * k);
+  const band = h * 0.07;
+  const amp = h * 0.05 * k;
+  const src = g.getImageData(0, 0, w, h);
+  const out = g.createImageData(w, h);
+  const S = src.data;
+  const D = out.data;
+  for (let y = 0; y < h; y++)
+    for (let x = 0; x < w; x++) {
+      const dx = x - point[0];
+      const dy = y - point[1];
+      const d = Math.hypot(dx, dy) || 1;
+      const push = amp * Math.exp(-(((d - R) / band) ** 2));
+      const sx = Math.min(w - 1, Math.max(0, Math.round(x - (dx / d) * push)));
+      const sy = Math.min(h - 1, Math.max(0, Math.round(y - (dy / d) * push)));
+      const from = (sy * w + sx) * 4;
+      const to = (y * w + x) * 4;
+      D[to] = S[from];
+      D[to + 1] = S[from + 1];
+      D[to + 2] = S[from + 2];
+      D[to + 3] = 255;
+    }
+  g.putImageData(out, 0, 0);
+  const [r, gg, b] = rgbOf(o.accent);
+  g.save();
+  g.strokeStyle = `rgba(${r},${gg},${b},${0.55 * k})`;
+  g.lineWidth = Math.max(2, h / 200);
+  g.filter = `blur(${Math.max(1, h / 400)}px)`;
+  g.beginPath();
+  g.arc(point[0], point[1], R + band * 0.4, 0, Math.PI * 2);
+  g.stroke();
+  g.restore();
 }
 
 /** A zoom blur out from the hit: the picture laid over itself, larger each time. */
@@ -647,6 +845,7 @@ export function drawImpact(options, data, frame = 0) {
     g.fillStyle = core;
     g.fillRect(0, 0, w, h);
   }
+  if (o.shock > 0) shockwave(g, w, h, point, o);
   if (o.zoom > 0) zoomBlur(c, point, o.zoom);
   if (o.posterize >= 2) posterized(g, w, h, o.posterize);
 

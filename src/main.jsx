@@ -13,6 +13,8 @@ import './styles/start.css';
 import './styles/features.css';
 import './styles/panels.css';
 import './styles/onboarding.css';
+import './theme.js';
+import './plugins.js';
 import { render } from 'preact';
 import { warmCodec } from '#codec';
 import { App } from './app.jsx';

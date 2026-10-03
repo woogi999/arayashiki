@@ -6,6 +6,8 @@ import { Icon } from '../icons.jsx';
 import { IconButton, Segmented } from './controls.jsx';
 import { Area } from './area.jsx';
 import { FrameMeter } from './meter.jsx';
+import { Problems, ProblemsTools } from './problems.jsx';
+import { lintResult } from '../linter.js';
 
 function TimeReadout() {
   const t = S.time.value;
@@ -26,6 +28,7 @@ const SPEEDS = [
 const EDITORS = [
   { id: 'timeline', label: 'Timeline', icon: 'clock' },
   { id: 'log', label: 'Log', icon: 'file-text' },
+  { id: 'problems', label: 'Problems', icon: 'warning' },
 ];
 
 function Log() {
@@ -57,9 +60,30 @@ function Log() {
 
 export function Timeline() {
   const can = Boolean(S.run.value);
+  const r = lintResult.value;
+  const bad = r ? r.errors + r.warnings : 0;
+  const editors = EDITORS.map((e) => (e.id === 'problems' && bad ? { ...e, label: `Problems ${bad}` } : e));
+  const pick = <Segmented label="Editor" options={editors} value={S.bottomTab.value} onChange={(v) => (S.bottomTab.value = v)} />;
+  if (S.bottomTab.value === 'problems')
+    return (
+      <Area
+        name="time"
+        icon="warning"
+        title=""
+        tools={
+          <>
+            {pick}
+            <span class="head-sep" />
+            <ProblemsTools />
+          </>
+        }
+      >
+        <Problems />
+      </Area>
+    );
   const tools = (
     <>
-      <Segmented label="Editor" options={EDITORS} value={S.bottomTab.value} onChange={(v) => (S.bottomTab.value = v)} />
+      {pick}
       <span class="head-sep" />
       <IconButton icon="skip-back" label="Back to the start" size={14} disabled={!can} onClick={() => S.seek(0)} />
       <IconButton

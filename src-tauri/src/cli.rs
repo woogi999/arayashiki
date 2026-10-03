@@ -276,6 +276,7 @@ pub fn ai_cli_run(
     system: String,
     session: Option<String>,
     model: Option<String>,
+    effort: Option<String>,
     on_event: Channel<CliEvent>,
 ) -> Result<u64, String> {
     let name = program(&tool)?;
@@ -283,6 +284,8 @@ pub fn ai_cli_run(
     let dir = workspace(&app, &system)?;
     let model = model.filter(|m| !m.trim().is_empty() && m.chars().all(|c| c.is_ascii_alphanumeric() || "-._:/[]".contains(c)));
     let session = session.filter(|s| s.chars().all(|c| c.is_ascii_alphanumeric() || c == '-'));
+    // How hard it thinks ("auto": the CLI's own default).
+    let effort = effort.filter(|e| e != "auto" && e.chars().all(|c| c.is_ascii_alphanumeric()));
     let mut args: Vec<String> = Vec::new();
     match tool.as_str() {
         "claude" => {
@@ -311,6 +314,9 @@ pub fn ai_cli_run(
             if let Some(m) = &model {
                 args.extend(["--model".into(), m.clone()]);
             }
+            if let Some(e) = &effort {
+                args.extend(["--effort".into(), e.clone()]);
+            }
         }
         "codex" => {
             // Its MCP servers come from ~/.codex/config.toml (Connect an AI
@@ -318,6 +324,9 @@ pub fn ai_cli_run(
             args.extend(["exec".into(), "--json".into(), "--skip-git-repo-check".into(), "--sandbox".into(), "read-only".into()]);
             if let Some(m) = &model {
                 args.extend(["-m".into(), m.clone()]);
+            }
+            if let Some(e) = &effort {
+                args.extend(["-c".into(), format!("model_reasoning_effort={e}")]);
             }
             if let Some(s) = &session {
                 args.extend(["resume".into(), s.clone()]);

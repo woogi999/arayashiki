@@ -1,0 +1,9 @@
+{
+  "id": "example",
+  "name": "Example plugin",
+  "version": "1.0.0",
+  "description": "A command, a linter rule, an AI tool and a meter example, to copy from.",
+  "author": "Arayashiki",
+  "api": "1.0",
+  "main": "main.js"
+}

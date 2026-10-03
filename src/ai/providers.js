@@ -21,29 +21,55 @@ import { localBase, refreshLocal } from './local.js';
 export const PROVIDERS = [
   // Subscriptions, through the provider's own CLI (src/ai/cli.js): signed in
   // in the browser, no API key.
-  { id: 'sub-claude', label: 'Claude: sign in with my Claude plan', cli: 'claude', subscription: true },
-  { id: 'sub-codex', label: 'ChatGPT: sign in with my ChatGPT plan', cli: 'codex', subscription: true },
-  { id: 'sub-gemini', label: 'Gemini: sign in with my Google account', cli: 'gemini', subscription: true },
-  { id: 'local', label: 'On this PC (built in, free)', local: true, builtin: true },
+  { id: 'sub-claude', label: 'Claude: sign in with my Claude plan', short: 'Claude plan', cli: 'claude', subscription: true, models: ['opus', 'sonnet', 'haiku', 'fable'], reasoning: 'claude' },
+  { id: 'sub-codex', label: 'ChatGPT: sign in with my ChatGPT plan', short: 'ChatGPT plan', cli: 'codex', subscription: true, models: ['gpt-5.5', 'gpt-5.5-codex', 'gpt-5', 'gpt-5-mini'], reasoning: 'openai' },
+  { id: 'sub-gemini', label: 'Gemini: sign in with my Google account', short: 'Google account', cli: 'gemini', subscription: true, models: ['gemini-3-pro', 'gemini-2.5-pro', 'gemini-2.5-flash'] },
+  { id: 'local', label: 'On this PC (built in, free)', short: 'This PC', local: true, builtin: true, reasoning: 'toggle' },
   {
     id: 'anthropic',
     label: 'Claude (Anthropic)',
+    short: 'Claude API',
     keyUrl: 'https://console.anthropic.com/settings/keys',
     models: ['claude-opus-5-5', 'claude-sonnet-5-5', 'claude-haiku-4-5', 'claude-fable-5-1'],
     model: 'claude-opus-5-5',
     vision: true,
+    reasoning: 'claude',
   },
-  { id: 'openai', label: 'OpenAI (ChatGPT)', base: 'https://api.openai.com/v1', keyUrl: 'https://platform.openai.com/api-keys', vision: true },
-  { id: 'gemini', label: 'Google Gemini', base: 'https://generativelanguage.googleapis.com/v1beta/openai', keyUrl: 'https://aistudio.google.com/apikey', vision: true },
-  { id: 'openrouter', label: 'OpenRouter (any model)', base: 'https://openrouter.ai/api/v1', keyUrl: 'https://openrouter.ai/keys', vision: true },
-  { id: 'groq', label: 'Groq', base: 'https://api.groq.com/openai/v1', keyUrl: 'https://console.groq.com/keys' },
-  { id: 'xai', label: 'xAI (Grok)', base: 'https://api.x.ai/v1', keyUrl: 'https://console.x.ai', vision: true },
-  { id: 'deepseek', label: 'DeepSeek', base: 'https://api.deepseek.com/v1', keyUrl: 'https://platform.deepseek.com/api_keys' },
-  { id: 'mistral', label: 'Mistral', base: 'https://api.mistral.ai/v1', keyUrl: 'https://console.mistral.ai/api-keys' },
-  { id: 'ollama', label: 'Ollama (on this PC, free)', base: 'http://localhost:11434/v1', local: true },
-  { id: 'lmstudio', label: 'LM Studio (on this PC, free)', base: 'http://localhost:1234/v1', local: true },
-  { id: 'custom', label: 'Another OpenAI-compatible service', base: '', keyUrl: null },
+  { id: 'openai', label: 'OpenAI (ChatGPT)', short: 'OpenAI', base: 'https://api.openai.com/v1', keyUrl: 'https://platform.openai.com/api-keys', vision: true, models: ['gpt-5.5', 'gpt-5.5-mini', 'gpt-5', 'gpt-5-mini', 'gpt-4.1', 'o4-mini'], model: 'gpt-5.5', reasoning: 'openai' },
+  { id: 'gemini', label: 'Google Gemini', short: 'Gemini', base: 'https://generativelanguage.googleapis.com/v1beta/openai', keyUrl: 'https://aistudio.google.com/apikey', vision: true, models: ['gemini-3-pro', 'gemini-2.5-pro', 'gemini-2.5-flash', 'gemini-2.5-flash-lite'], model: 'gemini-2.5-pro', reasoning: 'gemini' },
+  { id: 'openrouter', label: 'OpenRouter (any model)', short: 'OpenRouter', base: 'https://openrouter.ai/api/v1', keyUrl: 'https://openrouter.ai/keys', vision: true, models: ['anthropic/claude-opus-5.5', 'anthropic/claude-sonnet-5.5', 'openai/gpt-5.5', 'google/gemini-2.5-pro', 'x-ai/grok-4', 'deepseek/deepseek-v3.2', 'qwen/qwen3-coder', 'moonshotai/kimi-k2'], reasoning: 'openrouter' },
+  { id: 'xai', label: 'xAI (Grok)', short: 'xAI', base: 'https://api.x.ai/v1', keyUrl: 'https://console.x.ai', vision: true, models: ['grok-4', 'grok-4-fast', 'grok-3-mini'], model: 'grok-4', reasoning: 'openai' },
+  { id: 'deepseek', label: 'DeepSeek', short: 'DeepSeek', base: 'https://api.deepseek.com/v1', keyUrl: 'https://platform.deepseek.com/api_keys', models: ['deepseek-chat', 'deepseek-reasoner'], model: 'deepseek-chat' },
+  { id: 'mistral', label: 'Mistral', short: 'Mistral', base: 'https://api.mistral.ai/v1', keyUrl: 'https://console.mistral.ai/api-keys', models: ['mistral-large-latest', 'mistral-medium-latest', 'magistral-medium-latest', 'codestral-latest'], model: 'mistral-large-latest' },
+  { id: 'groq', label: 'Groq', short: 'Groq', base: 'https://api.groq.com/openai/v1', keyUrl: 'https://console.groq.com/keys', models: ['openai/gpt-oss-120b', 'moonshotai/kimi-k2-instruct', 'qwen/qwen3-32b', 'llama-3.3-70b-versatile'], model: 'openai/gpt-oss-120b', reasoning: 'openai' },
+  { id: 'cerebras', label: 'Cerebras', short: 'Cerebras', base: 'https://api.cerebras.ai/v1', keyUrl: 'https://cloud.cerebras.ai', models: ['gpt-oss-120b', 'qwen-3-235b-a22b-instruct-2507', 'llama-3.3-70b'], model: 'gpt-oss-120b', reasoning: 'openai' },
+  { id: 'together', label: 'Together AI', short: 'Together', base: 'https://api.together.xyz/v1', keyUrl: 'https://api.together.ai/settings/api-keys', models: ['moonshotai/Kimi-K2-Instruct', 'Qwen/Qwen3-Coder-480B-A35B-Instruct-FP8', 'deepseek-ai/DeepSeek-V3.1', 'openai/gpt-oss-120b'] },
+  { id: 'fireworks', label: 'Fireworks AI', short: 'Fireworks', base: 'https://api.fireworks.ai/inference/v1', keyUrl: 'https://fireworks.ai/account/api-keys', models: ['accounts/fireworks/models/kimi-k2-instruct', 'accounts/fireworks/models/qwen3-coder-480b-a35b-instruct', 'accounts/fireworks/models/deepseek-v3p1'] },
+  { id: 'moonshot', label: 'Moonshot (Kimi)', short: 'Kimi', base: 'https://api.moonshot.ai/v1', keyUrl: 'https://platform.moonshot.ai/console/api-keys', models: ['kimi-k2-0905-preview', 'kimi-k2-turbo-preview'] },
+  { id: 'qwen', label: 'Alibaba Qwen (DashScope)', short: 'Qwen', base: 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1', keyUrl: 'https://modelstudio.console.alibabacloud.com', vision: true, models: ['qwen3-max', 'qwen-plus', 'qwen3-coder-plus', 'qwen-vl-max'] },
+  { id: 'zai', label: 'Z.ai (GLM)', short: 'GLM', base: 'https://api.z.ai/api/paas/v4', keyUrl: 'https://z.ai/manage-apikey/apikey-list', models: ['glm-4.6', 'glm-4.5-air'] },
+  { id: 'huggingface', label: 'Hugging Face', short: 'Hugging Face', base: 'https://router.huggingface.co/v1', keyUrl: 'https://huggingface.co/settings/tokens', models: ['openai/gpt-oss-120b', 'Qwen/Qwen3-Coder-480B-A35B-Instruct', 'deepseek-ai/DeepSeek-V3.1'] },
+  { id: 'nvidia', label: 'NVIDIA NIM', short: 'NVIDIA', base: 'https://integrate.api.nvidia.com/v1', keyUrl: 'https://build.nvidia.com', models: ['nvidia/llama-3.3-nemotron-super-49b-v1.5', 'openai/gpt-oss-120b', 'qwen/qwen3-coder-480b-a35b-instruct'] },
+  { id: 'ollama', label: 'Ollama (on this PC, free)', short: 'Ollama', base: 'http://localhost:11434/v1', local: true, reasoning: 'toggle' },
+  { id: 'lmstudio', label: 'LM Studio (on this PC, free)', short: 'LM Studio', base: 'http://localhost:1234/v1', local: true, reasoning: 'toggle' },
+  { id: 'custom', label: 'Another OpenAI-compatible service', short: 'Custom', base: '', keyUrl: null },
 ];
+
+/**
+ * The reasoning levels a provider takes, for the chat's picker. 'auto' is
+ * the model's own default (nothing sent). Claude's are its effort levels;
+ * OpenAI-style services take reasoning_effort; models on this PC turn their
+ * thinking on or off.
+ */
+const LEVELS = {
+  claude: ['auto', 'low', 'medium', 'high', 'xhigh', 'max'],
+  openai: ['auto', 'minimal', 'low', 'medium', 'high'],
+  gemini: ['auto', 'off', 'low', 'medium', 'high'],
+  openrouter: ['auto', 'off', 'low', 'medium', 'high'],
+  toggle: ['auto', 'off', 'on'],
+};
+export const reasoningLevels = (id) => LEVELS[providerOf(id).reasoning] ?? [];
+
 export const providerOf = (id) => PROVIDERS.find((p) => p.id === id) ?? PROVIDERS[0];
 
 // Models that take Anthropic's server-side refusal fallback ("default" routing).
@@ -210,7 +236,7 @@ async function* sse(response) {
   }
 }
 
-async function openAiTurn({ provider, base, model, system, history, tools, signal, onText, onThinking }) {
+async function openAiTurn({ provider, base, model, system, history, tools, signal, onText, onThinking, effort }) {
   const url = `${base.replace(/\/$/, '')}/chat/completions`;
   const body = {
     model,
@@ -218,6 +244,14 @@ async function openAiTurn({ provider, base, model, system, history, tools, signa
     messages: [{ role: 'system', content: system }, ...history],
     tools: tools.map((t) => toOpenAiTool(t, provider)),
   };
+  // Reasoning, each service's way (nothing at 'auto': the model's default).
+  const kind = providerOf(provider).reasoning;
+  if (effort && effort !== 'auto') {
+    if (kind === 'toggle') body.chat_template_kwargs = { enable_thinking: effort !== 'off' };
+    else if (kind === 'openrouter') body.reasoning = effort === 'off' ? { enabled: false } : { effort };
+    else if (kind === 'gemini') body.reasoning_effort = effort === 'off' ? 'none' : effort;
+    else if (kind === 'openai') body.reasoning_effort = effort;
+  }
   const res = await shellFetch(provider)(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body), signal });
   if (!res.ok) {
     const text = await res.text().catch(() => '');
@@ -286,15 +320,15 @@ function openAiResults(results, vision) {
 
 /** One model reply. `config`: { provider, model, base, effort }. */
 export function turn(config, args) {
-  if (config.provider === 'anthropic') return claudeTurn({ ...args, model: config.model, effort: config.effort ?? 'medium' });
+  if (config.provider === 'anthropic') return claudeTurn({ ...args, model: config.model, effort: !config.effort || config.effort === 'auto' ? 'medium' : config.effort });
   if (config.provider === 'local')
     return localBase(config.model, { ctx: config.ctx, gpu: config.gpu }).then((base) =>
-      openAiTurn({ ...args, provider: 'local', base, model: config.model }),
+      openAiTurn({ ...args, provider: 'local', base, model: config.model, effort: config.effort }),
     );
   const base = config.provider === 'custom' ? config.base : (config.base || providerOf(config.provider).base);
   if (!base) throw new Error('Set the service’s address first (the gear above).');
   if (!config.model) throw new Error('Pick a model first (the gear above).');
-  return openAiTurn({ ...args, provider: config.provider, base, model: config.model });
+  return openAiTurn({ ...args, provider: config.provider, base, model: config.model, effort: config.effort });
 }
 
 /** The messages that carry tool results back, for the provider. */

@@ -10,6 +10,25 @@ const at = (run, who, t) => motionAt(run.motion[who], t);
 const peak = (run, who) => Math.max(...run.motion[who].map((p) => p[1]));
 
 describe('physics', () => {
+  it('a TELEPORT lands at once: a HITBOX right after it is where it put you', () => {
+    // 20 studs forward, then a hitbox in front, in the same frame (no WAIT).
+    const run = simulate(
+      program([
+        { K_NAME: 'TELEPORT', POSITION: '0, 0, 20' },
+        { K_NAME: 'HITBOX', POSITION: '0, 0, 3', SIZE: '4, 4, 4' },
+        { K_NAME: 'WAIT', TIME: 0.5 },
+      ]),
+      { hits: 'never' },
+    );
+    const box = run.events.find((e) => e.kind === 'HITBOX');
+    const tp = run.events.find((e) => e.kind === 'TELEPORT');
+    assert.ok(tp.t <= box.t, 'the teleport comes first');
+    // The hitbox is 3 in front of where you landed, not of where you started.
+    const start = at(run, 'user', 0);
+    const along = Math.hypot(box.at[0] - start[0], box.at[2] - start[2]);
+    assert.ok(Math.abs(along - 23) < 0.5, `hitbox ${along.toFixed(2)} studs from the start, expected 23`);
+  });
+
   it('a launch keeps rising after the push, then falls at Roblox gravity', () => {
     const run = simulate(
       program([

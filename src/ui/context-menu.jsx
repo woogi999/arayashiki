@@ -14,6 +14,7 @@ import { Icon } from '../icons.jsx';
 import { KindChip } from './controls.jsx';
 import { openSearch } from './search.jsx';
 import { deleteLayout, loadLayout, savedLayouts } from './dock.jsx';
+import * as B from '../barmaker/state.js';
 
 const menu = signal(null); // { x, y, items }
 const subs = signal([]); // open submenus, one per level: { x, y, flipX, items, from }
@@ -293,8 +294,208 @@ function outlinerAreaItems() {
   ];
 }
 
-function itemsFor(target) {
+// ─── The Meter Maker's menus, Photoshop's way ───────────────────────────
+// What's under the pointer decides: a layer gets its own menu (and picks
+// it, as a right-click does there), with every layer under the pointer to
+// pick from; a guide its own; the empty picture what can go on it; a step
+// its own; the tool in hand adds its options at the top.
+
+const BAR_KINDS = [
+  ['bar', 'Meter', 'battery'],
+  ['ring', 'Progress ring', 'circle-dot'],
+  ['textbar', 'Text bar', 'languages'],
+];
+const SHAPE_KINDS = [
+  ['rect', 'Rectangle', 'square'],
+  ['ellipse', 'Ellipse', 'circle'],
+  ['triangle', 'Triangle', 'triangle'],
+  ['diamond', 'Diamond', 'diamond'],
+  ['polygon', 'Polygon', 'hexagon'],
+  ['star', 'Star', 'star'],
+  ['custom', 'Custom shape', 'heart'],
+];
+const LAYER_ICONS = { bar: 'battery', shape: 'shapes', text: 'type', image: 'image', paint: 'brush' };
+
+function newLayerItems(point) {
+  return [
+    item('New meter', 'battery', null, { items: BAR_KINDS.map(([id, label, icon]) => item(label, icon, () => B.addAt(id, point))) }),
+    item('New shape', 'shapes', null, { items: SHAPE_KINDS.map(([id, label, icon]) => item(label, icon, () => B.addAt(id, point))) }),
+    item('New text', 'type', () => B.addAt('text', point)),
+    item('New drawing layer', 'brush', () => B.addAt('paint', point)),
+  ];
+}
+
+function viewItems() {
+  return [
+    item('View', 'zoom-in', null, {
+      items: [
+        item('Fit to the window', 'maximize', () => B.zoomTo(0), { keys: bindingOf('barFit') }),
+        item('Actual size', 'zoom-in', () => B.zoomTo(1)),
+        item('Zoom in', 'zoom-in', () => B.zoomBy(1.25)),
+        item('Zoom out', 'zoom-out', () => B.zoomBy(0.8)),
+        sep,
+        item('Rulers and guides', 'ruler', () => B.toggleRulers(), { checked: B.rulers.peek(), keys: bindingOf('barRulers') }),
+        item('Snapping', 'magnet', () => B.toggleSnapping(), { checked: B.snapping.peek(), keys: bindingOf('barSnap') }),
+        B.doc.peek().guides?.length > 0 && item('Clear the guides', 'trash-2', () => B.clearGuides()),
+      ],
+    }),
+  ];
+}
+
+function toolItems() {
+  const t = B.tool.peek();
+  if (t === 'pen' && B.penPoints.peek().length)
+    return [
+      heading('Pen'),
+      item('Close the shape', 'check', () => B.penFinish(true), { keys: 'Enter' }),
+      item('Leave it open (a line)', 'pen-tool', () => B.penFinish(false)),
+      item('Take the last point back', 'undo', () => B.penUndo(), { keys: 'Backspace' }),
+      danger(item('Drop it', 'x', () => B.penCancel(), { keys: 'Esc' })),
+      sep,
+    ];
+  if (t === 'bar') return [heading('Meter tool'), ...BAR_KINDS.map(([id, label, icon]) => item(label, icon, () => B.pickBarKind(id), { checked: B.barKind.peek() === id })), sep];
+  if (t === 'shape') return [heading('Shape tool'), ...SHAPE_KINDS.map(([id, label, icon]) => item(label, icon, () => B.pickShapeKind(id), { checked: B.shapeKind.peek() === id })), sep];
+  if (t === 'brush' || t === 'eraser')
+    return [
+      heading(t === 'brush' ? 'Brush' : 'Eraser'),
+      item('Size', 'brush', null, { items: [4, 8, 16, 24, 48, 96].map((n) => item(`${n} px`, null, () => (B.brushSize.value = n), { checked: B.brushSize.peek() === n })) }),
+      sep,
+    ];
+  return [];
+}
+
+function layerItems(layer, under = []) {
+  const bar = layer.type === 'bar';
+  return [
+    heading(layer.name),
+    under.length > 1 &&
+      item('Select layer', 'layers', null, {
+        items: under.map((l) => item(l.name, LAYER_ICONS[l.type] ?? 'layers', () => B.select(l.id), { checked: l.id === layer.id })),
+      }),
+    item('Properties', 'sliders', () => (B.propTab.value = bar ? 'shape' : layer.type === 'text' ? 'text' : 'layer')),
+    item('Effects…', 'sparkles', () => (B.propTab.value = 'effects')),
+    sep,
+    item('Duplicate layer', 'copy', () => B.duplicateLayer()),
+    item(layer.visible ? 'Hide layer' : 'Show layer', layer.visible ? 'eye-off' : 'eye', () => B.toggleLayer(layer.id, 'visible')),
+    item(layer.clip ? 'Release clipping mask' : 'Create clipping mask', 'link', () => B.toggleLayer(layer.id, 'clip')),
+    sep,
+    item('Arrange', 'layers', null, {
+      items: [
+        item('Bring to front', 'chevrons-up', () => B.arrange('front')),
+        item('Bring forward', 'arrow-up', () => B.moveLayer(1)),
+        item('Send backward', 'arrow-down', () => B.moveLayer(-1)),
+        item('Send to back', 'chevrons-down', () => B.arrange('back')),
+      ],
+    }),
+    layer.type !== 'paint' &&
+      item('Align to the picture', 'align-center', null, {
+        items: [
+          item('Left edges', 'align-left', () => B.alignSelected('left')),
+          item('Centres, across', 'align-center', () => B.alignSelected('hcenter')),
+          item('Right edges', 'align-right', () => B.alignSelected('right')),
+          sep,
+          item('Top edges', 'align-top', () => B.alignSelected('top')),
+          item('Middles, up and down', 'align-middle', () => B.alignSelected('vcenter')),
+          item('Bottom edges', 'align-bottom', () => B.alignSelected('bottom')),
+          sep,
+          item('Both centres', 'locate-fixed', () => (B.alignSelected('hcenter'), B.alignSelected('vcenter'))),
+        ],
+      }),
+    layer.type !== 'paint' &&
+      item('Transform', 'move', null, {
+        items: [
+          item('Fit to the picture', 'maximize', () => B.fitSelected(true)),
+          item('Stretch to the picture', 'maximize', () => B.fitSelected(false)),
+          item('Turn back to 0°', 'rotate-ccw', () => B.setLayer('rotation', 0), { disabled: !layer.rotation }),
+          item('Turn 90°', 'rotate-cw', () => B.setLayer('rotation', ((layer.rotation ?? 0) + 90) % 360)),
+        ],
+      }),
+    bar &&
+      item('Convert to', 'refresh', null, {
+        items: [
+          ['bar', 'Meter'],
+          ['ring', 'Progress ring'],
+          ['text', 'Text bar'],
+          ['image', 'Picture bar'],
+        ].map(([id, label]) => item(label, null, () => B.convertBar(id), { checked: layer.shape === id })),
+      }),
+    sep,
+    item('Copy layer style', 'copy', () => B.copyStyle()),
+    item('Paste layer style', 'paste', () => B.pasteStyle(), { disabled: !B.copiedStyle.peek() }),
+    item('Clear layer style', 'eraser', () => B.clearStyle()),
+    sep,
+    danger(item('Delete layer', 'trash-2', () => B.deleteLayer(), { keys: 'Delete' })),
+  ];
+}
+
+function meterCanvasItems(e) {
+  const guide = B.guideIndexAt(e.clientX, e.clientY);
+  if (guide >= 0)
+    return [
+      heading('Guide'),
+      danger(item('Delete this guide', 'trash-2', () => B.deleteGuide(guide))),
+      item('Clear all guides', 'trash-2', () => B.clearGuides()),
+    ];
+  const under = B.layersAt(e.clientX, e.clientY);
+  const point = B.docAt(e.clientX, e.clientY);
+  const tools = toolItems();
+  // With the move tool, a right-click picks what's under it, as Photoshop does.
+  const top = under.find((l) => l.id === B.selectedId.peek()) ?? under[0];
+  if (top && B.tool.peek() === 'move') {
+    B.select(top.id);
+    return [...tools, ...layerItems(top, under)];
+  }
+  return [
+    ...tools,
+    ...newLayerItems(point),
+    item('Add a picture…', 'image-plus', () => document.querySelector('.pb-rail input[type=file]')?.click()),
+    sep,
+    cmd('undo'),
+    cmd('redo'),
+    sep,
+    ...viewItems(),
+    item('Background colour', 'image', null, {
+      items: [
+        item(B.doc.peek().background?.on ? 'No background' : 'Fill the background', 'image', () => B.change(B.setInDoc('background.on', !B.doc.peek().background?.on))),
+      ],
+    }),
+    sep,
+    item('Export…', 'upload', () => B.openDialog('export'), { keys: bindingOf('export') }),
+  ];
+}
+
+function stepItems(step) {
+  return [
+    heading(`Step ${step}`),
+    item('Show this step', 'eye', () => B.showFrame(step)),
+    item('Save this step as a picture', 'download', () => (B.showFrame(step), B.saveFrame())),
+    sep,
+    item('Play the steps', 'play', () => B.play(), { keys: bindingOf('play') }),
+    item('Save every step (zip)', 'download', () => B.saveZip()),
+    item('Save a sheet of every step', 'download', () => B.saveSheet()),
+  ];
+}
+
+function meterItems(target, e) {
+  const row = target.closest?.('[data-layer-id]');
+  if (row) {
+    B.select(row.dataset.layerId);
+    const layer = B.selected.peek();
+    return layer ? layerItems(layer) : [];
+  }
+  const step = target.closest?.('[data-step]');
+  if (step) return stepItems(Number(step.dataset.step));
+  if (target.closest?.('.pb-canvas-area')) return meterCanvasItems(e);
+  if (target.closest?.('.pb-layers-area')) return [...newLayerItems(null), sep, ...viewItems()];
+  return null;
+}
+
+function itemsFor(target, e) {
   if (isText(target)) return textItems(target);
+  if (S.workspace.peek() === 'bars') {
+    const mine = meterItems(target, e);
+    if (mine) return mine;
+  }
   const nodeRow = target.closest?.('[data-node-index]');
   if (nodeRow) return nodeItems(Number(nodeRow.dataset.nodeIndex));
   const skillRow = target.closest?.('[data-skill-uid]');
@@ -334,7 +535,7 @@ function onContext(e) {
   const moved = downAt ? Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) : 0;
   downAt = null;
   if (moved > 5) return; // a right-drag (turning the camera), not a click
-  const items = clean(itemsFor(e.target));
+  const items = clean(itemsFor(e.target, e));
   if (items.length) openMenu(e.clientX, e.clientY, items);
 }
 

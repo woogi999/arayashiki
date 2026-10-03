@@ -27,6 +27,7 @@ import {
   STATES,
   animOf,
   defaultsOf,
+  withDefaults,
   effectFields,
   nodeInfo,
   nodeTitle,
@@ -516,6 +517,337 @@ export async function validate({ simulate: runSim = true, ...input }) {
     warnings: count('warning'),
     issues,
   };
+}
+
+// ─── Lint ───────────────────────────────────────────────────────────────
+// A linter for movesets, the way one checks code: everything validate
+// finds (JJS won't load it, typos, wrong types…), plus mistakes that load
+// fine but don't do what was meant (code that never runs, a tag nothing
+// sets, an effect nothing can take off, a combo the dummy escapes from), and
+// recommendations: simpler or sturdier ways to write the same thing. Each
+// problem says where it is (skill, branch, node) and how to fix it.
+//
+//   level  "error" (JJS won't load it) · "warning" (a bug) · "info" (worth
+//          knowing) · "tip" (a better way)
+//   rule   a short id, to look a kind of problem up or turn it off
+
+const FOREVER = 1e9;
+const isForever = (v) => Number(v) >= FOREVER;
+const nodeKey = (n) => JSON.stringify(n);
+
+/** Which branches each line jumps to, for "what runs" checks. */
+function jumpsOf(node) {
+  if (!node) return [];
+  const out = [];
+  for (const f of nodeInfo(node.K_NAME).fields.filter((f) => f.type === 'branch')) if (typeof node[f.key] === 'string' && node[f.key]) out.push(node[f.key]);
+  if (node.K_NAME === 'BRANCH' && node.RANDOM)
+    for (const o of String(node.RANDOM).split(',').map((s) => s.trim()).filter(Boolean)) out.push(o);
+  return out;
+}
+
+function lintSkill(skill, all, add) {
+  const d = skill.DATA;
+  if (!d || '__unreadable' in d) return;
+  const names = branchNames(d);
+  const lines = ['', ...names].map((b) => ({ branch: b, place: b || 'Default', line: lineOf(d, b) }));
+  const total = lines.reduce((n, l) => n + l.line.length, 0);
+  if (!total) add('warning', 'empty-skill', 'The skill has no nodes: pressing it does nothing.', null, 'Add nodes, or delete the skill.');
+
+  for (const { branch, place, line } of lines) {
+    // Nodes after a jump that always happens never run: a BRANCH to a
+    // branch that exists and has no conditions (one with conditions that
+    // don't hold, or a missing one, carries on to the next node).
+    const stop = line.findIndex(
+      (n) => n?.K_NAME === 'BRANCH' && !n.RANDOM && names.includes(n.BRANCH) && !reqOf(d, n.BRANCH).length,
+    );
+    if (stop >= 0 && stop < line.length - 1)
+      add(
+        'warning',
+        'unreachable',
+        `${line.length - stop - 1} node${line.length - stop - 1 === 1 ? '' : 's'} after the BRANCH at #${stop} never run: it always goes to "${line[stop].BRANCH}" (no conditions), and a branch doesn't come back (inferred: everything seen so far fits).`,
+        { branch, index: stop + 1 },
+        'Move them before the BRANCH, or into the branch it goes to.',
+      );
+    let waits = 0;
+    line.forEach((node, i) => {
+      const at = { branch, index: i };
+      const n = withDefaults(node ?? {});
+      // Two WAITs in a row are one WAIT.
+      if (node?.K_NAME === 'WAIT') {
+        waits++;
+        if (waits === 2) add('tip', 'merge-waits', `WAITs at #${i - 1} and #${i} in a row: one WAIT of their sum does the same.`, at, 'Merge them into one WAIT.');
+      } else waits = 0;
+      // The same node three times running: a LOOP says it once.
+      if (i >= 2 && nodeKey(line[i]) === nodeKey(line[i - 1]) && nodeKey(line[i]) === nodeKey(line[i - 2]) && nodeKey(line[i + 1]) !== nodeKey(line[i]))
+        add('tip', 'use-loop', `The same ${node?.K_NAME} repeats ${countRun(line, i)} times running (ending at #${i}).`, { branch, index: i - countRun(line, i) + 1 }, 'Write it once and add a LOOP (LOOP BACK 1) for the rest: shorter, and one place to change it.');
+      switch (node?.K_NAME) {
+        case 'VISUAL': {
+          if (isForever(n.TIME) && n.EFFECT !== 'Cancel' && !node['VISUAL TAG'] && !['Camera', 'Overlay', 'Screen Color'].includes(n.EFFECT))
+            add('warning', 'forever-untagged', `This ${n.EFFECT} lasts for ever and has no VISUAL TAG, so nothing can ever take it off: it stays on the player.`, at, 'Give it a VISUAL TAG, and Cancel that tag when it should go.');
+          if (n.EFFECT === 'Cancel') {
+            const tag = node['VISUAL TAG'];
+            if (!tag) add('warning', 'cancel-untagged', 'A Cancel with no VISUAL TAG takes nothing off.', at, 'Set the VISUAL TAG of the effects it should remove.');
+            else if (!tagged(all, 'VISUAL', 'VISUAL TAG', tag, (x) => x.EFFECT !== 'Cancel'))
+              add('warning', 'cancel-nothing', `Cancel "${tag}": no VISUAL in the moveset has that VISUAL TAG, so it does nothing.`, at, 'Check the spelling against the VISUAL it should remove.');
+          }
+          break;
+        }
+        case 'TAG': {
+          if (node.CHECK && !tagged(all, 'TAG', 'TAG', node.TAG, (x) => !x.CHECK))
+            add('warning', 'tag-never-set', `Checks tag "${node.TAG}", but nothing in the moveset sets it, so this never passes (unless another moveset sets it).`, at, 'Set the tag somewhere (a TAG node with CHECK off), or fix the name.');
+          if (!node.CHECK && !tagged(all, 'TAG', 'TAG', node.TAG, (x) => x.CHECK) && !hasTagReq(all, node.TAG))
+            add('info', 'tag-never-read', `Sets tag "${node.TAG}", but nothing in the moveset checks it.`, at, 'Fine if another moveset reads it; else it can go.');
+          break;
+        }
+        case 'VELO':
+          if (vec(n.FORCE).every((c) => c === 0) && !(Number(n.RAGDOLL) > 0))
+            add('info', 'velo-nothing', 'A VELOCITY with FORCE 0, 0, 0 and no ragdoll: it only stops the push in progress.', at, 'If that’s meant, a CLEAR KNOCKBACK says it more plainly.');
+          break;
+        case 'GRAB':
+          if (!branch && !line.slice(0, i).some((x) => x?.K_NAME === 'HITBOX' || x?.K_NAME === 'PROJECTILE'))
+            add('warning', 'grab-before-hit', 'A GRAB holds the last one hit, but nothing in the line has hit anyone yet here: it grabs nobody.', at, 'Put the GRAB in the hitbox’s OnHit branch (or after a hit).');
+          break;
+        case 'HITBOX':
+          if (!(Number(n.DAMAGE) > 0) && !(Number(n.STUN) > 0) && !node.BRANCH && !node['BRANCH TARGET'])
+            add('info', 'hitbox-nothing', 'A HITBOX with no damage, no stun and no branch: a hit does nothing.', at, 'If it’s a detector, give it a BRANCH to go to on a hit.');
+          break;
+      }
+    });
+  }
+
+  // Branches nothing jumps to (validate says so too, as info).
+  const reached = new Set(['', 'OnHit', 'OnHitTarget']);
+  for (const { line } of lines) for (const node of line) for (const b of jumpsOf(node)) reached.add(b);
+
+  // Recommendations for the skill as a whole.
+  const nodes = lines.flatMap((l) => l.line);
+  const hasCamera = nodes.some((n) => n?.K_NAME === 'VISUAL' && n.EFFECT === 'Camera');
+  const locked = nodes.some((n) => n?.K_NAME === 'STATE' && /DirectionLock/i.test(String(n.STATE)));
+  if (hasCamera && !locked)
+    add('tip', 'camera-no-lock', 'This skill moves the camera but doesn’t lock your direction: if you turn while the shot plays, it plays at the wrong angle.', null, 'Add a STATE DirectionLock on you for as long as the camera runs.');
+  const passive = d.Prop?.USE || (d.Prop?.AWK && d.Prop?.AWK2);
+  if (skill.K_NAME === 'SKILL' && !passive && !(Number(skill.COOLDOWN) > 0) && skill.KEY !== 99 && !d.Prop?.REP2 && !/^-+.*-+$/.test(skill.NAME ?? ''))
+    add('tip', 'no-cooldown', 'No COOLDOWN: the skill can be used again the moment it ends.', null, 'Give it a cooldown (most moves use 5–15 s), unless spamming it is the point.');
+}
+
+const countRun = (line, i) => {
+  let k = 0;
+  while (i - k >= 0 && nodeKey(line[i - k]) === nodeKey(line[i])) k++;
+  return k;
+};
+const vec = (v) => String(v ?? '0, 0, 0').split(',').map((x) => Number(x) || 0);
+
+/** Whether any node of `kind` in the moveset has `field` = `value` (and passes `also`). */
+function tagged(all, kind, field, value, also = () => true) {
+  for (const s of all) {
+    const d = s.DATA;
+    if (!d || '__unreadable' in d) continue;
+    for (const b of ['', ...branchNames(d)]) for (const n of lineOf(d, b)) if (n?.K_NAME === kind && n[field] === value && also(n)) return true;
+  }
+  return false;
+}
+/** Whether a skill's or branch's conditions read tag `name` (a TAG condition). */
+function hasTagReq(all, name) {
+  for (const s of all) {
+    const d = s.DATA;
+    if (!d || '__unreadable' in d) continue;
+    for (const b of ['', ...branchNames(d)]) if (reqOf(d, b).some((r) => r?.TAG === name)) return true;
+  }
+  return false;
+}
+
+/** Problems across the moveset: two skills on one key, two skills with one name. */
+function lintMoveset(skills, push) {
+  const seen = new Map();
+  for (const s of skills) {
+    if (!s.NAME || /^-+.*-+$/.test(s.NAME)) continue; // separators like "----BASE----"
+    const k = `${s.K_NAME}:${s.NAME}`;
+    if (seen.has(k)) push({ level: 'warning', rule: 'duplicate-name', skill: k, message: `Two ${s.K_NAME} skills are named "${s.NAME}": tools (and you) can't tell them apart.`, fix: 'Rename one.' });
+    seen.set(k, true);
+  }
+  // Two skills on one key only clash when both can be pressed at once: in
+  // base (not hidden there by AWK2) or awakened (not hidden by AWK).
+  // Passives (USE, or hidden in both) aren't pressed at all.
+  for (const [mode, hiddenBy] of [
+    ['base', 'AWK2'],
+    ['awakened', 'AWK'],
+  ]) {
+    const keys = new Map();
+    for (const s of skills) {
+      const prop = s.DATA && !('__unreadable' in s.DATA) ? (s.DATA.Prop ?? {}) : {};
+      if (s.K_NAME !== 'SKILL' || s.KEY == null || [99, -1, 0].includes(Number(s.KEY)) || /^-+.*-+$/.test(s.NAME ?? '')) continue;
+      if (prop.USE || (prop.AWK && prop.AWK2) || prop[hiddenBy]) continue;
+      const k = Number(s.KEY);
+      if (keys.has(k))
+        push({ level: 'warning', rule: 'duplicate-key', skill: `SKILL:${s.NAME}`, message: `"${s.NAME}" and "${keys.get(k)}" are both on key ${k} ${mode === 'base' ? 'out of awakening' : 'in awakening'}: only one of them can be used.`, fix: `Move one to a free key, or hide one ${mode === 'base' ? 'in base (AWK2)' : 'in awakening (AWK)'}.` });
+      else keys.set(k, s.NAME);
+    }
+  }
+}
+
+/**
+ * The combo checks: each skill run with every hit landing; between two hits
+ * on the dummy, is it still stunned when the next one comes? If not, it can
+ * block or run in that gap, and the combo drops.
+ */
+function lintCombos(skill, push) {
+  const d = skill.DATA;
+  if (!d || '__unreadable' in d) return;
+  const run = simulate(skill, { hits: 'always', maxTime: 8, conditions: { BAR: 100 } });
+  const hits = run.events.filter((e) => e.kind === 'HIT' && e.who === 'target').sort((a, b) => a.t - b.t);
+  for (let k = 0; k + 1 < hits.length; k++) {
+    const a = hits[k];
+    const b = hits[k + 1];
+    const node = lineOf(d, a.branch ?? '')[a.index];
+    if (!node || node.K_NAME !== 'HITBOX') continue;
+    const stun = Number(withDefaults(node).STUN) || 0;
+    const free = b.t - (a.t + stun);
+    if (stun > 0 && free > 0.05)
+      push({
+        level: 'warning',
+        rule: 'combo-drops',
+        skill: `${skill.K_NAME}:${skill.NAME}`,
+        at: { branch: a.branch ?? '', index: a.index },
+        message: `The dummy is free for ${free.toFixed(2)} s between the hit at ${a.t.toFixed(2)} s and the next at ${b.t.toFixed(2)} s (STUN ${stun} s): it can block or get away, and the combo drops.`,
+        fix: `Raise this hitbox's STUN to at least ${(b.t - a.t + 0.05).toFixed(2)} s, or land the next hit sooner.`,
+      });
+  }
+}
+
+const LEVEL_ORDER = { error: 0, warning: 1, info: 2, tip: 3 };
+
+/**
+ * Lints a moveset (or one skill: `select`). Returns { problems, errors,
+ * warnings, infos, tips }, problems sorted worst first; each { level, rule,
+ * skill, at?: { branch, index }, message, fix? }. `simulate: false` skips
+ * the checks that run the simulator (faster: for typing as you go).
+ * `ignore`: rules to leave out.
+ */
+export async function lint({ select, simulate: runSim = true, ignore = [], ...input } = {}) {
+  const all = await loadSkills(input);
+  const skills = select !== undefined && select !== null && select !== '' ? [pickSkill(all, select)] : all;
+  const problems = [];
+  const push = (p) => problems.push(p);
+  // validate's findings, with a place to jump to where they have one.
+  const v = await validate({ skills, simulate: runSim });
+  for (const i of v.issues) {
+    const m = /^(.+) #(\d+)$/.exec(i.at ?? '');
+    const at = m ? { branch: m[1] === 'Default' ? '' : m[1], index: Number(m[2]) } : i.at ? { branch: i.at === 'Default' ? '' : i.at } : undefined;
+    push({ level: i.level, rule: i.message.startsWith('Simulator:') ? 'simulator' : i.message.startsWith('Camera VISUAL') ? 'camera-overlap' : 'validate', skill: i.skill, ...(at ? { at } : {}), message: i.message });
+  }
+  for (const skill of skills) {
+    const where = `${skill.K_NAME}:${skill.NAME}`;
+    lintSkill(skill, all, (level, rule, message, at, fix) => push({ level, rule, skill: where, ...(at ? { at } : {}), message, ...(fix ? { fix } : {}) }));
+    if (runSim) lintCombos(skill, push);
+  }
+  if (!select) lintMoveset(all, push);
+  const kept = problems.filter((p) => !ignore.includes(p.rule)).sort((a, b) => LEVEL_ORDER[a.level] - LEVEL_ORDER[b.level]);
+  const count = (l) => kept.filter((p) => p.level === l).length;
+  return { problems: kept, errors: count('error'), warnings: count('warning'), infos: count('info'), tips: count('tip') };
+}
+
+// ─── A moveset's style ──────────────────────────────────────────────────
+// What a moveset tends to do, in numbers: how long its moves are, how hard
+// and how long they hit, how fast they come out, what effects and
+// animations they use, how they're named. For an AI to build in the same
+// style (and its memories, src/ai/memory.js, to keep as a reference).
+
+const median = (list) => {
+  const v = list.filter((n) => Number.isFinite(n)).sort((a, b) => a - b);
+  if (!v.length) return null;
+  const m = Math.floor(v.length / 2);
+  return Math.round((v.length % 2 ? v[m] : (v[m - 1] + v[m]) / 2) * 1000) / 1000;
+};
+const top = (counts, n = 6) =>
+  Object.entries(counts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, n)
+    .map(([k, c]) => `${k} ×${c}`);
+
+/** A moveset's style profile: { counts, numbers, uses, names, summary }. */
+export async function profile(input = {}) {
+  const skills = (await loadSkills(input)).filter((s) => s.DATA && !('__unreadable' in s.DATA));
+  const kinds = {};
+  const effects = {};
+  const anims = {};
+  const tags = new Set();
+  const damage = [];
+  const stun = [];
+  const firstHit = [];
+  const cooldowns = [];
+  const lengths = [];
+  const hitSizes = [];
+  let cameras = 0;
+  for (const s of skills) {
+    const d = s.DATA;
+    if (s.K_NAME === 'SKILL' && Number(s.COOLDOWN) > 0) cooldowns.push(Number(s.COOLDOWN));
+    let camera = false;
+    for (const b of ['', ...branchNames(d)]) {
+      for (const node of lineOf(d, b)) {
+        const n = withDefaults(node ?? {});
+        kinds[node?.K_NAME] = (kinds[node?.K_NAME] ?? 0) + 1;
+        if (node?.K_NAME === 'HITBOX') {
+          damage.push(Number(n.DAMAGE));
+          stun.push(Number(n.STUN));
+          hitSizes.push(String(n.SIZE));
+        }
+        if (node?.K_NAME === 'VISUAL') {
+          effects[n.EFFECT] = (effects[n.EFFECT] ?? 0) + 1;
+          if (n.EFFECT === 'Camera') camera = true;
+        }
+        if (node?.K_NAME === 'ANIM' && node.ANIM_USE) {
+          const a = animOf(node.ANIM_USE);
+          const key = a ? `${a.character ?? ''}${a.name ? `.${a.name}` : ''}` || String(node.ANIM_USE) : String(node.ANIM_USE);
+          anims[key] = (anims[key] ?? 0) + 1;
+        }
+        if (node?.K_NAME === 'TAG' && node.TAG) tags.add(node.TAG);
+      }
+    }
+    if (camera) cameras++;
+    // How long it runs and when it first hits, simulated (moves branch
+    // straight away, so the line alone doesn't say). Not passives.
+    const passive = d.Prop?.USE || (d.Prop?.AWK && d.Prop?.AWK2) || /^-+.*-+$/.test(s.NAME ?? '');
+    if (!passive && ['SKILL', 'MELEE', 'AWAKENING', 'CHASE', 'SPECIAL'].includes(s.K_NAME)) {
+      const run = simulate(s, { hits: 'always', maxTime: 6, conditions: { BAR: 100 } });
+      const hit = run.events.find((e) => e.kind === 'HIT' && e.who === 'target');
+      if (hit) firstHit.push(hit.t);
+      const end = Math.max(0, ...run.events.filter((e) => e.who === 'user').map((e) => e.t));
+      if (end > 0) lengths.push(Math.round(end * 1000) / 1000);
+    }
+  }
+  const categories = {};
+  for (const s of skills) categories[s.K_NAME] = (categories[s.K_NAME] ?? 0) + 1;
+  const sizes = {};
+  for (const sz of hitSizes) sizes[sz] = (sizes[sz] ?? 0) + 1;
+  const numbers = {
+    damage: median(damage),
+    stun: median(stun),
+    first_hit_s: median(firstHit),
+    move_length_s: median(lengths),
+    cooldown_s: median(cooldowns),
+  };
+  const out = {
+    skills: skills.length,
+    categories,
+    numbers,
+    hitbox_sizes: top(sizes, 3),
+    node_kinds: top(kinds, 8),
+    effects: top(effects, 8),
+    animations: top(anims, 6),
+    tags: [...tags].slice(0, 20),
+    camera_skills: cameras,
+    names: skills.filter((s) => s.K_NAME === 'SKILL' && !/^-+.*-+$/.test(s.NAME ?? '')).map((s) => s.NAME).slice(0, 16),
+  };
+  const bits = [
+    `${skills.length} skills`,
+    numbers.damage !== null && `hits ~${numbers.damage} dmg, stun ${numbers.stun}s`,
+    numbers.first_hit_s !== null && `first hit at ~${numbers.first_hit_s}s`,
+    numbers.cooldown_s !== null && `cooldowns ~${numbers.cooldown_s}s`,
+    cameras > 0 && `${cameras} with camera work`,
+    out.effects.length > 0 && `favourite effects ${out.effects.slice(0, 3).map((e) => e.split(' ×')[0]).join(', ')}`,
+  ].filter(Boolean);
+  out.summary = bits.join(' · ');
+  return out;
 }
 
 // ─── Reference ──────────────────────────────────────────────────────────

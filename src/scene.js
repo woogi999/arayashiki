@@ -30,6 +30,7 @@ import {
   Mesh,
   Object3D,
   MeshBasicMaterial,
+  MeshNormalMaterial,
   MeshLambertMaterial,
   OrthographicCamera,
   PerspectiveCamera,
@@ -1177,7 +1178,14 @@ export function mountSkillScene(host, { textureUrl = async () => null, meshData 
    * top row first), point: [x, y] where the dummy (or you) is on screen,
    * camera: whether a Camera block had the view }.
    */
-  async function silhouettes(t, { width = 1024, height = 576 } = {}) {
+  /**
+   * The characters at `t`, through the skill's camera, for an impact frame
+   * (src/impact.js): each one's silhouette (`masks`), and the surface's
+   * direction at every pixel (`normals`, view space: x right, y up, z to the
+   * camera), so the frame can shade them and draw their lines. `plain`
+   * (the default) draws the plain rigs, without avatar accessories.
+   */
+  async function silhouettes(t, { width = 1024, height = 576, plain = true } = {}) {
     const w = Math.max(16, Math.round(width));
     const h = Math.max(16, Math.round(height));
     const target = new WebGLRenderTarget(w, h);
@@ -1194,26 +1202,58 @@ export function mountSkillScene(host, { textureUrl = async () => null, meshData 
     const screen = run ? stage(t, shot) : null;
     scene.background = new Color('#000000');
     scene.fog = null;
-    scene.overrideMaterial = new MeshBasicMaterial({ color: '#ffffff' });
+    const white = new MeshBasicMaterial({ color: '#ffffff' });
+    const facing = new MeshNormalMaterial();
     const shown = scene.children.map((c) => [c, c.visible]);
-    const masks = {};
-    for (const who of ['user', 'target']) {
-      const mine = new Set([people[who].root, people[who].ragdoll.group]);
-      for (const [c] of shown) c.visible = mine.has(c) && (who === 'user' || dummyShown);
+    // The plain rigs: avatar accessories hidden while the pictures are taken.
+    const hats = plain ? worn.map((m) => [m, m.visible]) : [];
+    for (const [m] of hats) m.visible = false;
+    const read = async () => {
       renderer.setRenderTarget(target);
       renderer.setClearColor(0x000000, 1);
       renderer.clear();
       renderer.render(scene, shot);
       const px = new Uint8Array(w * h * 4);
       await renderer.readRenderTargetPixelsAsync(target, 0, 0, w, h, px);
+      return px;
+    };
+    // Only what was already showing (the posed body, or the ragdoll when
+    // it's down): never both, which drew loose parts and their accessories
+    // over the body.
+    const showOnly = (set) => {
+      for (const [c, v] of shown) c.visible = v && set.has(c);
+    };
+    const masks = {};
+    const both = new Set();
+    scene.overrideMaterial = white;
+    for (const who of ['user', 'target']) {
+      const mine = new Set(who === 'user' || dummyShown ? [people[who].root, people[who].ragdoll.group] : []);
+      for (const c of mine) both.add(c);
+      showOnly(mine);
+      const px = await read();
       // WebGL reads bottom row first.
       const m = new Uint8ClampedArray(w * h);
       for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) m[(h - 1 - y) * w + x] = px[(y * w + x) * 4];
       masks[who] = m;
     }
+    // Which way each pixel of them faces, both at once (what's in front wins).
+    scene.overrideMaterial = facing;
+    showOnly(both);
+    const npx = await read();
+    const normals = new Float32Array(w * h * 3);
+    for (let y = 0; y < h; y++)
+      for (let x = 0; x < w; x++) {
+        const from = (y * w + x) * 4;
+        const to = ((h - 1 - y) * w + x) * 3;
+        normals[to] = (npx[from] / 255) * 2 - 1;
+        normals[to + 1] = (npx[from + 1] / 255) * 2 - 1;
+        normals[to + 2] = (npx[from + 2] / 255) * 2 - 1;
+      }
     for (const [c, v] of shown) c.visible = v;
+    for (const [m, v] of hats) m.visible = v;
     renderer.setRenderTarget(null);
-    scene.overrideMaterial.dispose();
+    white.dispose();
+    facing.dispose();
     Object.assign(scene, { background: keep.background, fog: keep.fog, overrideMaterial: keep.override });
     skillCamera = keep.skillCamera;
     target.dispose();
@@ -1224,7 +1264,7 @@ export function mountSkillScene(host, { textureUrl = async () => null, meshData 
     };
     const point = (dummyShown && on('target')) || on('user') || [w / 2, h / 2];
     show(time);
-    return { masks, point, width: w, height: h, camera: Boolean(screen?.camera) };
+    return { masks, normals, point, width: w, height: h, camera: Boolean(screen?.camera) };
   }
 
   function endCapture() {

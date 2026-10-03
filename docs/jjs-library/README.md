@@ -2,9 +2,10 @@
 
 Ready-made Jujutsu Shenanigans Skill Builder moves, taken from real exports,
 for reference when understanding or making a skill. When someone asks for a
-move, **find the closest one here first and build from it**: copy its
-structure, its timings and its numbers, and change what's different. That
-keeps new moves consistent with how JJS's own and the owner's moves feel.
+move, **look here for moves that do similar things, as references**: how
+JJS does each part (a launch, a grab, a camera), and the usual timings and
+numbers, so the new move feels like JJS's own. Then design the move that
+was asked for: take what fits from several, don't copy the nearest one.
 
 The node reference (what every node and field does, and what's confirmed or
 inferred) is the handbook, [../jjs-skill-builder.md](../jjs-skill-builder.md).

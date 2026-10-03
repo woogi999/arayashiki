@@ -11,12 +11,12 @@
   max-height: calc(100vh - 64px);
   padding: 0;
   overflow: hidden;
-  border: 1px solid #2a2a2a;
+  border: 1px solid var(--g16);
   border-radius: 12px;
   background: var(--head);
   color: var(--text);
   box-shadow:
-    0 1px 0 rgb(255 255 255 / 5%) inset,
+    0 1px 0 rgb(var(--fg-rgb) / 5%) inset,
     0 40px 100px rgb(0 0 0 / 65%);
 }
 
@@ -54,8 +54,8 @@
   overflow: hidden;
   background:
     radial-gradient(260px 220px at 50% 42%, rgb(200 245 66 / 10%), transparent 70%),
-    linear-gradient(180deg, #252525 0%, #1b1b1b 100%);
-  border-right: 1px solid #262626;
+    linear-gradient(180deg, var(--g15) 0%, var(--g11) 100%);
+  border-right: 1px solid var(--g15);
 }
 
 /* Rings that ripple out from the katana, like a skill going off. */
@@ -73,7 +73,7 @@
   width: 150px;
   height: 150px;
   translate: -50% -50%;
-  border: 1px solid rgb(255 255 255 / 14%);
+  border: 1px solid rgb(var(--fg-rgb) / 14%);
   border-radius: 50%;
   animation: tw-ripple 3.6s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
   opacity: 0;
@@ -123,8 +123,8 @@
   inset: auto -40% -8% -40%;
   height: 52%;
   background:
-    repeating-linear-gradient(90deg, #303030 0 1px, transparent 1px 28px),
-    repeating-linear-gradient(0deg, #303030 0 1px, transparent 1px 28px);
+    repeating-linear-gradient(90deg, var(--g19) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(0deg, var(--g19) 0 1px, transparent 1px 28px);
   transform: perspective(240px) rotateX(58deg);
   transform-origin: 50% 100%;
   mask-image: linear-gradient(to top, rgb(0 0 0 / 85%), transparent 80%);
@@ -216,7 +216,7 @@
 }
 
 .tw-points li:nth-child(odd) {
-  background: rgb(255 255 255 / 2.5%);
+  background: rgb(var(--fg-rgb) / 2.5%);
 }
 
 .tw-points .icon {
@@ -263,7 +263,7 @@
   .tw-art {
     min-height: 180px;
     border-right: 0;
-    border-bottom: 1px solid #262626;
+    border-bottom: 1px solid var(--g15);
   }
 
   .tw-mark {
@@ -288,7 +288,7 @@
   position: absolute;
   border-radius: 9px;
   box-shadow:
-    0 0 0 1px rgb(255 255 255 / 55%),
+    0 0 0 1px rgb(var(--fg-rgb) / 55%),
     0 0 0 9999px rgb(0 0 0 / 64%);
   transition:
     left var(--tt-glide),
@@ -304,7 +304,7 @@
   content: '';
   position: absolute;
   inset: -5px;
-  border: 1.5px solid rgb(255 255 255 / 45%);
+  border: 1.5px solid rgb(var(--fg-rgb) / 45%);
   border-radius: 13px;
   animation: tt-pulse 1.9s ease-out infinite;
 }
@@ -332,11 +332,11 @@
 .tt-card {
   position: absolute;
   overflow: hidden;
-  border: 1px solid #2e2e2e;
+  border: 1px solid var(--g18);
   border-radius: 10px;
   background: var(--head);
   box-shadow:
-    0 1px 0 rgb(255 255 255 / 5%) inset,
+    0 1px 0 rgb(var(--fg-rgb) / 5%) inset,
     0 24px 64px rgb(0 0 0 / 60%);
   transition:
     left var(--tt-glide),
@@ -352,17 +352,17 @@
 }
 
 .tt-card.is-final {
-  background: radial-gradient(320px 160px at 50% 0%, rgb(255 255 255 / 6%), transparent 70%), var(--head);
+  background: radial-gradient(320px 160px at 50% 0%, rgb(var(--fg-rgb) / 6%), transparent 70%), var(--head);
 }
 
 .tt-bar {
   height: 2px;
-  background: #262626;
+  background: var(--g15);
 }
 
 .tt-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #8a8a8a, #f2f2f2);
+  background: linear-gradient(90deg, var(--g54), var(--g95));
   transition: width var(--tt-glide);
 }
 
@@ -392,11 +392,11 @@
   place-items: center;
   width: 34px;
   height: 34px;
-  border: 1px solid #3a3a3a;
+  border: 1px solid var(--g23);
   border-radius: 9px;
-  background: linear-gradient(180deg, #353535, #2a2a2a);
+  background: linear-gradient(180deg, var(--g21), var(--g16));
   color: var(--text);
-  animation: tt-pop 560ms cubic-bezier(0.34, 1.56, 0.64, 1) 80ms both;
+  animation: tt-pop 560ms cubic-bezier(0.16, 1, 0.3, 1) 80ms both;
 }
 
 @keyframes tt-pop {
@@ -485,14 +485,14 @@
 .tt-done circle,
 .tt-done path {
   fill: none;
-  stroke: #f2f2f2;
+  stroke: var(--g95);
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 2;
 }
 
 .tt-done circle {
-  stroke: #5a5a5a;
+  stroke: var(--g35);
   stroke-dasharray: 107;
   animation: tt-draw 700ms cubic-bezier(0.65, 0, 0.35, 1) both;
 }
@@ -545,19 +545,19 @@
   padding: 0;
   border: 0;
   border-radius: 3px;
-  background: #383838;
+  background: var(--g22);
   transition:
     width 360ms cubic-bezier(0.16, 1, 0.3, 1),
     background 300ms ease;
 }
 
 .tt-dots button.is-past {
-  background: #6a6a6a;
+  background: var(--g42);
 }
 
 .tt-dots button.is-on {
   width: 18px;
-  background: #e2e2e2;
+  background: var(--g89);
 }
 
 /* ─── Updates ────────────────────────────────────────────────────────── */
@@ -589,17 +589,17 @@
   place-items: center;
   width: 42px;
   height: 42px;
-  border: 1px solid #3a3a3a;
+  border: 1px solid var(--g23);
   border-radius: 11px;
   background: var(--widget);
   color: var(--text);
 }
 
 .upd-badge.is-new {
-  border-color: #cfcfcf;
-  background: #e8e8e8;
-  color: #111;
-  animation: tt-pop 600ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  border-color: var(--g81);
+  background: var(--g91);
+  color: var(--g7);
+  animation: tt-pop 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .upd-badge.is-warn {
@@ -638,14 +638,14 @@
 .upd-progress-track {
   height: 6px;
   overflow: hidden;
-  border: 1px solid #070707;
+  border: 1px solid var(--g3);
   border-radius: 4px;
   background: var(--field);
 }
 
 .upd-progress-fill {
   height: 100%;
-  background: repeating-linear-gradient(-45deg, rgb(0 0 0 / 12%) 0 6px, transparent 6px 12px), #d8d8d8;
+  background: repeating-linear-gradient(-45deg, rgb(0 0 0 / 12%) 0 6px, transparent 6px 12px), var(--g85);
   background-size:
     17px 100%,
     auto;
@@ -680,17 +680,17 @@
   height: 22px;
   margin-right: 6px;
   padding: 0 10px 0 8px;
-  border: 1px solid #070707;
+  border: 1px solid var(--g3);
   border-radius: 999px;
-  background: #474747;
-  color: #fff;
+  background: var(--g28);
+  color: var(--g100);
   font-size: var(--text-sm);
   font-weight: 500;
-  animation: upd-pill-in 600ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation: upd-pill-in 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .upd-pill:hover {
-  background: #555;
+  background: var(--g33);
 }
 
 @keyframes upd-pill-in {
@@ -705,7 +705,7 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #fff;
+  background: var(--g100);
 }
 
 .upd-pill-dot::after {
@@ -713,7 +713,7 @@
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: #fff;
+  background: var(--g100);
   animation: upd-ping 1.8s ease-out infinite;
 }
 

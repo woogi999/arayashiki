@@ -22,7 +22,7 @@ const server = new McpServer(
     instructions: [
       'Arayashiki: Jujutsu Shenanigans (Roblox) Skill Builder skills. A "code" is the text JJS copies out (base64 of zstd JSON, starts "KLUv/"); a path to a .txt holding one works too.',
       'Typical flow: decode (overview) → describe or simulate one skill (select by name, "CATEGORY:NAME" or index) → edit the JSON from decode detail "json" → encode → validate.',
-      'Building a new move: search_library for the closest real move, get_library_move for its nodes and code, node_reference for fields, then adapt its structure and numbers.',
+      'Building a new move: work out what it should do first, then look at real moves that do similar things (search_library, get_library_move) as references for how JJS does it and the usual numbers. Design the move that was asked for, don\'t just copy the nearest one. node_reference for fields; simulate and lint before you hand it over.',
       "The simulator is a model of JJS's rules read from real exports, not the game: timings and damage are close, not exact. The handbook says what is confirmed and what is inferred.",
       'The app_* tools work on the desktop app the user has open: app_state to see what is open, app_get_skills / app_put_skills to edit the moveset in place (undoable), app_simulate and app_playback to run it, app_screenshot to look at it, app_export_video to render it, app_animate to keyframe a VISUAL or camera.',
     ].join('\n'),

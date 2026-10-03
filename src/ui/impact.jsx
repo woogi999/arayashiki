@@ -112,11 +112,15 @@ const WHO = [
 const SHAPES = { '16:9': 16 / 9, '16:10': 16 / 10, '21:9': 21 / 9, '4:3': 4 / 3 };
 const BODIES = [
   { id: 'solid', label: 'Solid', title: 'Flat ink silhouettes' },
+  { id: 'toon', label: 'Shaded', title: 'Lit from the hit and cut to two tones, inked outlines and folds' },
+  { id: 'lines', label: 'Lines', title: 'Line art: outlines, folds and hatched shadows' },
   { id: 'smear', label: 'Smear', title: 'Torn into streaks rushing out of the hit' },
-  { id: 'edges', label: 'Edges', title: 'Soft streaks off their edges, like pencil' },
   { id: 'rim', label: 'Rim lit', title: 'Dark, lit along the side facing the hit' },
-  { id: 'glow', label: 'Glow', title: 'Glowing streaky outlines, a colour each' },
 ];
+// The plain rigs (no avatar accessories) for the frame: kept between openings.
+const plainRigs = signal(true);
+// Pictures of your own (made elsewhere, say in Blender) in place of the drawn frames.
+const ownPictures = signal(null);
 // The preview is drawn smaller (it's redrawn as you change things); the
 // pictures that go to Roblox are drawn full size.
 const PREVIEW_WIDTH = 640;
@@ -181,8 +185,8 @@ const canvasBlob = (c) => new Promise((done) => c.toBlob(done, 'image/png'));
 export function ImpactDialog() {
   const where = at.value;
   const [data, setData] = useState(null);
-  const [preset, setPreset] = useState('smear');
-  const [opts, setOpts] = useState(() => optionsOf('smear'));
+  const [preset, setPreset] = useState('manga');
+  const [opts, setOpts] = useState(() => optionsOf('manga'));
   const [shape, setShape] = useState(SHAPES[S.aspect.peek()] ? S.aspect.peek() : '16:9');
   const [editing, setEditing] = useState(false);
   const [ids, setIds] = useState('');
@@ -213,7 +217,7 @@ export function ImpactDialog() {
   };
 
   // The characters as JJS's screen will have them at that moment.
-  const moment = (width) => S.sceneNow()?.silhouettes(where.t, { width, height: Math.round(width / SHAPES[shape]) });
+  const moment = (width) => S.sceneNow()?.silhouettes(where.t, { width, height: Math.round(width / SHAPES[shape]), plain: plainRigs.value });
   useEffect(() => {
     let gone = false;
     if (!S.sceneNow() || !where) return;
@@ -223,20 +227,53 @@ export function ImpactDialog() {
       gone = true;
       clearTimeout(timer);
     };
-  }, [where?.t, shape, pose.value]);
+  }, [where?.t, shape, pose.value, plainRigs.value]);
 
   // Redrawn a moment after the last change, not on every step of a slider.
-  const [frames, setFrames] = useState([]);
+  const [drawn, setFrames] = useState([]);
   useEffect(() => {
     if (!data) return;
     const timer = setTimeout(() => setFrames(drawFrames(opts, data)), 90);
     return () => clearTimeout(timer);
   }, [data, opts]);
+  // Your own pictures, when you've loaded some, are the frames.
+  const frames = ownPictures.value ?? drawn;
   /** The pictures at full size, for Roblox or a file. */
   const fullFrames = async () => {
+    if (ownPictures.value) return ownPictures.value;
     const d = await moment(FULL_WIDTH);
     return d ? drawFrames(opts, d) : frames;
   };
+
+  /** Saves the frame on show (or the first) as a PNG, full size. */
+  async function saveFrame() {
+    const full = await fullFrames();
+    const i = Math.max(0, flash);
+    const c = full[i] ?? full[0];
+    if (!c) return;
+    const saved = await saveBlob(await canvasBlob(c), `impact_frame_${i + 1}.png`, 'PNG picture');
+    if (saved) setNote(`Saved frame ${i + 1}.`);
+  }
+
+  /** Loads pictures of your own as the frames, fitted to the screen's shape. */
+  async function loadOwn(files) {
+    const list = [...(files ?? [])].filter((f) => f.type.startsWith('image/'));
+    if (!list.length) return;
+    const W = FULL_WIDTH;
+    const H = Math.round(W / SHAPES[shape]);
+    const canvases = [];
+    for (const f of list.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }))) {
+      const img = await createImageBitmap(f);
+      const c = Object.assign(document.createElement('canvas'), { width: W, height: H });
+      const g = c.getContext('2d');
+      // Covers the screen, as an Overlay does: cropped, never stretched.
+      const k = Math.max(W / img.width, H / img.height);
+      g.drawImage(img, (W - img.width * k) / 2, (H - img.height * k) / 2, img.width * k, img.height * k);
+      canvases.push(c);
+    }
+    ownPictures.value = canvases;
+    setNote(`Using ${canvases.length} picture${canvases.length === 1 ? '' : 's'} of your own as the frames.`);
+  }
   const camera = cameraAtTime(S.run.peek(), where?.t ?? 0);
   const big = useRef(null);
   useEffect(() => {
@@ -380,6 +417,24 @@ export function ImpactDialog() {
           >
             {pose.value ? 'Pose the fighters (posed)' : 'Pose the fighters'}
           </Button>
+          <label class="prop-row" title="Draw the plain R6 rigs, without your avatar’s accessories (hats, hair, gear)">
+            <span>Default dummy models</span>
+            <Switch checked={plainRigs.value} label="Default dummy models" onChange={(on) => (plainRigs.value = on)} />
+          </label>
+          <div class="prop-row">
+            <span>Your own pictures</span>
+            {ownPictures.value ? (
+              <Button variant="ghost" icon="x" onClick={() => ((ownPictures.value = null), setNote(null))}>
+                Back to the drawn frames
+              </Button>
+            ) : (
+              <label class="btn btn-ghost" title="Use pictures made elsewhere (Blender, Photoshop…) as the frames: one per frame, in name order">
+                <Icon name="upload" size={15} />
+                <span>Load pictures…</span>
+                <input type="file" accept="image/*" multiple class="sr-only" onChange={(e) => (loadOwn(e.currentTarget.files), (e.currentTarget.value = ''))} />
+              </label>
+            )}
+          </div>
           <div class="prop-row">
             <span>Who’s in it</span>
             <Segmented
@@ -420,10 +475,20 @@ export function ImpactDialog() {
           </button>
           {editing && (
             <div class="imp-edit">
-              <div class="prop-row">
+              <div class="prop-row imp-stack">
                 <span>Bodies</span>
                 <Segmented label="Bodies" options={BODIES} value={opts.body} onChange={(body) => set({ body })} />
               </div>
+              {(opts.body === 'toon' || opts.body === 'lines' || opts.body === 'smear') && (
+                <>
+                  {opts.body !== 'lines' && <Range label="Shadow" value={opts.cut ?? 45} min={0} max={100} unit="%" onChange={(cut) => set({ cut })} />}
+                  {opts.body === 'toon' && <Colour label="Lit side" value={opts.light ?? '#ffffff'} onChange={(light) => set({ light })} />}
+                  <Range label="Ink lines" value={opts.lineWeight ?? 3} min={0} max={14} unit="px" onChange={(lineWeight) => set({ lineWeight })} />
+                  <Range label="Folds" value={opts.creases ?? 60} min={0} max={100} onChange={(creases) => set({ creases })} />
+                  {opts.body === 'toon' && <Range label="Screentone" value={opts.tone ?? 0} min={0} max={16} unit="px" onChange={(tone) => set({ tone })} />}
+                  <Range label="Hatching" value={opts.hatch ?? 0} min={0} max={16} unit="px" onChange={(hatch) => set({ hatch })} />
+                </>
+              )}
               {(opts.body === 'smear' || opts.body === 'edges' || opts.body === 'glow') && (
                 <Range label="Smear length" value={opts.smear} min={0} max={150} unit="%" onChange={(smear) => set({ smear })} />
               )}
@@ -440,6 +505,7 @@ export function ImpactDialog() {
               <Range label="Streaks" value={opts.streaks} min={0} max={100} onChange={(streaks) => set({ streaks })} />
               <Range label="Flare" value={opts.flare} min={0} max={100} onChange={(flare) => set({ flare })} />
               <Range label="Zoom blur" value={opts.zoom} min={0} max={100} onChange={(zoom) => set({ zoom })} />
+              <Range label="Shockwave" value={opts.shock ?? 0} min={0} max={100} onChange={(shock) => set({ shock })} />
               <Range label="Ink levels" value={opts.posterize} min={0} max={6} onChange={(posterize) => set({ posterize })} />
               <Colour label="Background" value={opts.background} onChange={(background) => set({ background })} />
               <Colour
@@ -546,8 +612,11 @@ export function ImpactDialog() {
           />
           {note && <p class="hint">{note}</p>}
           <div class="modal-actions">
-            <Button variant="ghost" icon="download" disabled={!frames.length} onClick={savePictures}>
-              Save pictures
+            <Button variant="ghost" icon="download" disabled={!frames.length} onClick={saveFrame} title="The frame on show, as a PNG">
+              Download frame
+            </Button>
+            <Button variant="ghost" icon="download" disabled={!frames.length} onClick={savePictures} title="Every frame, in a zip">
+              All frames
             </Button>
             <span class="spacer" />
             {typed.length === frames.length && frames.length > 0 ? (

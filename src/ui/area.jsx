@@ -18,7 +18,7 @@ export function Area({ name, icon, title, tools, children, class: className = ''
       <header class={`area-head ${dock ? 'is-draggable' : ''}`} onPointerDown={dock?.startDrag}>
         <span class="area-title" title={dock ? 'Drag to dock this panel somewhere else' : undefined}>
           {icon && <Icon name={icon} size={14} />}
-          {title}
+          <span class="area-title-text">{title}</span>
         </span>
         {tools}
         {dock && (

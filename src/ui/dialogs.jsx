@@ -15,6 +15,7 @@ import {
 } from '../platform.js';
 import { ACTIONS, GROUPS, LAYOUTS, bindingOf, clashesOf, comboOf, custom, defaultOf, layout, layoutChosen, rebind, resetBinds, setLayout } from '../keybinds.js';
 import { appearance, BACKGROUNDS, setAppearance } from '../prefs.js';
+import { CUSTOM_KEYS, THEMES, loadThemeJson, setCustom, setTheme, themeJson, tokenNow } from '../theme.js';
 import { openUpdates, setUpdatePrefs, updatePrefs } from '../updates.js';
 import { startTour } from '../onboarding.js';
 import { saveLayout, savedLayouts } from './dock.jsx';
@@ -183,6 +184,7 @@ const SETTINGS_TABS = [
   { id: 'look', label: 'Appearance' },
   { id: 'ai', label: 'AI' },
   { id: 'roblox', label: 'Roblox' },
+  { id: 'plugins', label: 'Plugins' },
   { id: 'updates', label: 'Updates' },
 ];
 
@@ -269,11 +271,93 @@ function KeybindsSettings() {
   );
 }
 
+// Themes: the presets as cards (a little window in each one's colours),
+// and the custom theme's colours over its preset.
+function ThemePicker() {
+  const a = appearance.value;
+  const current = a.theme ?? 'dark';
+  const custom = a.customTheme;
+  const [note, setNote] = useState(null);
+  return (
+    <section class="theme-picker" aria-label="Theme">
+      <h4 class="section-title">Theme</h4>
+      <div class="theme-cards" role="radiogroup" aria-label="Theme">
+        {THEMES.map((t) => (
+          <button type="button" role="radio" aria-checked={current === t.id} key={t.id} class="theme-card" title={t.hint} onClick={() => setTheme(t.id)}>
+            <span class="theme-swatch" style={{ background: t.tokens['--ground'] ?? t.grey(4), borderColor: t.grey(21) }}>
+              <span style={{ background: t.tokens['--panel'] ?? t.grey(13) }} />
+              <span style={{ background: t.tokens['--area'] ?? t.grey(9) }}>
+                <i style={{ background: t.tokens['--text'] ?? t.grey(89) }} />
+                <i style={{ background: t.tokens['--play'] ?? '#c8f542' }} />
+              </span>
+            </span>
+            <strong>{t.label}</strong>
+          </button>
+        ))}
+        <button type="button" role="radio" aria-checked={current === 'custom'} class="theme-card" title="A preset with colours of your own" onClick={() => setCustom({})}>
+          <span class="theme-swatch is-custom">
+            <Icon name="sliders" size={18} />
+          </span>
+          <strong>Custom</strong>
+        </button>
+      </div>
+      {current === 'custom' && (
+        <div class="theme-custom">
+          <label class="prop-row">
+            <span>Starts from</span>
+            <select class="input" value={custom?.base ?? 'dark'} onChange={(e) => setCustom({ base: e.currentTarget.value })}>
+              {THEMES.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          {CUSTOM_KEYS.map(([name, label]) => (
+            <label class="prop-row" key={name}>
+              <span>{label}</span>
+              <span class="theme-colour">
+                <input type="color" value={custom?.tokens?.[name] ?? tokenNow(name)} aria-label={label} onInput={(e) => setCustom({ tokens: { [name]: e.currentTarget.value } })} />
+                {custom?.tokens?.[name] && (
+                  <IconButton icon="undo" size={12} label={`${label}: the preset's again`} onClick={() => setCustom({ tokens: { [name]: '' } })} />
+                )}
+              </span>
+            </label>
+          ))}
+          <div class="modal-actions">
+            <Button
+              icon="copy"
+              onClick={() => navigator.clipboard.writeText(themeJson()).then(() => setNote('Copied: paste it on another PC with “Paste a theme”.'))}
+            >
+              Copy theme
+            </Button>
+            <Button
+              icon="paste"
+              onClick={async () => {
+                try {
+                  loadThemeJson(await navigator.clipboard.readText());
+                  setNote('Theme pasted.');
+                } catch (e) {
+                  setNote(String(e?.message ?? e));
+                }
+              }}
+            >
+              Paste a theme
+            </Button>
+          </div>
+          {note && <p class="hint">{note}</p>}
+        </div>
+      )}
+    </section>
+  );
+}
+
 function AppearanceSettings() {
   const a = appearance.value;
   const [onLaunch, setOnLaunch] = useState(S.startOnLaunch());
   return (
     <>
+      <ThemePicker />
       <div class="prop-row">
         <span>Start screen on launch</span>
         <Switch
@@ -350,6 +434,156 @@ function LocalAi() {
   );
 }
 
+// Memories: on or off, and what's in them, to read and delete.
+function MemorySettings() {
+  const [mem, setMem] = useState(null);
+  const [list, setList] = useState({ notes: [], movesets: [] });
+  const [note, setNote] = useState(null);
+  useEffect(() => {
+    import('../ai/memory.js').then(setMem);
+  }, []);
+  const version = mem?.memoryVersion.value;
+  useEffect(() => {
+    if (!mem) return;
+    Promise.all([mem.listNotes(), mem.listMovesets()]).then(([notes, movesets]) => setList({ notes, movesets }));
+  }, [mem, version]);
+  if (!mem) return null;
+  const on = mem.memoryOn.value;
+  return (
+    <>
+      <h3 class="section-title">Memories</h3>
+      <label class="prop-row">
+        <span>Let the AI remember</span>
+        <Switch checked={on} label="Let the AI remember" onChange={(v) => mem.setMemoryOn(v)} />
+      </label>
+      <p class="hint">
+        The AI keeps short notes on what it learns here (your preferences, JJS rules it finds out, what worked) and movesets you
+        ask it to remember, with their style, to build like them again. It reads them at the start of a conversation: the
+        assistant here and AI apps connected through MCP alike. Kept on this PC only.
+      </p>
+      {on && (
+        <>
+          <div class="modal-actions">
+            <Button
+              icon="save"
+              onClick={() =>
+                mem
+                  .rememberMoveset({})
+                  .then((r) => setNote(`Remembered “${r.name}”: ${r.profile.summary}`))
+                  .catch((e) => setNote(String(e?.message ?? e)))
+              }
+            >
+              Remember the open moveset
+            </Button>
+            <span class="spacer" />
+            {(list.notes.length > 0 || list.movesets.length > 0) && (
+              <Button variant="ghost" icon="trash-2" class="danger" onClick={() => mem.clearMemories().then(() => setNote('Everything forgotten.'))}>
+                Forget everything
+              </Button>
+            )}
+          </div>
+          {note && <p class="hint">{note}</p>}
+          <ul class="memory-list">
+            {list.movesets.map((m) => (
+              <li key={m.id}>
+                <Icon name="layers" size={13} />
+                <span>
+                  <strong>{m.name}</strong>
+                  <small>{m.summary}</small>
+                </span>
+                <IconButton icon="trash-2" size={12} label={`Forget ${m.name}`} onClick={() => mem.forget(m.id)} />
+              </li>
+            ))}
+            {list.notes.map((n) => (
+              <li key={n.id}>
+                <span class="memory-kind">{n.kind}</span>
+                <span>{n.text}</span>
+                <IconButton icon="trash-2" size={12} label="Forget this" onClick={() => mem.forget(n.id)} />
+              </li>
+            ))}
+            {!list.notes.length && !list.movesets.length && <li class="empty">Nothing yet: the AI adds to this as you work together.</li>}
+          </ul>
+        </>
+      )}
+    </>
+  );
+}
+
+// Whether AIs may upload what they make (meters, pictures, sounds, models) to the user's Roblox account.
+function AiUploadSetting() {
+  const [kit, setKit] = useState(null);
+  const [on, setOn] = useState(false);
+  useEffect(() => {
+    import('../ai/media.js').then((m) => (setKit(m), setOn(m.uploadsAllowed())));
+  }, []);
+  if (!kit) return null;
+  return (
+    <>
+      <h3 class="section-title">Uploads</h3>
+      <label class="prop-row">
+        <span>Let AIs upload to my Roblox account</span>
+        <Switch checked={on} label="Let AIs upload to my Roblox account" onChange={(v) => (kit.allowUploads(v), setOn(v))} />
+      </label>
+      <p class="hint">
+        So an AI can put what it makes into your skills: a meter’s pictures, and pictures, sounds and 3D models it made (checked
+        first: PNGs up to 1024 px, sounds up to 7 minutes, models up to 20,000 triangles). They go to the Roblox account you’re
+        signed in with. Off, it hands you the files instead.
+      </p>
+    </>
+  );
+}
+
+// Plugins (mods): src/plugins.js loads them; docs/PLUGINS.md is the creators' guide.
+function PluginSettings() {
+  const [kit, setKit] = useState(null);
+  const [folder, setFolder] = useState(null);
+  useEffect(() => {
+    import('../plugins.js').then((m) => (setKit(m), m.pluginsFolder().then(setFolder, () => {})));
+  }, []);
+  if (!isDesktop) return <p class="hint">Plugins run in the desktop app.</p>;
+  if (!kit) return null;
+  const list = kit.plugins.value;
+  const busy = kit.pluginsLoading.value;
+  return (
+    <>
+      <h3 class="section-title">Plugins</h3>
+      <p class="hint">
+        Plugins add commands, keybinds, linter rules, AI tools and Meter Maker examples. Each is a folder in the plugins folder
+        with a plugin.json and a main.js. A plugin runs with the same access as the app, so only add ones you trust.
+      </p>
+      <div class="modal-actions">
+        <Button icon="folder" onClick={() => kit.openPluginsFolder()}>
+          Open the plugins folder
+        </Button>
+        <Button variant="ghost" icon="refresh" disabled={busy} onClick={() => kit.loadPlugins()}>
+          {busy ? 'Loading…' : 'Reload plugins'}
+        </Button>
+        <span class="spacer" />
+        <Button variant="ghost" icon="help" onClick={() => ((S.manualSection.value = 'Plugins'), (S.dialog.value = 'manual'))}>
+          Making plugins
+        </Button>
+      </div>
+      {folder && <p class="hint mono-path">{folder}</p>}
+      <ul class="memory-list plugin-list">
+        {list.map((p) => (
+          <li key={p.id} class={p.state === 'error' ? 'is-error' : ''}>
+            <Icon name="puzzle" size={13} />
+            <span>
+              <strong>
+                {p.name}
+                {p.version && <small class="plugin-version"> {p.version}</small>}
+              </strong>
+              <small>{p.state === 'error' ? p.error : p.description || (p.author ? `By ${p.author}` : p.folder)}</small>
+            </span>
+            <Switch checked={p.enabled} label={`${p.enabled ? 'Turn off' : 'Turn on'} ${p.name}`} onChange={(v) => kit.setPluginEnabled(p.id, v)} />
+          </li>
+        ))}
+        {!list.length && <li class="empty">No plugins yet. Put one’s folder in the plugins folder, then Reload.</li>}
+      </ul>
+    </>
+  );
+}
+
 function AiSettings() {
   return (
     <>
@@ -372,6 +606,8 @@ function AiSettings() {
           Open the assistant ({bindingOf('assistant')})
         </Button>
       </div>
+      <MemorySettings />
+      <AiUploadSetting />
       <h3 class="section-title">AI apps and editors (MCP)</h3>
       <p class="hint">
         Claude Desktop, Claude Code, Cursor, VS Code, Windsurf, Codex, Gemini CLI, LM Studio: pick yours and Arayashiki adds
@@ -525,6 +761,8 @@ function SettingsDialog() {
           <AiSettings />
         ) : tab === 'updates' ? (
           <UpdatesSettings />
+        ) : tab === 'plugins' ? (
+          <PluginSettings />
         ) : (
           <RobloxSettings />
         )}

@@ -275,6 +275,24 @@ Follow on, the skill's own camera on, the Auto camera's defaults, and the view
 framed on your character again. Recorded camera keys stay (**Clear camera
 keys** removes them).
 
+## Problems (the linter)
+
+The **Problems** tab (beside Timeline and Log, or <kbd>Ctrl+Shift+L</kbd>)
+checks the moveset as you edit it, the way a code editor's linter does:
+
+- **Errors**: what breaks (a branch target that doesn't exist, a value JJS
+  won't take).
+- **Warnings**: what's probably not meant (a branch nothing runs, two skills
+  on one key, a hitbox with no damage or stun, a wait that never ends, a
+  cancel that cancels nothing).
+- **Info** and **Tips**: fields a node doesn't read, a move with no cooldown,
+  and suggestions.
+
+The quick checks run a moment after each change. **Check with the
+simulator** also runs every skill: combos the dummy escapes, endless loops,
+cameras that overlap. Click a problem to open its skill, branch and node, or
+turn its rule off. Plugins can add rules of their own.
+
 ## Exporting: code, videos and pictures
 
 Everything that leaves the app goes through one window: **Export…** at the
@@ -530,22 +548,32 @@ camera, and styled by a **look**. Everything is drawn from the hit outward,
 the way an animator draws one: focus lines rushing in, bodies smeared into
 streaks, light bursting out.
 
-- **Presets**: **Ink smear** (manga ink: bodies torn into streaks rushing out
-  of the hit, heavy focus lines), **Graphite** (soft pencil streaks off the
-  bodies' edges, a white-hot core), **Zoom ink** (everything blown outward in a
-  zoom blur and cut into grey ink), **Neon streak** (glowing streaky outlines
-  on black, a colour each), **Crimson rim** (dark bodies rim-lit by a white
-  flare on red), **Black flash** (black and red sparks, inverted between
-  frames), **Screentone** (a manga page), and the plain **Basic**, **Negative**
-  and **Flicker**.
+- **Presets**: **Manga ink** (shaded from the hit and cut to ink and paper,
+  inked outlines and folds, screentone, focus lines), **Flash invert** (black,
+  only the sides facing the hit lit, strobing inverted), **Zoom ink**
+  (everything blown outward in a zoom blur and cut into grey ink), **Ink
+  smear** (shadows torn into streaks rushing out of the hit), **Crimson** (red
+  and streaked against a flare), **Black flash** (black and red, sparks
+  cracking out, inverted between frames), **Shockwave** (a ring of force
+  bending the picture round the hit), **Sketch ink** (pen on paper, hatched
+  shadows), and the plain **Basic**, **Negative** and **Flicker**.
+- **Default dummy models** (on unless you turn it off): the plain R6 rigs,
+  without your avatar's hats, hair and gear.
+- **Your own pictures**: **Load pictures…** uses impact frame pictures you
+  made yourself instead of drawing them; they're uploaded and inserted the
+  same way.
 - **Who's in it**: both of you, only you, only the enemy, or nobody.
 - **Frames** and **Each for**: several frames one after another make it hit
   harder. Each frame draws its lines anew, so they flicker the way drawn ones
   do.
 - **Screen shape**: the shape of the screen it's drawn for (16:9 for most).
 - **Shuffle** draws another take; **Flash it** previews it at speed.
-- **Edit the look**: the **Bodies** (Solid, Smear, Edges, Rim lit, Glow), how
-  far a smear trails and how torn up it is, **focus lines** (how many, how
+- **Edit the look**: the **Bodies** (**Solid** silhouettes; **Shaded**: lit
+  from the hit and cut to two tones, with inked outlines and folds; **Lines**:
+  line art with hatched shadows; **Smear**; **Rim lit**), where the light
+  falls and where it cuts to shadow, the ink lines' width, folds, hatching and
+  tone in the shadows, how far a smear trails and how torn up it is, a
+  **shockwave**, **focus lines** (how many, how
   wide, how much clear space round the hit), **streaks** over the background,
   a **flare** at the hit, a **zoom blur**, **ink levels** (cut to a few greys),
   the colours (and a gradient out from the hit), an outline, screentone,
@@ -569,7 +597,8 @@ the viewport so you can pose both rigs by hand, as in Blender:
   kept while the app is open, and the frames are drawn with it. Closing the
   dialog puts the rigs back as the skill has them.
 
-**Upload and insert** (signed in with Roblox) uploads the frames and puts
+**Download frame** saves the picture of the frame on show, **All frames**
+every one. **Upload and insert** (signed in with Roblox) uploads the frames and puts
 them in the open branch at that moment, after the nodes already there: an
 **Overlay** VISUAL each, for its frame's time, splitting WAITs to fit. Or
 **Save pictures**, upload them yourself, paste their image IDs and **Insert
@@ -597,7 +626,10 @@ form, preview it, and add the skills to your moveset.
 The **auto-sheathing weapon** has a 3D preview: an R6 body wearing the weapon
 (and its scabbard) where the skill puts them, **Sheathed**, **Drawn**, or
 **Both** (the drawn one see-through), so you can check a position or rotation
-before it goes into JJS. Drag to look around.
+before it goes into JJS. Drag to look around. Click the weapon or the
+scabbard and drag its arrows to move it, or switch to **Turn** (or press
+<kbd>G</kbd> to move, <kbd>R</kbd> to turn) and drag its rings, as in
+Blender: the form's position and rotation follow.
 
 ## The Meter Maker
 
@@ -606,14 +638,40 @@ value, like a resource or a charge), uploads the pictures to Roblox on your
 account, and makes the JJS skill that shows the right picture for the value.
 
 1. **New** asks how many steps; start from a bar, a ring, or blank.
-2. Draw it with layers: shapes and meters (<kbd>U</kbd>), the brush
-   (<kbd>B</kbd>), text (<kbd>T</kbd>), and pictures. <kbd>Space</kbd> plays it
-   through its steps.
+2. Draw it with layers: meters (<kbd>M</kbd>: a bar, a ring or text that
+   fills), shapes (<kbd>U</kbd>: rectangles, ellipses, polygons with any
+   number of sides, stars with any number of points, and a library of custom
+   shapes: heart, arrow, chevron, lightning, shield, flame, kunai and more),
+   the pen (<kbd>P</kbd>), the brush (<kbd>B</kbd>), text (<kbd>T</kbd>), and
+   pictures. <kbd>Space</kbd> plays it through its steps.
 3. **Export** saves the pictures, or uploads them to Roblox and makes the
    skill, ready to add to your moveset or copy into JJS.
 
 Designs are saved inside the app (**Save**), or as `.meter.json` files to
 share (**Save As**). **Settings** is in the Meter Maker's top bar too.
+**New** also offers examples to start from (a health bar, cursed energy,
+black flash, a manga panel, a ring, a gauge, a charge, a boss bar, a domain,
+a signal meter, chevrons, retro), between them using every feature.
+
+**The pen.** Click to place corners, drag to pull out a curve; click the
+first point (or press <kbd>Enter</kbd>) to close the shape, <kbd>Backspace</kbd>
+takes the last point back and <kbd>Esc</kbd> drops it. The finished path is a
+shape layer like any other.
+
+**Getting around.** Drag with the middle mouse button to pan;
+<kbd>Ctrl</kbd>+wheel zooms. Click the number next to any slider to type a
+value.
+
+**Changing a meter's shape** (Shape tab: Bar, Ring, Text, Picture) keeps its
+fill, track, stroke, segments and effects. Rings can taper; rings, text and
+pictures can slant.
+
+**Right-click** for a menu of what's under the pointer, as in Photoshop: on a
+layer, its properties and effects, duplicate, hide, clipping mask,
+**Arrange**, **Align to the picture**, **Transform**, **Convert to**, copy,
+paste and clear its **layer style**, delete; on the empty canvas, new layers
+and the view; on a guide, remove it; on a step, its own menu; on a tool, the
+tools.
 
 **Rulers, guides and snapping.** Rulers run along the top and left of the
 picture in its pixels (<kbd>Ctrl+R</kbd> shows or hides them), with a mark
@@ -739,6 +797,8 @@ open when you click outside it: Esc or its × closes it):
   settings, Follow, hitboxes, pictures and videos, and a new camera animation;
 - the **timeline**: play and the speeds;
 - a **text field**: cut, copy, paste, select all;
+- in the **Meter Maker**: a layer, the canvas, a guide, a step or a tool, each
+  with its own menu (see the Meter Maker);
 - anywhere else: search, undo, save, export, the panel layout, settings,
   this manual.
 
@@ -783,6 +843,29 @@ Then ask: "what does this skill do?", "why doesn't my M1 hit?", "make a dash
 that launches the dummy upward", "film this at quarter speed with a
 transparent background". Click a tool line in the chat to see exactly what it
 did.
+
+**Under the message box**: the model (click it to switch to any model of any
+AI you've set up), how hard it thinks (for models that can: from off up to
+high, or max for Claude Opus; more is slower and costs more), and the mode:
+
+- **Autopilot**: the assistant works on its own.
+- **Manual**: it asks before each change it makes (a node, a skill, a meter,
+  an upload). Reading, simulating and screenshots never ask.
+
+**Meters, pictures, sounds and models.** The assistant can make a meter in
+the Meter Maker for a move that needs one, and look at what it made. Pictures,
+sounds and 3D models it makes are checked against what Roblox takes and shown
+to it; with **Let AIs upload to my Roblox account** on (Settings → AI), it
+can upload them when you ask and put their IDs in your skills.
+
+**Memories** (Settings → AI → **Let the AI remember**, off until you turn it
+on): the AI keeps short notes on what it learns (your preferences, JJS rules
+it finds out, what worked), and movesets you ask it to remember (or
+**Remember the open moveset**), with their style: damage, stun, timings,
+effects, names. It reads them at the start of a conversation, here and in AI
+apps connected through MCP, and builds like your movesets do. They stay on
+this PC; Settings → AI lists them, with a bin to forget one, or **Forget
+everything**.
 
 ### Free models on this PC
 
@@ -839,22 +922,45 @@ way: use the assistant inside the app with an OpenAI key instead.
 For anything else that speaks MCP, the wizard's **Other** page gives the
 command (`arayashiki.exe --mcp`) and a JSON snippet.
 
+## Plugins
+
+Plugins (mods) add to Arayashiki: commands you can search for and give a key,
+rules for the linter, tools for the assistant and AI apps, and examples for
+the Meter Maker.
+
+To add one, open **Settings → Plugins → Open the plugins folder**, put the
+plugin's folder in it (a folder with a `plugin.json` and a `main.js`), and
+press **Reload plugins**. Each plugin has a switch to turn it off; one that
+fails to load says why. Its commands are in the search (Ctrl+Space) and under
+**Plugins** in Settings → Keybinds.
+
+A plugin runs with the same access as the app, like any program you run:
+only add plugins you trust.
+
+**Making plugins**: the guide is `docs\PLUGINS.md` in the install folder
+(`%LOCALAPPDATA%\Arayashiki`), with a working example plugin in
+`docs\plugins\example` to copy.
+
 ## Settings
 
-Settings (search for it) has five tabs:
+Settings (search for it) has six tabs:
 
 - **Keybinds** (<kbd>Ctrl+/</kbd>): your **keyboard layout** (the defaults
   follow it: flying is ZQSD on AZERTY, `, A O E` on Dvorak), and every
   command's shortcut, grouped as in this manual. Click one and press the new
   keys, or clear it (×); the undo arrow puts its default back. Two shortcuts
   heard in the same place are marked as a clash.
-- **Appearance**: the start screen on launch, the interface size, the
-  viewport's background, hitboxes.
+- **Appearance**: the **theme** (Dark, Light, Midnight, Black, Warm, High
+  contrast, or **Custom**: pick your own colours, and save or load them as a
+  file), the start screen on launch, the interface size, the viewport's
+  background, hitboxes. Search "theme" to switch from anywhere.
 - **AI**: the assistant, the free models on this PC (download and pick one
-  here too), and connecting AI apps.
+  here too), memories, AI uploads, and connecting AI apps.
 - **Roblox**: the index of Roblox's own cache on your PC (assets come from
   there when Roblox already downloaded them), and deleting what Arayashiki
   downloaded.
+- **Plugins**: the plugins you've added, each with a switch, the plugins
+  folder, and **Reload plugins** (see Plugins).
 - **Updates**: the version you have, checking for a newer one, whether to
   check at launch and to download updates by themselves, taking the quick
   tour again, and what's new.

@@ -51,12 +51,14 @@
   --play-ink: #151a05;
   --hit: #ff5c5f;
   --hit-soft: rgb(255 92 95 / 14%);
+  --hit-text: color-mix(in srgb, var(--hit) 72%, white); /* errors in text */
 
   /* Who acted. */
   --you: #5aa9ff;
   --dummy: #f0a44b;
 
   --warn: #d9b36a;
+  --warn-soft: color-mix(in srgb, var(--warn) 16%, transparent);
   --focus: #9a9a9a;
   --scrim: rgb(0 0 0 / 55%);
   --kind-chip-ink: #111111;
@@ -64,6 +66,57 @@
   /* Names the frame meter reads. */
   --bg-1: var(--area);
   --line-accent: var(--play);
+
+
+  /* The grey ramp (theme.js reshapes it per theme): every grey the styles
+     use, named by its lightness in %. */
+  --g3: #070707;
+  --g5: #0c0c0c;
+  --g7: #111111;
+  --g8: #151515;
+  --g10: #1a1a1a;
+  --g11: #1c1c1c;
+  --g13: #202020;
+  --g14: #232323;
+  --g15: #262626;
+  --g16: #2a2a2a;
+  --g17: #2c2c2c;
+  --g18: #2e2e2e;
+  --g19: #303030;
+  --g20: #333333;
+  --g21: #363636;
+  --g22: #383838;
+  --g23: #3a3a3a;
+  --g24: #3d3d3d;
+  --g27: #454545;
+  --g28: #474747;
+  --g29: #4a4a4a;
+  --g33: #555555;
+  --g35: #5a5a5a;
+  --g36: #5c5c5c;
+  --g37: #5e5e5e;
+  --g42: #6a6a6a;
+  --g43: #6e6e6e;
+  --g44: #6f6f6f;
+  --g48: #7a7a7a;
+  --g54: #8a8a8a;
+  --g56: #909090;
+  --g60: #9a9a9a;
+  --g63: #a0a0a0;
+  --g67: #aaaaaa;
+  --g73: #bbbbbb;
+  --g81: #cfcfcf;
+  --g84: #d6d6d6;
+  --g85: #d8d8d8;
+  --g89: #e2e2e2;
+  --g90: #e6e6e6;
+  --g91: #e8e8e8;
+  --g95: #f2f2f2;
+  --g100: #ffffff;
+  /* White and near-black, for overlays and scrims that follow the theme. */
+  --fg-rgb: 255 255 255;
+  --fg-rgb-c: 255, 255, 255;
+  --bg-rgb: 10 10 10;
 
   color-scheme: dark;
 }

@@ -16,8 +16,10 @@ import {
   frameName,
   hasPart,
   separateParts,
+  CUSTOM_SHAPES,
   newBar,
   newDoc,
+  newFx,
   newImage,
   newJjs,
   newPaint,
@@ -72,11 +74,19 @@ function makeShape(kind, box) {
   if (kind === 'textbar') return newBar({ ...box, name: 'Text', shape: 'text', direction: 'ltr' });
   if (kind === 'bar') return newBar(shaped(kind, box));
   if (kind === 'ring') return newRing(shaped(kind, box));
+  if (kind === 'polygon') return newShape('polygon', { ...box, sides: polySides.peek() });
+  if (kind === 'star') return newShape('star', { ...box, points: starPoints.peek() });
+  if (kind === 'custom') {
+    const c = CUSTOM_SHAPES.find((x) => x.id === customShape.peek()) ?? CUSTOM_SHAPES[0];
+    return newShape('path', { ...box, d: c.d, name: c.label });
+  }
   return newShape(kind, box);
 }
 
 // A click without a drag gets a shape this big, centred on the click.
-const CLICK_SIZES = { bar: [800, 100], ring: [600, 600], textbar: [600, 300] };
+const CLICK_SIZES = { bar: [800, 100], ring: [600, 600], textbar: [600, 300], polygon: [300, 300], star: [300, 300], custom: [300, 300] };
+// Shapes that start out square (Shift squares any of them).
+const SQUARE = new Set(['ring', 'polygon', 'star']);
 
 function startingDoc() {
   const doc = newDoc();
@@ -93,7 +103,14 @@ export const selectedId = signal(doc.value.layers[0]?.id ?? null);
 export const frame = signal(13);
 export const tool = signal('move');
 export const brushSize = signal(24);
-export const shapeKind = signal('bar');
+// The bar tool draws meters (a bar, a ring, a text bar); the shape tool
+// draws shapes (a rectangle… a polygon, a star, a custom shape); the pen
+// draws a path point by point.
+export const barKind = signal('bar');
+export const shapeKind = signal('rect');
+export const customShape = signal('heart');
+export const polySides = signal(6);
+export const starPoints = signal(5);
 export const brushColor = signal('#FFFFFF');
 export const brushAlpha = signal(100);
 export const past = signal([]);
@@ -303,6 +320,29 @@ function drawSelection() {
       ctx.stroke();
     };
     if (rulers.value) for (const g of doc.value.guides ?? []) line(g, 'rgba(54,197,240,0.85)');
+    // The pen's path so far, its points, and the line to the pointer.
+    const pts = penPoints.value;
+    if (pts.length && tool.value === 'pen') {
+      const live = pointerAt.value && !penDrag ? [...pts, { x: pointerAt.value.x, y: pointerAt.value.y, out: null }] : pts;
+      ctx.save();
+      ctx.lineWidth = 1.5 * k;
+      ctx.strokeStyle = '#f2f2f2';
+      ctx.setLineDash([]);
+      ctx.stroke(new Path2D(penPathData(live, false)));
+      for (const [i, q] of pts.entries()) {
+        const s = (i === 0 ? 9 : 7) * k;
+        ctx.fillStyle = i === 0 ? '#36c5f0' : '#1c1c1c';
+        ctx.fillRect(q.x - s / 2, q.y - s / 2, s, s);
+        ctx.strokeRect(q.x - s / 2, q.y - s / 2, s, s);
+        if (q.out) {
+          ctx.beginPath();
+          ctx.moveTo(q.x - q.out[0], q.y - q.out[1]);
+          ctx.lineTo(q.x + q.out[0], q.y + q.out[1]);
+          ctx.stroke();
+        }
+      }
+      ctx.restore();
+    }
     if (guideDraft) line(guideDraft, '#36c5f0');
     for (const g of snapLines) line(g, '#ff3df2');
   }
@@ -655,6 +695,8 @@ export function docField(path, event) {
   change(setIn(doc.value, path, value), `doc:${path}`);
 }
 
+/** The doc with one setting changed (for the menus): `change(setInDoc('background.on', true))`. */
+export const setInDoc = (path, value) => setIn(doc.value, path, value);
 export const setBackground = (hex) => change(setIn(doc.value, 'background.color', hex), 'doc:background');
 
 export function matchSteps() {
@@ -676,6 +718,14 @@ export const addDrawing = () => addLayer(newPaint());
 export function pickShapeKind(id) {
   shapeKind.value = id;
   pickTool('shape');
+}
+export function pickBarKind(id) {
+  barKind.value = id;
+  pickTool('bar');
+}
+export function pickCustomShape(id) {
+  customShape.value = id;
+  pickShapeKind('custom');
 }
 
 const readAsDataUrl = (file) =>
@@ -751,6 +801,122 @@ export function deleteLayer() {
   draw();
 }
 
+// ─── For the right-click menu (src/ui/context-menu.jsx) ──────────────────
+
+/** The point on the picture under a screen point, or null off it. */
+export function docAt(clientX, clientY) {
+  if (!overlay) return null;
+  const p = toDoc({ clientX, clientY });
+  return p.x >= 0 && p.y >= 0 && p.x <= doc.value.width && p.y <= doc.value.height ? p : null;
+}
+
+/** Every layer under a screen point, topmost first (as Photoshop's "Select layer" lists them). */
+export function layersAt(clientX, clientY) {
+  const p = docAt(clientX, clientY);
+  if (!p) return [];
+  return doc.value.layers
+    .filter((l) => {
+      if (!l.visible) return false;
+      if (l.type === 'paint') return true;
+      const q = local(l, p);
+      return Math.abs(q.x) <= l.w / 2 && Math.abs(q.y) <= l.h / 2;
+    })
+    .reverse();
+}
+
+/** The guide under a screen point (its index), or -1. */
+export function guideIndexAt(clientX, clientY) {
+  return overlay ? guideAt(toDoc({ clientX, clientY })) : -1;
+}
+
+export function deleteGuide(index) {
+  change({ ...doc.value, guides: (doc.value.guides ?? []).filter((_, i) => i !== index) });
+}
+
+/** The picked layer to the top ('front') or bottom ('back') of the stack. */
+export function arrange(where) {
+  const i = indexOf(selectedId.value);
+  if (i < 0) return;
+  const layers = [...doc.value.layers];
+  const [layer] = layers.splice(i, 1);
+  if (where === 'front') layers.push(layer);
+  else layers.unshift(layer);
+  change({ ...doc.value, layers });
+}
+
+/** Lines the picked layer up with the picture: 'left', 'hcenter', 'right', 'top', 'vcenter', 'bottom'. */
+export function alignSelected(how) {
+  const layer = selected.value;
+  if (!layer || layer.type === 'paint') return;
+  const { width: W, height: H } = doc.value;
+  const patch = {
+    left: { x: 0 },
+    hcenter: { x: Math.round((W - layer.w) / 2) },
+    right: { x: W - layer.w },
+    top: { y: 0 },
+    vcenter: { y: Math.round((H - layer.h) / 2) },
+    bottom: { y: H - layer.h },
+  }[how];
+  if (patch) change(patchLayer(layer.id, patch));
+}
+
+/** The picked layer stretched (or fitted, keeping its shape) to the whole picture. */
+export function fitSelected(keepShape = true) {
+  const layer = selected.value;
+  if (!layer || layer.type === 'paint') return;
+  const { width: W, height: H } = doc.value;
+  let w = W;
+  let h = H;
+  if (keepShape && layer.w && layer.h) {
+    const k = Math.min(W / layer.w, H / layer.h);
+    w = Math.round(layer.w * k);
+    h = Math.round(layer.h * k);
+  }
+  change(patchLayer(layer.id, { x: Math.round((W - w) / 2), y: Math.round((H - h) / 2), w, h }));
+}
+
+// A layer's style (its effects, opacity and blend), as Photoshop's Copy /
+// Paste Layer Style: kept here, put onto any other layer.
+export const copiedStyle = signal(null);
+export function copyStyle() {
+  const layer = selected.value;
+  if (layer) copiedStyle.value = structuredClone({ fx: layer.fx, opacity: layer.opacity, blend: layer.blend });
+}
+export function pasteStyle() {
+  const layer = selected.value;
+  if (layer && copiedStyle.value) change(patchLayer(layer.id, structuredClone(copiedStyle.value)));
+}
+export function clearStyle() {
+  const layer = selected.value;
+  if (layer) change(patchLayer(layer.id, { fx: newFx(), opacity: 100, blend: 'source-over' }));
+}
+
+/** A new layer of `kind` (a meter, a shape, text, a drawing) centred where the menu opened, or mid-picture. */
+export function addAt(kind, point) {
+  const p = point ?? { x: doc.value.width / 2, y: doc.value.height / 2 };
+  if (kind === 'text') {
+    const h = Math.round(doc.value.height * 0.14);
+    const w = Math.round(doc.value.width * 0.6);
+    return addLayer(newText({ x: Math.round(p.x - w / 2), y: Math.round(p.y - h / 2), w, h, size: Math.round(h * 0.75) }));
+  }
+  if (kind === 'paint') return addDrawing();
+  const [w, h] = CLICK_SIZES[kind] ?? [300, 200];
+  addLayer(makeShape(kind, shaped(kind, { x: Math.round(p.x - w / 2), y: Math.round(p.y - h / 2), w, h })));
+}
+
+/** Turns a bar layer into another kind of bar, keeping all its settings (they apply to every kind they can). */
+export function convertBar(shape) {
+  const layer = selected.value;
+  if (layer?.type !== 'bar') return;
+  const patch = { shape };
+  // A ring is round: give it a square box the first time, round its band.
+  if (shape === 'ring' && layer.w !== layer.h) {
+    const side = Math.min(layer.w, layer.h) > 40 ? Math.max(layer.w, layer.h) * 0.6 : Math.max(layer.w, layer.h);
+    Object.assign(patch, { x: Math.round(layer.x + (layer.w - side) / 2), y: Math.round(layer.y + (layer.h - side) / 2), w: Math.round(side), h: Math.round(side) });
+  }
+  change(patchLayer(layer.id, patch));
+}
+
 // ─── New, open, save ────────────────────────────────────────────────────
 
 export function openDialog(name) {
@@ -785,6 +951,22 @@ export function createNew() {
 }
 
 export const useExample = (example) => replaceDoc(example.make());
+
+// Each example drawn small, at two thirds full, for the New dialog's cards
+// (once, a frame at a time, so the dialog opens at once).
+export const exampleThumbs = signal({});
+export function drawExampleThumbs() {
+  const todo = EXAMPLES.filter((t) => !exampleThumbs.peek()[t.id]);
+  const next = () => {
+    const t = todo.shift();
+    if (!t) return;
+    const d = t.make();
+    const url = render(d, Math.round(d.frames * 0.66), { scale: 0.18, resolve }).toDataURL();
+    exampleThumbs.value = { ...exampleThumbs.peek(), [t.id]: url };
+    requestAnimationFrame(next);
+  };
+  requestAnimationFrame(next);
+}
 
 export function setName(raw) {
   const name = raw.trim().slice(0, 80) || 'Untitled bar';
@@ -894,8 +1076,105 @@ let brushStroke = null;
 let drag = null;
 
 export function pickTool(id) {
+  if (tool.value === 'pen' && id !== 'pen') penFinish();
   tool.value = id;
   draw();
+}
+
+// ─── The pen ────────────────────────────────────────────────────────────
+// Click to place points; drag from a point to curve it (its handles). Click
+// the first point (or press Enter) to close the shape, Esc to drop it,
+// Backspace to take the last point back. The finished path is a shape layer
+// ('path') like any other: moved, resized, filled, outlined and styled.
+
+export const penPoints = signal([]); // [{ x, y, out: [dx, dy] | null }] in picture pixels
+let penDrag = null;
+
+function penDown(p, event) {
+  const pts = penPoints.value;
+  const first = pts[0];
+  // Back on the first point: closed.
+  if (first && pts.length > 2 && Math.hypot(p.x - first.x, p.y - first.y) < 10 * unit()) return penFinish(true);
+  const at = snapPoint(p, null, event);
+  penPoints.value = [...pts, { x: at.x, y: at.y, out: null }];
+  penDrag = { start: at };
+  const move = (e) => {
+    const q = toDoc(e);
+    const dx = q.x - penDrag.start.x;
+    const dy = q.y - penDrag.start.y;
+    if (Math.hypot(dx, dy) < 3 * unit()) return;
+    const list = [...penPoints.value];
+    list[list.length - 1] = { ...list.at(-1), out: [dx, dy] };
+    penPoints.value = list;
+    drawSelection();
+  };
+  const up = () => {
+    penDrag = null;
+    removeEventListener('pointermove', move);
+    removeEventListener('pointerup', up);
+  };
+  addEventListener('pointermove', move);
+  addEventListener('pointerup', up);
+  drawSelection();
+}
+
+/** The path through `pts` as SVG data (absolute picture pixels); curves where a point has handles. */
+function penPathData(pts, closed, map = (x, y) => [x, y]) {
+  if (!pts.length) return '';
+  const f = (v) => Math.round(v * 100) / 100;
+  const P = (x, y) => map(x, y).map(f).join(' ');
+  let d = `M${P(pts[0].x, pts[0].y)}`;
+  const seg = (a, b) => {
+    if (!a.out && !b.out) return `L${P(b.x, b.y)}`;
+    const c1 = a.out ? [a.x + a.out[0], a.y + a.out[1]] : [a.x, a.y];
+    const c2 = b.out ? [b.x - b.out[0], b.y - b.out[1]] : [b.x, b.y];
+    return `C${P(...c1)} ${P(...c2)} ${P(b.x, b.y)}`;
+  };
+  for (let i = 1; i < pts.length; i++) d += seg(pts[i - 1], pts[i]);
+  if (closed && pts.length > 2) d += `${seg(pts.at(-1), pts[0])}Z`;
+  return d;
+}
+
+/** Ends the pen: a shape layer if there's a shape to make, closed or open. */
+export function penFinish(closed = false) {
+  const pts = penPoints.value;
+  penPoints.value = [];
+  if (pts.length < 2) return drawSelection();
+  // The box round the points and their handles' pulls.
+  const xs = pts.flatMap((q) => [q.x, ...(q.out ? [q.x + q.out[0], q.x - q.out[0]] : [])]);
+  const ys = pts.flatMap((q) => [q.y, ...(q.out ? [q.y + q.out[1], q.y - q.out[1]] : [])]);
+  const x = Math.min(...xs);
+  const y = Math.min(...ys);
+  const w = Math.max(1, Math.max(...xs) - x);
+  const h = Math.max(1, Math.max(...ys) - y);
+  const d = penPathData(pts, closed, (px, py) => [((px - x) / w) * 100, ((py - y) / h) * 100]);
+  const open = !closed || pts.length < 3;
+  addLayer(
+    newShape('path', {
+      x: Math.round(x),
+      y: Math.round(y),
+      w: Math.round(w),
+      h: Math.round(h),
+      d,
+      closed: !open,
+      name: open ? 'Line' : 'Path',
+      fillOn: !open,
+      stroke: open ? 8 : 0,
+      strokeColor: '#FFFFFF',
+    }),
+  );
+  tool.value = 'move';
+  draw();
+}
+
+export function penCancel() {
+  penPoints.value = [];
+  drawSelection();
+}
+
+export function penUndo() {
+  penPoints.value = penPoints.value.slice(0, -1);
+  drawSelection();
 }
 
 function toDoc(event) {
@@ -968,8 +1247,9 @@ export function pointerDown(event) {
     tool.value = 'move';
     return draw();
   }
-  if (t === 'shape') {
-    const kind = shapeKind.value;
+  if (t === 'pen') return penDown(p, event);
+  if (t === 'shape' || t === 'bar') {
+    const kind = t === 'bar' ? barKind.value : shapeKind.value;
     const start = snapPoint(p, null, event);
     const layer = makeShape(kind, { x: start.x, y: start.y, w: 1, h: 1 });
     addLayer(layer);
@@ -1017,7 +1297,7 @@ export function pointerMove(event) {
     let w = Math.abs(p.x - drag.start.x);
     let h = Math.abs(p.y - drag.start.y);
     // Rings are round; Shift makes anything square.
-    if (drag.shape === 'ring' || event.shiftKey) w = h = Math.max(w, h);
+    if (SQUARE.has(drag.shape) || event.shiftKey) w = h = Math.max(w, h);
     const box = {
       x: Math.round(p.x < drag.start.x ? drag.start.x - w : drag.start.x),
       y: Math.round(p.y < drag.start.y ? drag.start.y - h : drag.start.y),
@@ -1090,7 +1370,47 @@ export function zoomBy(k) {
 
 export function zoomTo(value) {
   zoom.value = value;
+  pan.value = { x: 0, y: 0 };
   draw();
+}
+
+// ─── Panning ────────────────────────────────────────────────────────────
+// A middle-drag moves the view: it scrolls while there's somewhere to
+// scroll, and past that moves the picture itself, so it can be panned even
+// while it fits. Fit (Ctrl+0) centres it again.
+
+export const pan = signal({ x: 0, y: 0 });
+
+export function startPan(event, area, after = () => {}) {
+  if (event.button !== 1 || !area) return;
+  event.preventDefault();
+  event.stopPropagation();
+  area.classList.add('is-panning');
+  let x = event.clientX;
+  let y = event.clientY;
+  const move = (e) => {
+    const dx = e.clientX - x;
+    const dy = e.clientY - y;
+    x = e.clientX;
+    y = e.clientY;
+    // Scroll first; what scrolling can't take moves the picture.
+    const sl = area.scrollLeft;
+    const st = area.scrollTop;
+    area.scrollLeft -= dx;
+    area.scrollTop -= dy;
+    const leftX = dx + (area.scrollLeft - sl);
+    const leftY = dy + (area.scrollTop - st);
+    if (leftX || leftY) pan.value = { x: pan.value.x + leftX, y: pan.value.y + leftY };
+    after();
+  };
+  const up = () => {
+    area.classList.remove('is-panning');
+    removeEventListener('pointermove', move);
+    removeEventListener('pointerup', up);
+    after();
+  };
+  addEventListener('pointermove', move);
+  addEventListener('pointerup', up);
 }
 
 // ─── Brush ──────────────────────────────────────────────────────────────
@@ -1155,7 +1475,7 @@ function endStroke() {
 
 // ─── Keys ───────────────────────────────────────────────────────────────
 
-const TOOL_ACTIONS = { barMove: 'move', barBrush: 'brush', barEraser: 'eraser', barShape: 'shape', barText: 'text' };
+const TOOL_ACTIONS = { barMove: 'move', barBrush: 'brush', barEraser: 'eraser', barShape: 'shape', barText: 'text', barBar: 'bar', barPen: 'pen' };
 const isTyping = (el) => el?.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(el?.tagName);
 
 /** The Meter Maker's keys (rebindable: src/keybinds.js, the 'bars' and 'both' actions). */
@@ -1167,6 +1487,11 @@ export function onKey(event) {
     event.preventDefault();
     fn();
   };
+  if (tool.value === 'pen' && penPoints.value.length) {
+    if (event.key === 'Enter') return act(() => penFinish(true));
+    if (event.key === 'Escape') return act(penCancel);
+    if (event.key === 'Backspace') return act(penUndo);
+  }
   const action = actionOf(event, 'bars');
   if (action === 'undo') return act(event.shiftKey ? redo : undo);
   if (action === 'redo') return act(redo);
@@ -1552,4 +1877,95 @@ async function uploadLayered() {
   } finally {
     uploading.value = false;
   }
+}
+
+// ─── For AI tools (src/ai/registry.js meter_*) ──────────────────────────
+// The Meter Maker as an AI works it: the whole design to read and write,
+// layers to add and change by id or name, a step drawn to a picture to look
+// at, and the export. Every change is one undo step, as the user's are.
+
+const layerRef = (ref) => doc.value.layers.find((l) => l.id === ref) ?? doc.value.layers.find((l) => l.name === ref) ?? null;
+
+// Settings grouped in objects (stroke, fx, glow…) merge a level down, so
+// { fx: { shadow: { on: true } } } keeps the rest of fx.
+function deepMerge(base, patch) {
+  if (!patch || typeof patch !== 'object' || Array.isArray(patch)) return patch;
+  const out = { ...(base && typeof base === 'object' && !Array.isArray(base) ? base : {}) };
+  for (const [k, v] of Object.entries(patch)) out[k] = v && typeof v === 'object' && !Array.isArray(v) && !('stops' in v) ? deepMerge(out[k], v) : v;
+  return out;
+}
+
+/** A design (doc) put in place of the open one, made whole (normaliseDoc). */
+export function aiPutDoc(raw) {
+  const next = normaliseDoc({ ...doc.value, ...raw, layers: raw.layers ?? doc.value.layers });
+  if (!next) throw new Error('That isn’t a design: it needs layers.');
+  replaceDoc(next, frame.value, designId.value);
+  return next;
+}
+
+/** Adds a layer of `kind` (as the tools draw them) with `props` over its defaults; its id. */
+export function aiAddLayer(kind, props = {}, customId = null) {
+  const box = { x: props.x ?? 262, y: props.y ?? 412, w: props.w ?? 500, h: props.h ?? 200 };
+  let layer;
+  if (kind === 'text') layer = newText(box);
+  else if (kind === 'paint') layer = newPaint();
+  else if (kind === 'path') layer = newShape('path', box);
+  else {
+    if (kind === 'custom' && customId) customShape.value = customId;
+    layer = makeShape(kind, box);
+  }
+  layer = deepMerge(layer, props);
+  addLayer(layer);
+  return layer.id;
+}
+
+export function aiSetLayer(ref, props) {
+  const layer = layerRef(ref);
+  if (!layer) throw new Error(`No layer "${ref}". Layers: ${doc.value.layers.map((l) => `${l.name} (${l.id})`).join(', ')}`);
+  change(patchLayer(layer.id, deepMerge(layer, props)));
+  return layer.id;
+}
+
+export function aiDeleteLayer(ref) {
+  const layer = layerRef(ref);
+  if (!layer) throw new Error(`No layer "${ref}".`);
+  change({ ...doc.value, layers: doc.value.layers.filter((l) => l.id !== layer.id) });
+  return layer.id;
+}
+
+export function aiNew({ frames, start = 'bar', example } = {}) {
+  if (example) {
+    const t = EXAMPLES.find((x) => x.id === example);
+    if (!t) throw new Error(`No example "${example}": ${EXAMPLES.map((x) => x.id).join(', ')}`);
+    useExample(t);
+  } else {
+    if (frames) newSteps.value = clamp(Math.round(frames), 1, MAX_FRAMES);
+    newStart.value = start;
+    createNew();
+  }
+}
+
+/** Step(s) drawn as one PNG data URL (several side by side), at `scale` of full size. */
+export async function aiPicture({ steps, scale = 0.5, part } = {}) {
+  await loadAll();
+  const d = doc.value;
+  const list = (steps?.length ? steps : [frame.value]).map((k) => clamp(Math.round(k), 0, d.frames));
+  const w = Math.round(d.width * scale);
+  const h = Math.round(d.height * scale);
+  const sheet = Object.assign(document.createElement('canvas'), { width: w * list.length, height: h });
+  const ctx = sheet.getContext('2d');
+  // The checkerboard of see-through, as the editor shows it.
+  for (let y = 0; y < h; y += 16) for (let x = 0; x < sheet.width; x += 16) {
+    ctx.fillStyle = (x / 16 + y / 16) % 2 ? '#2a2a2a' : '#1e1e1e';
+    ctx.fillRect(x, y, 16, 16);
+  }
+  list.forEach((k, i) => ctx.drawImage(render(d, k, { resolve, scale, ...(part ? { part } : {}) }), i * w, 0));
+  return { url: sheet.toDataURL('image/png'), steps: list };
+}
+
+/** Sets the skill's settings (name, tag, style…) and makes the skill if the IDs are there. */
+export async function aiSkillSettings(patch = {}) {
+  for (const [k, v] of Object.entries(patch)) if (v !== undefined) setJjs(k, v);
+  await refreshSkill();
+  return { code: skillCode.value, missing: skillNote.value };
 }

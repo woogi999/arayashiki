@@ -168,7 +168,7 @@ body.is-moving * {
 
 .key-row.is-picked {
   background: var(--row-selected);
-  box-shadow: inset 0 0 0 1px #4a4a4a;
+  box-shadow: inset 0 0 0 1px var(--g29);
 }
 
 .key-n {
@@ -183,7 +183,7 @@ body.is-moving * {
 
 .key-row.is-picked .key-n {
   background: var(--widget-on);
-  color: #fff;
+  color: var(--g100);
 }
 
 .key-vec,
@@ -267,7 +267,7 @@ body.is-moving * {
 
 .chip[aria-pressed='true'] {
   background: var(--widget-on);
-  color: #fff;
+  color: var(--g100);
 }
 
 /* The Nodes panel's Animate menu: one column. */
@@ -297,7 +297,7 @@ body.is-moving * {
 
 .head-btn.is-on {
   background: var(--widget-on);
-  color: #fff;
+  color: var(--g100);
 }
 
 /* The first focus in a dialog goes to the dialog, not its close button. */
@@ -357,7 +357,7 @@ body.is-moving * {
 
 .ex-nav button[aria-selected='true'] {
   background: var(--widget);
-  color: #fff;
+  color: var(--g100);
 }
 
 .ex-nav-note {
@@ -522,7 +522,7 @@ body.is-moving * {
 .ex-chip-swatch {
   width: 18px;
   height: 18px;
-  border: 1px solid rgb(255 255 255 / 25%);
+  border: 1px solid rgb(var(--fg-rgb) / 25%);
   border-radius: 50%;
   cursor: pointer;
 }
@@ -578,16 +578,16 @@ body.is-moving * {
   overflow: hidden;
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  background: #111;
+  background: var(--g7);
 }
 
 .ex-preview-frame.is-alpha {
-  background-color: #2a2a2a;
+  background-color: var(--g16);
   background-image:
-    linear-gradient(45deg, #333 25%, transparent 25%),
-    linear-gradient(-45deg, #333 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, #333 75%),
-    linear-gradient(-45deg, transparent 75%, #333 75%);
+    linear-gradient(45deg, var(--g20) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--g20) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--g20) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--g20) 75%);
   background-position:
     0 0,
     0 8px,
@@ -857,4 +857,161 @@ body.is-moving * {
 .eg-nums {
   display: inline-flex;
   gap: 3px;
+}
+
+/* ─── Themes (Settings → Appearance) ─────────────────────────────────── */
+
+.theme-picker {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.theme-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 8px;
+}
+
+.theme-card {
+  display: grid;
+  gap: 5px;
+  padding: 6px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--text-sm);
+  text-align: left;
+  cursor: pointer;
+}
+
+.theme-card:hover {
+  border-color: var(--focus);
+}
+
+.theme-card[aria-checked='true'] {
+  border-color: var(--sel-line);
+  box-shadow: inset 0 0 0 1px var(--sel-line);
+}
+
+.theme-swatch {
+  display: grid;
+  grid-template-columns: 30% 1fr;
+  gap: 3px;
+  height: 46px;
+  padding: 3px;
+  border: 1px solid;
+  border-radius: 5px;
+}
+
+.theme-swatch > span {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 5px;
+  border-radius: 3px;
+}
+
+.theme-swatch i {
+  display: block;
+  width: 70%;
+  height: 4px;
+  border-radius: 2px;
+}
+
+.theme-swatch i + i {
+  width: 40%;
+}
+
+.theme-swatch.is-custom {
+  display: grid;
+  place-items: center;
+  border-color: var(--line-strong);
+  border-style: dashed;
+  color: var(--text-2);
+}
+
+.theme-custom {
+  display: grid;
+  gap: 4px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.theme-colour {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.theme-colour input[type='color'] {
+  width: 44px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: none;
+}
+
+/* The AI's memories (Settings → AI). */
+.memory-list {
+  display: grid;
+  gap: 2px;
+  max-height: 260px;
+  margin: 6px 0 0;
+  padding: 0;
+  overflow: auto;
+  list-style: none;
+}
+
+.memory-list li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: var(--radius);
+  background: var(--area);
+  font-size: var(--text-sm);
+}
+
+.memory-list li > span:nth-child(2) {
+  display: grid;
+  gap: 2px;
+}
+
+.memory-list small {
+  color: var(--text-3);
+}
+
+.memory-kind {
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--widget);
+  color: var(--text-2);
+  font-size: var(--text-xs);
+}
+
+/* Plugins (Settings → Plugins). */
+.plugin-list li {
+  align-items: center;
+}
+
+.plugin-list li.is-error small {
+  color: var(--warn);
+}
+
+.plugin-version {
+  color: var(--text-3);
+  font-weight: 400;
+}
+
+.mono-path {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  word-break: break-all;
+  user-select: text;
 }

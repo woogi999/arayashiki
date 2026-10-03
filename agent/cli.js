@@ -8,6 +8,7 @@
 //           [--ult] [--bar N] [--from BRANCH] [--seed N] [--distance N]
 //           [--wall N] [--max N] [--events|--full]
 //   sbs validate <code|file>
+//   sbs lint <code|file> [skill] [--fast] [--ignore rule,rule]   bugs and tips, like a code linter
 //   sbs encode <skills.json>            (a JSON array of skills, or one skill)
 //   sbs nodes [KIND]
 //   sbs template [CATEGORY]
@@ -90,6 +91,18 @@ async function main() {
       const result = await T.validate({ code: codeArg(rest[0]) });
       out(result);
       process.exitCode = result.ok ? 0 : 1;
+      return;
+    }
+    case 'lint': {
+      const ignoreAt = rest.indexOf('--ignore');
+      const result = await T.lint({
+        code: codeArg(rest[0]),
+        select: rest[1] && !rest[1].startsWith('--') ? rest[1] : undefined,
+        simulate: !flags.has('fast'),
+        ignore: ignoreAt >= 0 ? String(rest[ignoreAt + 1] ?? '').split(',').filter(Boolean) : [],
+      });
+      out(result);
+      process.exitCode = result.errors ? 1 : 0;
       return;
     }
     case 'encode': {

@@ -22,6 +22,9 @@ fn ai_kit() {
         ("docs/jjs-skill-builder.md".into(), docs.join("jjs-skill-builder.md")),
         ("docs/USER-MANUAL.md".into(), docs.join("USER-MANUAL.md")),
         ("docs/ai-guide.md".into(), docs.join("ai/README.md")),
+        ("docs/PLUGINS.md".into(), docs.join("PLUGINS.md")),
+        ("docs/plugins/example/plugin.json".into(), docs.join("plugins/example/plugin.json")),
+        ("docs/plugins/example/main.js".into(), docs.join("plugins/example/main.js")),
     ];
     for dir in ["jjs-library", "jjs-game"] {
         let mut names: Vec<_> = std::fs::read_dir(docs.join(dir))

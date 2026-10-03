@@ -1,6 +1,6 @@
 // The small controls every panel shares, so a button, a toggle or a
 // segmented choice looks and behaves the same everywhere.
-import { useEffect, useRef } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import { Icon } from '../icons.jsx';
 
 export function IconButton({ icon, label, size = 16, class: className = '', title, ...rest }) {
@@ -101,6 +101,64 @@ export function KindChip({ color, icon, size = 13 }) {
   return (
     <span class="kind-chip" style={{ '--kind': color }} aria-hidden="true">
       <Icon name={icon} size={size} />
+    </span>
+  );
+}
+
+/**
+ * A slider's value that you can click to type, as in Blender or Photoshop:
+ * Enter or leaving the field sets it, Esc puts it back. A typed number may go
+ * past the slider's ends (the slider only covers the usual range).
+ */
+export function TypeValue({ value, unit = '', onSet, label, min, max, class: className = '' }) {
+  const [draft, setDraft] = useState(null);
+  const input = useRef(null);
+  useEffect(() => {
+    if (draft !== null) input.current?.select();
+  }, [draft !== null]);
+  const commit = () => {
+    if (draft === null) return;
+    const n = Number(String(draft).replace(',', '.'));
+    setDraft(null);
+    if (Number.isFinite(n) && n !== Number(value)) onSet(n);
+  };
+  if (draft !== null)
+    return (
+      <input
+        ref={input}
+        class={`input num type-value is-editing ${className}`}
+        aria-label={label}
+        value={draft}
+        onInput={(e) => setDraft(e.currentTarget.value)}
+        onBlur={commit}
+        onKeyDown={(e) => {
+          e.stopPropagation();
+          if (e.key === 'Enter') commit();
+          else if (e.key === 'Escape') setDraft(null);
+        }}
+      />
+    );
+  const shown = typeof value === 'number' && !Number.isInteger(value) ? Math.round(value * 1000) / 1000 : value;
+  return (
+    <button
+      type="button"
+      class={`type-value ${className}`}
+      title={`Click to type a value${min != null && max != null ? ` (the slider goes ${min} to ${max})` : ''}`}
+      aria-label={`${label ?? 'Value'}: ${shown}${unit}. Click to type`}
+      onClick={() => setDraft(String(shown))}
+    >
+      {shown}
+      {unit}
+    </button>
+  );
+}
+
+/** A range slider with its value beside it, typed by clicking it. */
+export function RangeValue({ min, max, step = 1, value, unit = '', onChange, label }) {
+  return (
+    <span class="range-value">
+      <input type="range" min={min} max={max} step={step} value={value} aria-label={label} onInput={(e) => onChange(Number(e.currentTarget.value))} />
+      <TypeValue value={value} unit={unit} label={label} min={min} max={max} onSet={onChange} />
     </span>
   );
 }

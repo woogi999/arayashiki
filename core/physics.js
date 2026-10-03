@@ -64,7 +64,6 @@ class Body {
     this.vel = [...vel];
     this.yaw = yaw;
     this.pushes = []; // { t0, t1, v: world velocity, fade }
-    this.teleports = []; // { t, pos }
     this.grabs = []; // { t0, t1, anchor(step) → pos, from: Body }
     this.pendingRagdoll = null; // { start, seconds, true, counting: t | null }
     this.ragdolls = []; // finished: { t0, t1, landed }
@@ -91,11 +90,6 @@ class Body {
   }
 
   step(t, dt, world) {
-    // Teleports land exactly on their step.
-    while (this.teleports.length && this.teleports[0].t <= t + 1e-9) {
-      this.pos = [...this.teleports.shift().pos];
-      this.vel = [0, 0, 0];
-    }
     const grab = this.grabs.find((g) => t >= g.t0 && t < g.t1);
     if (grab) {
       this.pos = grab.anchor();
@@ -244,7 +238,12 @@ export class World {
     this.advanceTo(t);
     const b = this.bodies[who];
     for (const p of b.pushes) if (p.t1 > t) p.t1 = Math.max(p.t0, t);
-    b.teleports.push({ t, pos: [...pos] });
+    // At once: JJS runs a line's nodes in the same frame, so a HITBOX (or
+    // anything) right after the TELEPORT already finds them where it put
+    // them, not where they were.
+    b.pos = [...pos];
+    b.vel = [0, 0, 0];
+    b.grounded = b.pos[1] <= 1e-6;
   }
 
   /** `who` held at `by`'s body part (with an offset in `by`'s frame) from t0 to t1. */

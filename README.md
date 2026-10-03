@@ -177,13 +177,17 @@ launch, downloads a newer `arayashiki.exe` in the background, and swaps it in
 when you restart, or at the next launch. The setup's link never changes:
 `https://github.com/woogi999/arayashiki/releases/latest/download/Arayashiki-Setup.exe`.
 
-**Releasing.** Bump the version in `package.json`, `src-tauri/tauri.conf.json`
-and `src-tauri/Cargo.toml`, add its section to `CHANGELOG.md`, and run
-`npm run release` (with `-- --publish` and a `GITHUB_TOKEN`, it makes the
-GitHub release too). Publish a release tagged `vX.Y.Z` with `arayashiki.exe`
-and `Arayashiki-Setup.exe` attached: installed copies update to it by
-themselves. (`npx tauri build` still makes the old NSIS installer, in
-`src-tauri/target/release/bundle/nsis/`, if it's ever wanted.)
+**Releasing.** Add a `## X.Y.Z` section to the top of `CHANGELOG.md` and run
+`npm run release`: it reads that heading as the version, bumps
+`package.json`, `src-tauri/tauri.conf.json` and `src-tauri/Cargo.toml` to
+match, builds, and gathers the files (with `-- --publish` and a
+`GITHUB_TOKEN`, it makes the GitHub release too). Publish a release tagged
+`vX.Y.Z` with `arayashiki.exe` and `Arayashiki-Setup.exe` attached: installed
+copies update to it by themselves. (`npx tauri build` still makes the old
+NSIS installer, in `src-tauri/target/release/bundle/nsis/`, if it's ever
+wanted.) `update-release.bat` runs the whole thing for you once the
+changelog section is written (it asks for a `GITHUB_TOKEN` once and keeps it
+in `release/github-token.txt`, which stays out of git).
 
 For agents working from the repo:
 

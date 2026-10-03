@@ -7,6 +7,7 @@ import * as B from './barmaker/state.js';
 import { bindingOf } from './keybinds.js';
 import { requestExit } from './exit.js';
 import { setAppearance, appearance, BACKGROUNDS } from './prefs.js';
+import { THEMES, setTheme } from './theme.js';
 import { resetLayout } from './ui/dock.jsx';
 import { startTour } from './onboarding.js';
 import { openUpdates } from './updates.js';
@@ -102,10 +103,13 @@ export const COMMANDS = [
   { id: 'saveLayout', title: 'Save the panel layout…', group: 'Workspace', icon: 'save', keywords: 'panels dock layout workspace save keep preset', run: dialog('save-layout') },
   { id: 'search', title: 'Search everything', group: 'Help', icon: 'command', keywords: 'search find command palette', run: () => import('./ui/search.jsx').then((m) => m.openSearch()) },
   { id: 'assistant', title: 'AI assistant', group: 'AI', icon: 'bot', keywords: 'ai chat assistant claude gpt gemini help', run: () => assistant().then((m) => m.toggleAssistant()) },
+  { id: 'lint', title: 'Check the moveset for problems (linter)', group: 'Skills', icon: 'warning', keywords: 'lint linter check problems bugs errors warnings mistakes tips validate', run: () => import('./linter.js').then((m) => (m.showProblems(), m.runLint({ full: true }))) },
   { id: 'connectAi', title: 'Connect an AI app (MCP)', group: 'AI', icon: 'plug', keywords: 'mcp claude desktop cursor vscode codex connect', run: dialog('connect-ai') },
   { id: 'tour', title: 'Quick tour (where everything is)', group: 'Help', icon: 'sparkles', keywords: 'onboarding quick start guide tour welcome intro tutorial walkthrough basics', run: startTour },
   { id: 'checkUpdates', title: 'Check for updates', group: 'Help', icon: 'refresh', keywords: 'update upgrade new version release github download install', run: openUpdates },
   { id: 'changelog', title: 'What’s new (changelog)', group: 'Help', icon: 'file-text', keywords: 'changelog changes release notes version history new', run: dialog('changelog') },
+  { id: 'plugins', title: 'Plugins', group: 'Help', icon: 'puzzle', keywords: 'plugins mods extensions addons reload', run: () => ((S.settingsTab.value = 'plugins'), (S.dialog.value = 'settings')) },
+  { id: 'reloadPlugins', title: 'Reload plugins', group: 'Help', icon: 'refresh', keywords: 'plugins mods reload refresh', run: () => import('./plugins.js').then((m) => m.loadPlugins()) },
   { id: 'manual', title: 'User manual', group: 'Help', icon: 'help', keywords: 'help manual guide how docs', run: dialog('manual') },
   { id: 'settings', title: 'Settings', group: 'Settings', icon: 'settings', keywords: 'preferences options', run: dialog('settings') },
   { id: 'keybinds', title: 'Keyboard shortcuts', group: 'Settings', icon: 'keyboard', keywords: 'keys hotkeys shortcuts bindings', run: () => ((S.settingsTab.value = 'keys'), (S.dialog.value = 'settings')) },
@@ -127,6 +131,15 @@ export const COMMANDS = [
     const i = BACKGROUNDS.findIndex(([v]) => v === appearance.peek().viewportBg);
     setAppearance({ viewportBg: BACKGROUNDS[(i + 1) % BACKGROUNDS.length][0] });
   } },
+  ...THEMES.map((t) => ({
+    id: `theme-${t.id}`,
+    title: `Theme: ${t.label}`,
+    group: 'Settings',
+    icon: t.scheme === 'light' ? 'sun' : 'moon',
+    keywords: `theme colours colors ${t.id} ${t.label} light dark mode appearance`,
+    run: () => setTheme(t.id),
+    checked: () => (appearance.peek().theme ?? 'dark') === t.id,
+  })),
   ...BACKGROUNDS.map(([value, label]) => ({
     id: `bg${value}`,
     title: `Viewport background: ${label}`,

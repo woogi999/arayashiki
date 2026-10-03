@@ -16,9 +16,13 @@ says what each file is.
   `simulate` (what happens: hits, branches run, log with node indexes).
 - Something broken → `validate`, then `simulate` with the conditions that
   fail (`hits`, `conditions` AIR/JUMP/HOLD/ULT/BAR, `start` a branch).
-- A new move → `search_library` → `get_library_move` for the closest real
-  move; adapt its structure and numbers; `node_reference` for fields;
-  `simulate` until it works; `validate`; `encode`.
+- A new move → work out what it should do; `search_library` /
+  `get_library_move` for real moves that do similar things, as references
+  (how JJS does each part, the usual numbers), not templates to copy;
+  `node_reference` for fields; `simulate` until it works; `lint`; `encode`.
+- A move that needs a bar → the Meter Maker tools (`meter_new`,
+  `meter_add_layer`, `meter_screenshot`, `meter_publish`), then TAG nodes in
+  the moves that fill or empty it.
 - A rule or field meaning → `handbook` with a query; a node's fields,
   defaults and the game's lists → `node_reference`.
 - An animation or sound from the base game → `game_assets`.
